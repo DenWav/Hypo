@@ -1,0 +1,32 @@
+[versions]
+junit = "5.7.1"
+errorprone = "2.6.0"
+asm = "9.1"
+
+[libraries]
+# Deps
+annotations = "org.jetbrains:annotations:20.1.0"
+
+asm-core = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
+asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
+
+lorenz = "org.cadixdev:lorenz:0.5.7"
+bombe = "org.cadixdev:bombe:0.3.4"
+jgrapht = "org.jgrapht:jgrapht-core:1.4.0"
+lorenzTiny = "org.quiltmc:lorenz-tiny:3.0.0"
+
+# Testing
+junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-runtime = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
+
+# Linting
+errorprone-core = { module = "com.google.errorprone:error_prone_core", version.ref = "errorprone" }
+errorprone-annotations = { module = "com.google.errorprone:error_prone_annotations", version.ref = "errorprone" }
+
+# Gradle
+gradle-errorprone = "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:2.0.1"
+gradle-licenser = "org.cadixdev.licenser:org.cadixdev.licenser.gradle.plugin:0.5.1"
+
+[bundles]
+asm = [ "asm-core", "asm-util" ]

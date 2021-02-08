@@ -1,0 +1,28 @@
+# IntelliJ
+.idea/
+
+out/
+*.iml
+*.ipr
+*.iws
+
+# Allow a couple useful files
+!.idea/inspectionProfiles/
+
+# Gradle
+.gradle/
+build/
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.zip
+
+hs_err_pid*
+
+# Mac
+.DS_Store
+
+!gradle/wrapper/gradle-wrapper.jar

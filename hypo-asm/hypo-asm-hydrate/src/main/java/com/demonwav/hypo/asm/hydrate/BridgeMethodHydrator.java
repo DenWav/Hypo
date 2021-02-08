@@ -1,0 +1,168 @@
+/*
+ * Hypo, an extensible and pluggable Java bytecode analytical model.
+ *
+ * Copyright (C) 2021  Kyle Wood (DemonWav)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+package com.demonwav.hypo.asm.hydrate;
+
+import com.demonwav.hypo.asm.AsmMethodData;
+import com.demonwav.hypo.core.HypoContext;
+import com.demonwav.hypo.hydrate.HydrationProvider;
+import com.demonwav.hypo.hydrate.generic.HypoHydration;
+import com.demonwav.hypo.model.data.MethodData;
+import com.demonwav.hypo.model.data.MethodDescriptor;
+import java.io.IOException;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.VarInsnNode;
+
+/**
+ * {@link HydrationProvider} for determining synthetic bridge method targets and sources on {@link AsmMethodData}
+ * objects.
+ *
+ * <p>This class fills in {@link HypoHydration#SYNTHETIC_SOURCE} and {@link HypoHydration#SYNTHETIC_TARGET} keys on
+ * {@link AsmMethodData} objects.
+ */
+public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
+
+    private BridgeMethodHydrator() {}
+
+    /**
+     * Create a new instance of {@link BridgeMethodHydrator}.
+     * @return A new instance of {@link BridgeMethodHydrator}.
+     */
+    @Contract(value = "-> new", pure = true)
+    public static @NotNull BridgeMethodHydrator create() {
+        return new BridgeMethodHydrator();
+    }
+
+    @Override
+    public @NotNull Class<? extends AsmMethodData> target() {
+        return AsmMethodData.class;
+    }
+
+    @Override
+    public void hydrate(@NotNull AsmMethodData data, @NotNull HypoContext context) throws IOException {
+        if (!data.isSynthetic() || !data.isBridge() || data.name().indexOf('$') != -1) {
+            return;
+        }
+
+        State state = State.IN_PARAMS;
+        int nextLvt = 0;
+
+        @Nullable MethodInsnNode invokeInsn = null;
+
+        for (final AbstractInsnNode insn : data.getNode().instructions) {
+            if ((insn instanceof LabelNode) || (insn instanceof LineNumberNode) || (insn instanceof TypeInsnNode)) {
+                continue;
+            }
+
+            if (state == State.IN_PARAMS) {
+                if (!(insn instanceof VarInsnNode) || ((VarInsnNode) insn).var != nextLvt) {
+                    state = State.INVOKE;
+                }
+            }
+
+            final int opcode = insn.getOpcode();
+            switch (state) {
+                case IN_PARAMS:
+                    nextLvt++;
+                    if (opcode == Opcodes.LLOAD || opcode == Opcodes.DLOAD) {
+                        nextLvt++;
+                    }
+                    break;
+                case INVOKE:
+                    // Must be a virtual or interface invoke instruction
+                    if ((opcode != Opcodes.INVOKEVIRTUAL && opcode != Opcodes.INVOKEINTERFACE) || !(insn instanceof MethodInsnNode)) {
+                        return;
+                    }
+
+                    invokeInsn = (MethodInsnNode) insn;
+                    state = State.RETURN;
+                    break;
+                case RETURN:
+                    // The next instruction must be a return
+                    if (opcode < Opcodes.IRETURN || opcode > Opcodes.RETURN) {
+                        return;
+                    }
+
+                    state = State.OTHER_INSN;
+                    break;
+                case OTHER_INSN:
+                    // We shouldn't see any other instructions
+                    return;
+            }
+        }
+
+        if (invokeInsn == null) {
+            return;
+        }
+        final @NotNull MethodInsnNode invoke = invokeInsn;
+
+        if (invoke.name.indexOf('$') != -1) {
+            // not a bridge method
+            return;
+        }
+
+        // Must be a method in the same class with a different signature
+        if (!data.parentClass().getNode().name.equals(invoke.owner) || (data.name().equals(invoke.name) && data.getNode().desc.equals(invoke.desc))) {
+            return;
+        }
+
+        // The descriptors need to be the same size
+        final MethodDescriptor invokeDesc = MethodDescriptor.parseDescriptor(invoke.desc);
+        if (data.params().size() != invokeDesc.getParams().size()) {
+            return;
+        }
+
+        final MethodData targetMethod = data.parentClass().method(invoke.name, invokeDesc);
+        if (targetMethod == null) {
+            return;
+        }
+
+        data.store(HypoHydration.SYNTHETIC_TARGET, targetMethod);
+        targetMethod.store(HypoHydration.SYNTHETIC_SOURCE, data);
+    }
+
+    /**
+     * State for the parser in {@link #hydrate(AsmMethodData, HypoContext)}, used internally.
+     */
+    enum State {
+        /**
+         * Checking method parameter LVT indexes.
+         */
+        IN_PARAMS,
+        /**
+         * Found invoke instruction.
+         */
+        INVOKE,
+        /**
+         * Found return instruction.
+         */
+        RETURN,
+        /**
+         * After return instruction.
+         */
+        OTHER_INSN
+    }
+}
