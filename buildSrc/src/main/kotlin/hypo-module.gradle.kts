@@ -1,7 +1,4 @@
-import gradle.kotlin.dsl.accessors._06b9ce813363296770ea10098f5ef51d.compileClasspath
 import org.cadixdev.gradle.licenser.LicenseExtension
-import java.net.HttpURLConnection
-import java.net.URL
 
 plugins {
     `java-library`
@@ -9,8 +6,14 @@ plugins {
     id("org.cadixdev.licenser")
 }
 
-java {
-    withJavadocJar()
+val hypoModule = extensions.create("hypoModule", HypoModuleExtension::class)
+
+afterEvaluate {
+    if (hypoModule.enableJavadoc.get()) {
+        java {
+            withJavadocJar()
+        }
+    }
 }
 
 repositories {

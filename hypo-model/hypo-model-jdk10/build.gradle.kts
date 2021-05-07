@@ -11,3 +11,7 @@ dependencies {
 tasks.withType<JavaCompile>().configureEach {
     options.release.set(10)
 }
+
+hypoModule {
+    enableJavadoc.set(false)
+}
