@@ -29,6 +29,10 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           ORG_GRADLE_PROJECT_wavJfrogUsername: ${{ secrets.WAV_JFROG_USERNAME }}
           ORG_GRADLE_PROJECT_wavJfrogPassword: ${{ secrets.WAV_JFROG_PASSWORD }}
+      - name: Get tag name
+        id: get_tag
+        shell: bash
+        run: echo ::set-output name=tag::$tag_name
       - name: Generate release changelog
         id: generate-release-changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.1.1
@@ -41,8 +45,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          name: 'Release ${{ github.ref }}'
+          tag_name: ${{ steps.get_tag.outputs.tag }}
+          name: 'Release ${{ steps.get_tag.outputs.tag }}'
           body: ${{ steps.generate-release-changelog.outputs.changelog }}
           prerelease: false
           draft: false
