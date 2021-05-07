@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Manager for the mappings completion process. Mappings completion is the combination of bytecode analysis with
- * {@code hypo-model} and {@code hypo-hydration} with mappings analysis using
+ * {@code hypo-model} and {@code hypo-hydrate} with mappings analysis using
  * {@link ChangeContributor change contributors}.
  *
  * <p>Classes which implement {@link ChangeContributor} run on {@link ClassData} in a {@link HypoContext} along with the
