@@ -1,6 +1,6 @@
 plugins {
-    `maven-publish`
     signing
+    `maven-publish`
 }
 
 val extension: HypoPublishingExtension = extensions.create("hypoPublish", HypoPublishingExtension::class)
@@ -58,25 +58,19 @@ publishing {
             }
         }
     }
-
-    repositories {
-        maven("https://wav.jfrog.io/artifactory/repo/") {
-            credentials(PasswordCredentials::class)
-            name = "wavJfrog"
-        }
-    }
 }
 
-val wavJfrogUsername = providers.gradleProperty("wavJfrogUsername").forUseAtConfigurationTime()
-val wavJfrogPassword = providers.gradleProperty("wavJfrogPassword").forUseAtConfigurationTime()
+// Don't configure signing unless this is present
+val sonatypeUsername = providers.gradleProperty("sonatypeUsername").forUseAtConfigurationTime()
+val sonatypePassword = providers.gradleProperty("sonatypePassword").forUseAtConfigurationTime()
 
 val gpgSigningKey = providers.environmentVariable("GPG_SIGNING_KEY").forUseAtConfigurationTime()
 val gpgPassphrase = providers.environmentVariable("GPG_PASSPHRASE").forUseAtConfigurationTime()
 
-if (wavJfrogUsername.isPresent && wavJfrogPassword.isPresent) {
+if (sonatypeUsername.isPresent && sonatypePassword.isPresent) {
     signing {
         setRequired {
-            !isSnapshot && gradle.taskGraph.hasTask("publishMavenPublicationToWavJfrogRepository")
+            !isSnapshot && gradle.taskGraph.hasTask("publishToSonatype")
         }
 
         if (gpgSigningKey.isPresent && gpgPassphrase.isPresent) {
