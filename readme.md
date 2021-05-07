@@ -24,6 +24,18 @@ logic.
 
 Releases of Hypo are deployed to Maven Central.
 
+> <details>
+> <summary>Using SNAPSHOT versions</summary>
+> 
+> You can also use the latest SNAPSHOT commit to `main` with Sonatype's snapshot repo:
+> 
+> ```kotlin
+> repositories {
+>     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+> }
+> ```
+> </details>
+
 The easiest way to use Hypo is to use `hypo-platform` to keep the multiple versions of the artifacts in sync for you.
 
 If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.

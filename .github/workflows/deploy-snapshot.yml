@@ -2,6 +2,14 @@ name: Deploy Snapshot
 on:
   push:
     branches: ['main']
+    paths-ignore:
+      - '.idea/**'
+      - 'COPYING*'
+      - 'header.txt'
+      - 'readme.md'
+      - '.gitignore'
+      - '.gitattributes'
+      - '.editorconfig'
 
 jobs:
   deploy:
