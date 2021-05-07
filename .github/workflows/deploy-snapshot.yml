@@ -1,0 +1,40 @@
+name: Deploy Snapshot
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  deploy:
+    name: Deploy Snapshot
+    runs-on: 'ubuntu-latest'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 16
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/jdks
+            ~/.gradle/native
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - uses: gradle/wrapper-validation-action@v1
+      - name: Get project version
+        id: get_version
+        shell: bash
+        run: |
+          project_version=$(./gradlew -q --console=plain printVersion --no-daemon)
+          echo ::set-output name=version::$project_version
+      - name: Deploy snapshot version
+        if: endsWith(steps.get_version.outputs.version, '-SNAPSHOT')
+        # Don't actually run this yet until the above if is tested
+        run: echo ./gradlew -Dorg.gradle.parallel=true publishMavenPublicationToSonatypeRepository --no-daemon --stacktrace
+        env:
+          GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+          ORG_GRADLE_PROJECT_sonatypeUsername: ${{ secrets.SONATYPE_USERNAME }}
+          ORG_GRADLE_PROJECT_sonatypePassword: ${{ secrets.SONATYPE_PASSWORD }}

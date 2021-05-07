@@ -22,6 +22,8 @@ logic.
 
 ## Getting Hypo
 
+Releases of Hypo are deployed to Maven Central.
+
 The easiest way to use Hypo is to use `hypo-platform` to keep the multiple versions of the artifacts in sync for you.
 
 If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
@@ -33,7 +35,7 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > 
 > ```kotlin
 > repositories {
->     maven("https://wav.jfrog.io/artifactory/repo/")
+>     mavenCentral()
 > }
 > 
 > dependencies {
@@ -56,9 +58,7 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > 
 > ```groovy
 > repositories {
->     maven {
->         url = 'https://wav.jfrog.io/artifactory/repo/'
->     }
+>     mavenCentral()
 > }
 > 
 > dependencies {
@@ -81,13 +81,6 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > 
 > ```xml
 > <project>
->     <repositories>
->         <repository>
->             <id>demonwav</id>
->             <url>https://wav.jfrog.io/artifactory/repo/</url>
->         </repository>
->     </repositories>
-> 
 >     <dependencyManagement>
 >         <dependencies>
 >             <dependency>
