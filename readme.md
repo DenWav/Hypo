@@ -22,7 +22,9 @@ logic.
 
 ## Getting Hypo
 
-The easiest way to use Hypo is to use `hypo-bom` to keep the multiple versions of the artifacts in sync for you.
+The easiest way to use Hypo is to use `hypo-platform` to keep the multiple versions of the artifacts in sync for you.
+
+If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 
 ### Gradle Kotlin DSL
 
@@ -35,7 +37,7 @@ The easiest way to use Hypo is to use `hypo-bom` to keep the multiple versions o
 > }
 > 
 > dependencies {
->     implementation(platform("com.demonwav.hypo:hypo-bom:1.0.0"))
+>     implementation(platform("com.demonwav.hypo:hypo-platform:1.0.0"))
 >     // Whichever modules you need:
 >     implemenatation("com.demonwav.hypo:hypo-model")
 >     implemenatation("com.demonwav.hypo:hypo-core")
@@ -60,7 +62,7 @@ The easiest way to use Hypo is to use `hypo-bom` to keep the multiple versions o
 > }
 > 
 > dependencies {
->     implementation platform('com.demonwav.hypo:hypo-bom:1.0.0')
+>     implementation platform('com.demonwav.hypo:hypo-platform:1.0.0')
 >     // Whichever modules you need:
 >     implemenatation 'com.demonwav.hypo:hypo-model'
 >     implemenatation 'com.demonwav.hypo:hypo-core'
@@ -90,7 +92,7 @@ The easiest way to use Hypo is to use `hypo-bom` to keep the multiple versions o
 >         <dependencies>
 >             <dependency>
 >                 <groupId>com.demonwav.hypo</groupId>
->                 <artifactId>hypo-bom</artifactId>
+>                 <artifactId>hypo-platform</artifactId>
 >                 <version>1.0.0</version>
 >             </dependency>
 >         </dependencies>

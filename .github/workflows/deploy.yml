@@ -1,7 +1,7 @@
 name: Deploy
 on:
   push:
-    tags: ['*']
+    tags: ['v*']
 
 jobs:
   deploy:
@@ -29,3 +29,27 @@ jobs:
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
           ORG_GRADLE_PROJECT_wavJfrogUsername: ${{ secrets.WAV_JFROG_USERNAME }}
           ORG_GRADLE_PROJECT_wavJfrogPassword: ${{ secrets.WAV_JFROG_PASSWORD }}
+      - name: Generate release changelog
+        id: generate-release-changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          onlyLastTag: true
+          stripGeneratorNotice: true
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          name: 'Release ${{ github.ref }}'
+          body: ${{ steps.generate-release-changelog.outputs.changelog }}
+          prerelease: false
+          draft: false
+          files: |
+            hypo-asm/build/libs/*.jar
+            hypo-asm/hypo-asm-hydrate/build/libs/*.jar
+            hypo-core/build/libs/*.jar
+            hypo-hydrate/build/libs/*.jar
+            hypo-mappings/build/libs/*.jar
+            hypo-model/build/libs/*.jar
