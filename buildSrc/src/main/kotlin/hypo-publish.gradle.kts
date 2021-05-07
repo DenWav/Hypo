@@ -1,5 +1,6 @@
 plugins {
     `maven-publish`
+    signing
 }
 
 val extension: HypoPublishingExtension = extensions.create("hypoPublish", HypoPublishingExtension::class)
@@ -56,5 +57,34 @@ publishing {
                 }
             }
         }
+    }
+
+    repositories {
+        maven("https://wav.jfrog.io/artifactory/repo/") {
+            credentials(PasswordCredentials::class)
+            name = "wavJfrog"
+        }
+    }
+}
+
+val wavJfrogUsername = providers.gradleProperty("wavJfrogUsername").forUseAtConfigurationTime()
+val wavJfrogPassword = providers.gradleProperty("wavJfrogPassword").forUseAtConfigurationTime()
+
+val gpgSigningKey = providers.environmentVariable("GPG_SIGNING_KEY").forUseAtConfigurationTime()
+val gpgPassphrase = providers.environmentVariable("GPG_PASSPHRASE").forUseAtConfigurationTime()
+
+if (wavJfrogUsername.isPresent && wavJfrogPassword.isPresent) {
+    signing {
+        setRequired {
+            !isSnapshot && gradle.taskGraph.hasTask("publishMavenPublicationToWavJfrogRepository")
+        }
+
+        if (gpgSigningKey.isPresent && gpgPassphrase.isPresent) {
+            useInMemoryPgpKeys(gpgSigningKey.get(), gpgPassphrase.get())
+        } else {
+            useGpgCmd()
+        }
+
+        sign(publishing.publications["maven"])
     }
 }

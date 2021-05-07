@@ -9,3 +9,6 @@ fun Project.lib(name: String) =
 
 val Javadoc.opt
     get() = options as StandardJavadocDocletOptions
+
+val Project.isSnapshot
+    get() = version.toString().endsWith("-SNAPSHOT")
