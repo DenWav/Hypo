@@ -1,7 +1,7 @@
 Hypo
 ====
 
-![Version 1.0.0](https://img.shields.io/badge/Version-1.0.0-blue?logo=apache-maven&style=flat)
+[![Maven Central Version 1.0.0](https://img.shields.io/badge/Maven_Central-1.0.0-blue?logo=apache-maven&style=flat)](https://search.maven.org/search?q=g:com.demonwav.hypo)
 [![Test](https://github.com/DemonWav/Hypo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/DemonWav/Hypo/actions/workflows/test.yml)
 
 Hypo is a model for Java bytecode inspection. The main idea behind Hypo is to separate the process of determining
