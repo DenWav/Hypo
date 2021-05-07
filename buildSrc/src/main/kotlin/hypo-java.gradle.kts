@@ -37,8 +37,9 @@ afterEvaluate {
         for (projDep in hypoJava.jdkVersionProjects.get()) {
             val proj = projDep.dependencyProject
 
-            source += files(proj.sourceSets.main.map { it.allJava }).asFileTree
-            classpath += files(proj.sourceSets.main.map { it.compileClasspath })
+            val sources = files(proj.sourceSets.main.map { it.allJava })
+            source += sources.asFileTree
+            classpath += sources
         }
 
         val base = "https://javadoc.io/doc"
