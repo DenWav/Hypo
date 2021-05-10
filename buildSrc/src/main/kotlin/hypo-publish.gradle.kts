@@ -21,7 +21,7 @@ publishing {
             withoutBuildIdentifier()
 
             pom {
-                val repoUrl = "https://github.com/DemonWav/Hypo"
+                val repoUrl = "https://github.com/DenWav/Hypo"
 
                 name.set("Hypo")
                 description.set("An extensible and pluggable Java bytecode analytical model")
@@ -43,10 +43,10 @@ publishing {
 
                 developers {
                     developer {
-                        id.set("DemonWav")
+                        id.set("DenWav")
                         name.set("Kyle Wood")
-                        email.set("demonwav@gmail.com")
-                        url.set("https://github.com/DemonWav")
+                        email.set("kyle@denwav.dev")
+                        url.set("https://github.com/DenWav")
                     }
                 }
 

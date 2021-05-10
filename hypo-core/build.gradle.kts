@@ -12,7 +12,7 @@ dependencies {
 tasks.jar {
     manifest {
         attributes(
-            "Automatic-Module-Name" to "com.demonwav.hypo.core"
+            "Automatic-Module-Name" to "dev.denwav.hypo.core"
         )
     }
 }

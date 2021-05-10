@@ -1,8 +1,8 @@
 Hypo
 ====
 
-[![Maven Central Version 1.0.0](https://img.shields.io/badge/Maven_Central-1.0.0-blue?logo=apache-maven&style=flat)](https://search.maven.org/search?q=g:com.demonwav.hypo)
-[![Test](https://github.com/DemonWav/Hypo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/DemonWav/Hypo/actions/workflows/test.yml)
+[![Maven Central Version 1.0.0](https://img.shields.io/badge/Maven_Central-1.0.0-blue?logo=apache-maven&style=flat)](https://search.maven.org/search?q=g:dev.denwav.hypo)
+[![Test](https://github.com/DenWav/Hypo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/DenWav/Hypo/actions/workflows/test.yml)
 
 Hypo is a model for Java bytecode inspection. The main idea behind Hypo is to separate the process of determining
 facts about Java bytecode, and the analysis of those facts.
@@ -51,14 +51,14 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > }
 > 
 > dependencies {
->     implementation(platform("com.demonwav.hypo:hypo-platform:1.0.0"))
+>     implementation(platform("dev.denwav.hypo:hypo-platform:1.0.0"))
 >     // Whichever modules you need:
->     implemenatation("com.demonwav.hypo:hypo-model")
->     implemenatation("com.demonwav.hypo:hypo-core")
->     implemenatation("com.demonwav.hypo:hypo-hydrate")
->     implemenatation("com.demonwav.hypo:hypo-asm")
->     implemenatation("com.demonwav.hypo:hypo-asm-hydrate")
->     implemenatation("com.demonwav.hypo:hypo-mappings")
+>     implemenatation("dev.denwav.hypo:hypo-model")
+>     implemenatation("dev.denwav.hypo:hypo-core")
+>     implemenatation("dev.denwav.hypo:hypo-hydrate")
+>     implemenatation("dev.denwav.hypo:hypo-asm")
+>     implemenatation("dev.denwav.hypo:hypo-asm-hydrate")
+>     implemenatation("dev.denwav.hypo:hypo-mappings")
 > }
 > ```
 > </details>
@@ -74,14 +74,14 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > }
 > 
 > dependencies {
->     implementation platform('com.demonwav.hypo:hypo-platform:1.0.0')
+>     implementation platform('dev.denwav.hypo:hypo-platform:1.0.0')
 >     // Whichever modules you need:
->     implemenatation 'com.demonwav.hypo:hypo-model'
->     implemenatation 'com.demonwav.hypo:hypo-core'
->     implemenatation 'com.demonwav.hypo:hypo-hydrate'
->     implemenatation 'com.demonwav.hypo:hypo-asm'
->     implemenatation 'com.demonwav.hypo:hypo-asm-hydrate'
->     implemenatation 'com.demonwav.hypo:hypo-mappings'
+>     implemenatation 'dev.denwav.hypo:hypo-model'
+>     implemenatation 'dev.denwav.hypo:hypo-core'
+>     implemenatation 'dev.denwav.hypo:hypo-hydrate'
+>     implemenatation 'dev.denwav.hypo:hypo-asm'
+>     implemenatation 'dev.denwav.hypo:hypo-asm-hydrate'
+>     implemenatation 'dev.denwav.hypo:hypo-mappings'
 > }
 > ```
 > </details>
@@ -96,7 +96,7 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 >     <dependencyManagement>
 >         <dependencies>
 >             <dependency>
->                 <groupId>com.demonwav.hypo</groupId>
+>                 <groupId>dev.denwav.hypo</groupId>
 >                 <artifactId>hypo-platform</artifactId>
 >                 <version>1.0.0</version>
 >             </dependency>
@@ -106,27 +106,27 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 >     <!-- Whichever modules you need -->
 >     <dependencies>
 >         <dependency>
->             <groupId>com.demonwav.hypo</groupId>
+>             <groupId>dev.denwav.hypo</groupId>
 >             <artifactId>hypo-model</artifactId>
 >         </dependency>
 >         <dependency>
->             <groupId>com.demonwav.hypo</groupId>
+>             <groupId>dev.denwav.hypo</groupId>
 >             <artifactId>hypo-core</artifactId>
 >         </dependency>
 >         <dependency>
->             <groupId>com.demonwav.hypo</groupId>
+>             <groupId>dev.denwav.hypo</groupId>
 >             <artifactId>hypo-hydrate</artifactId>
 >         </dependency>
 >         <dependency>
->             <groupId>com.demonwav.hypo</groupId>
+>             <groupId>dev.denwav.hypo</groupId>
 >             <artifactId>hypo-asm</artifactId>
 >         </dependency>
 >         <dependency>
->             <groupId>com.demonwav.hypo</groupId>
+>             <groupId>dev.denwav.hypo</groupId>
 >             <artifactId>hypo-asm-hydrate</artifactId>
 >         </dependency>
 >         <dependency>
->             <groupId>com.demonwav.hypo</groupId>
+>             <groupId>dev.denwav.hypo</groupId>
 >             <artifactId>hypo-mappings</artifactId>
 >         </dependency>
 >     </dependencies>
@@ -152,7 +152,7 @@ classes, which come from the currently running JVM.
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import com.demonwav.hypo.model.ClassProviderRoot;
+> import ClassProviderRoot;
 > import java.nio.file.Path;
 > import java.nio.file.Paths;
 > 
@@ -179,9 +179,9 @@ Pass these roots to a `ClassDataProvider`, the default implementation is in `hyp
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import com.demonwav.hypo.asm.AsmClassDataProvider;
-> import com.demonwav.hypo.model.ClassDataProvider;
-> import com.demonwav.hypo.model.ClassProviderRoot;
+> import AsmClassDataProvider;
+> import ClassDataProvider;
+> import ClassProviderRoot;
 > 
 > public class Example {
 >     public static void main(String[] args) {
@@ -202,9 +202,9 @@ Create a `HypoContext` using the providers you created:
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import com.demonwav.hypo.asm.AsmClassDataProvider;
-> import com.demonwav.hypo.core.HypoContext;
-> import com.demonwav.hypo.model.ClassProviderRoot;
+> import AsmClassDataProvider;
+> import HypoContext;
+> import ClassProviderRoot;
 > import java.nio.file.Path;
 > import java.nio.file.Paths;
 > 
@@ -242,9 +242,9 @@ classes available. This data model is not fully complete yet however, as it has 
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import com.demonwav.hypo.asm.AsmClassDataProvider;
-> import com.demonwav.hypo.core.HypoContext;
-> import com.demonwav.hypo.model.ClassProviderRoot;
+> import AsmClassDataProvider;
+> import HypoContext;
+> import ClassProviderRoot;
 > import java.nio.file.Path;
 > import java.nio.file.Paths;
 > 
@@ -283,8 +283,8 @@ Create the default implementation of `HydrationManager` and hydrate your `HypoCo
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import com.demonwav.hypo.core.HypoContext;
-> import com.demonwav.hypo.hydrate.HydrationManager;
+> import HypoContext;
+> import HydrationManager;
 > 
 > public class Example {
 >     public static void main(String[] args) {
@@ -308,10 +308,10 @@ these objects using `HypoKey`s.
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import com.demonwav.hypo.asm.hydrate.BridgeMethodHydrator;
-> import com.demonwav.hypo.core.HypoContext;
-> import com.demonwav.hypo.hydrate.generic.HypoHydration;
-> import com.demonwav.hypo.hydrate.HydrationManager;
+> import BridgeMethodHydrator;
+> import HypoContext;
+> import HypoHydration;
+> import HydrationManager;
 > 
 > public class Example {
 >     public static void main(String[] args) {

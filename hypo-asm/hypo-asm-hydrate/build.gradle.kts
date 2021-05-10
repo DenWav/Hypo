@@ -14,7 +14,7 @@ dependencies {
 tasks.jar {
     manifest {
         attributes(
-            "Automatic-Module-Name" to "com.demonwav.hypo.asm.hydrator"
+            "Automatic-Module-Name" to "dev.denwav.hypo.asm.hydrator"
         )
     }
 }

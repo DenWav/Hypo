@@ -25,7 +25,7 @@ tasks.withType<JavaCompile>().configureEach {
 tasks.jar {
     manifest {
         attributes(
-            "Automatic-Module-Name" to "com.demonwav.hypo.mappings"
+            "Automatic-Module-Name" to "dev.denwav.hypo.mappings"
         )
     }
 }
