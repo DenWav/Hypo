@@ -152,7 +152,7 @@ classes, which come from the currently running JVM.
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import ClassProviderRoot;
+> import dev.denwav.hypo.model.ClassProviderRoot;
 > import java.nio.file.Path;
 > import java.nio.file.Paths;
 > 
@@ -179,9 +179,9 @@ Pass these roots to a `ClassDataProvider`, the default implementation is in `hyp
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import AsmClassDataProvider;
-> import ClassDataProvider;
-> import ClassProviderRoot;
+> import dev.denwav.hypo.asm.AsmClassDataProvider;
+> import dev.denwav.hypo.model.ClassDataProvider;
+> import dev.denwav.hypo.model.ClassProviderRoot;
 > 
 > public class Example {
 >     public static void main(String[] args) {
@@ -202,9 +202,9 @@ Create a `HypoContext` using the providers you created:
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import AsmClassDataProvider;
-> import HypoContext;
-> import ClassProviderRoot;
+> import dev.denwav.hypo.asm.AsmClassDataProvider;
+> import dev.denwav.hypo.core.HypoContext;
+> import dev.denwav.hypo.model.ClassProviderRoot;
 > import java.nio.file.Path;
 > import java.nio.file.Paths;
 > 
@@ -242,9 +242,9 @@ classes available. This data model is not fully complete yet however, as it has 
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import AsmClassDataProvider;
-> import HypoContext;
-> import ClassProviderRoot;
+> import dev.denwav.hypo.asm.AsmClassDataProvider;
+> import dev.denwav.hypo.core.HypoContext;
+> import dev.denwav.hypo.model.ClassProviderRoot;
 > import java.nio.file.Path;
 > import java.nio.file.Paths;
 > 
@@ -283,8 +283,8 @@ Create the default implementation of `HydrationManager` and hydrate your `HypoCo
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import HypoContext;
-> import HydrationManager;
+> import dev.denwav.hypo.core.HypoContext;
+> import dev.denwav.hypo.hydrate.HydrationManager;
 > 
 > public class Example {
 >     public static void main(String[] args) {
@@ -308,10 +308,10 @@ these objects using `HypoKey`s.
 > <summary>Click to show Java snippet</summary>
 > 
 > ```java
-> import BridgeMethodHydrator;
-> import HypoContext;
-> import HypoHydration;
-> import HydrationManager;
+> import dev.denwav.hypo.asm.hydrate.BridgeMethodHydrator;
+> import dev.denwav.hypo.core.HypoContext;
+> import dev.denwav.hypo.hydrate.generic.HypoHydration;
+> import dev.denwav.hypo.hydrate.HydrationManager;
 > 
 > public class Example {
 >     public static void main(String[] args) {
