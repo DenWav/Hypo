@@ -79,7 +79,7 @@ final class LorenzUtilHelperJdk8 extends LorenzUtilHelper {
     @Override
     @NotNull Map<String, TopLevelClassMapping> getTopLevelClassesMap(@NotNull MappingSet mappingSet) {
         final MappingSetImpl castMap = checkType(mappingSet);
-        final Object unsafeResult = unsafe.getObject(castMap, innerClassesOffset);
+        final Object unsafeResult = unsafe.getObject(castMap, topLevelClassesOffset);
         final Map<String, TopLevelClassMapping> result = cast(unsafeResult);
         return notNull(result, "topLevelClasses");
     }
