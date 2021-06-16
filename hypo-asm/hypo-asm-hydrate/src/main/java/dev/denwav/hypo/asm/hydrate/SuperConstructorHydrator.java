@@ -388,6 +388,10 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
                     final FieldAccess fieldAccess = new FieldAccess(superCall.args.removeLast());
                     superCall.args.addLast(fieldAccess);
                     continue;
+                case Opcodes.ARRAYLENGTH:
+                    superCall.args.removeLast();
+                    superCall.args.addLast(Constant.INSTANCE);
+                    continue;
                 case Opcodes.IF_ICMPEQ:
                 case Opcodes.IF_ICMPNE:
                 case Opcodes.IF_ICMPLT:
