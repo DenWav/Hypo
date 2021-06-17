@@ -79,11 +79,26 @@ public interface ClassDataProvider extends AutoCloseable {
     void setContextClassProvider(final boolean contextClassProvider);
 
     /**
-     * Get whether or not this is a context provider.
+     * Get whether this is a context provider.
      *
      * @return {@code true} if this is a context provider, {@code false} if not.
      */
     boolean isContextClassProvider();
+
+    /**
+     * Set {@code true} if the current context configuration is set to require full classpath to be present. User code
+     * probably shouldn't call this method.
+     *
+     * @param requireFullClasspath {@code true} if the full classpath is required, {@code false} if not.
+     */
+    void setRequireFullClasspath(final boolean requireFullClasspath);
+
+    /**
+     * Get whether the full classpath is required.
+     *
+     * @return {@code true} if the full classpath is required, {@code false} if not.
+     */
+    boolean isRequireFullClasspath();
 
     /**
      * Return the {@link ClassData} object corresponding with the given class name, if it can be found. This method

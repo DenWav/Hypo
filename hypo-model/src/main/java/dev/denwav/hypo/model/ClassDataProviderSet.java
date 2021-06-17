@@ -34,9 +34,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ClassDataProviderSet implements ClassDataProvider {
 
-    private final @NotNull List<@NotNull ? extends ClassDataProvider> delegateProviders;
+    private final @NotNull List<? extends @NotNull ClassDataProvider> delegateProviders;
 
-    private ClassDataProviderSet(final @NotNull List<@NotNull ? extends ClassDataProvider> delegateProviders) {
+    private ClassDataProviderSet(final @NotNull List<? extends @NotNull ClassDataProvider> delegateProviders) {
         this.delegateProviders = delegateProviders;
     }
 
@@ -49,7 +49,7 @@ public class ClassDataProviderSet implements ClassDataProvider {
      */
     @Contract("_ -> new")
     public static ClassDataProviderSet wrap(
-        final @NotNull Collection<@NotNull ? extends ClassDataProvider> providers
+        final @NotNull Collection<? extends @NotNull ClassDataProvider> providers
     ) {
         return new ClassDataProviderSet(HypoModelUtil.asImmutableList(providers));
     }
@@ -75,6 +75,22 @@ public class ClassDataProviderSet implements ClassDataProvider {
             isContext |= delegateProvider.isContextClassProvider();
         }
         return isContext;
+    }
+
+    @Override
+    public void setRequireFullClasspath(boolean requireFullClasspath) {
+        for (final ClassDataProvider delegateProvider : this.delegateProviders) {
+            delegateProvider.setRequireFullClasspath(requireFullClasspath);
+        }
+    }
+
+    @Override
+    public boolean isRequireFullClasspath() {
+        boolean isRequireFullClasspath = false;
+        for (final ClassDataProvider delegateProvider : this.delegateProviders) {
+            isRequireFullClasspath |= delegateProvider.isRequireFullClasspath();
+        }
+        return isRequireFullClasspath;
     }
 
     @Override

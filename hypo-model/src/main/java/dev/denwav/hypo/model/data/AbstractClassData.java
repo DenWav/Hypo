@@ -41,6 +41,7 @@ public abstract class AbstractClassData extends AbstractHypoData implements Clas
     @LazyInit protected @Nullable ClassDataProvider provider = null;
 
     private boolean isContextClass = false;
+    private boolean isRequireFullClasspath = false;
 
     private final @NotNull Set<@NotNull ClassData> childClasses = new LinkedHashSet<>();
     private final @NotNull Set<@NotNull ClassData> innerClasses = new LinkedHashSet<>();
@@ -58,6 +59,16 @@ public abstract class AbstractClassData extends AbstractHypoData implements Clas
     @Override
     public boolean isContextClass() {
         return this.isContextClass;
+    }
+
+    @Override
+    public void setRequireFullClasspath(boolean requireFullClasspath) {
+        this.isRequireFullClasspath = requireFullClasspath;
+    }
+
+    @Override
+    public boolean isRequireFullClasspath() {
+        return this.isRequireFullClasspath;
     }
 
     @Override

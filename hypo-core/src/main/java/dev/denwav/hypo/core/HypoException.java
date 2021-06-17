@@ -19,9 +19,9 @@
 package dev.denwav.hypo.core;
 
 /**
- * Generic checked exception for Hypo execution errors.
+ * Generic unchecked exception for Hypo execution errors.
  */
-public class HypoException extends Exception {
+public class HypoException extends RuntimeException {
 
     /**
      * Constructor for {@link HypoException} with a message.

@@ -35,6 +35,8 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -60,6 +62,8 @@ import org.objectweb.asm.tree.VarInsnNode;
  */
 public class SuperConstructorHydrator implements HydrationProvider<AsmConstructorData> {
 
+    private static final Logger logger = LogManager.getLogger(SuperConstructorHydrator.class);
+
     private SuperConstructorHydrator() {}
 
     /**
@@ -82,8 +86,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
         try {
             this.hydrate0(data);
         } catch (final IllegalStateException e) {
-            // TODO remove
-            System.out.println(e.getMessage());
+            logger.debug("Failed to determine super constructor linking for method {}: {}", data.name(), e.getMessage());
         }
     }
 

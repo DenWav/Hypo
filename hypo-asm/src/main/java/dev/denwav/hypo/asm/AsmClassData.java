@@ -18,6 +18,7 @@
 
 package dev.denwav.hypo.asm;
 
+import dev.denwav.hypo.core.HypoException;
 import dev.denwav.hypo.model.ClassDataProvider;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ClassKind;
@@ -126,7 +127,16 @@ public class AsmClassData extends LazyClassData {
 
     @Override
     public @Nullable ClassData computeSuperClass() throws IOException {
-        return this.prov().findClass(this.node.superName);
+        final String superName = this.node.superName;
+        if (superName == null) {
+            return null;
+        }
+        final ClassData superClassData = this.prov().findClass(superName);
+        if (superClassData == null && this.isRequireFullClasspath()) {
+            throw new HypoException("Unable to resolve class data binding for '" + superName +
+                "' which is listed as the super class for '" + this.name() + "'");
+        }
+        return superClassData;
     }
 
     @Override
@@ -134,7 +144,15 @@ public class AsmClassData extends LazyClassData {
         final ClassDataProvider prov = this.prov();
         final HashSet<ClassData> res = new HashSet<>();
         for (final String inter : this.node.interfaces) {
-            res.add(prov.findClass(inter));
+            final ClassData interfaceData = prov.findClass(inter);
+            if (interfaceData != null) {
+                res.add(interfaceData);
+                continue;
+            }
+            if (this.isRequireFullClasspath()) {
+                throw new HypoException("Unable to resolve class data binding for '" + inter +
+                    "' which is listed as an interface for '" + this.name() + "'");
+            }
         }
         return res;
     }

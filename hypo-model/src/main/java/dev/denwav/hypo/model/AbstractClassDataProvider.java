@@ -81,6 +81,10 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
      * @see #isContextClassProvider()
      */
     private boolean isContextClassProvider = false;
+    /**
+     * @see #isRequireFullClasspath()
+     */
+    private boolean isRequireFullClasspath = false;
 
     /**
      * Create a new {@link AbstractClassDataProvider} using the given {@link ClassProviderRoot root providers}.
@@ -99,11 +103,21 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
     @Override
     public boolean isContextClassProvider() {
         return this.isContextClassProvider;
-    }
+}
 
     @Override
     public void setContextClassProvider(boolean contextClassProvider) {
         this.isContextClassProvider = contextClassProvider;
+    }
+
+    @Override
+    public boolean isRequireFullClasspath() {
+        return this.isRequireFullClasspath;
+    }
+
+    @Override
+    public void setRequireFullClasspath(boolean requireFullClasspath) {
+        this.isRequireFullClasspath = requireFullClasspath;
     }
 
     @Override
@@ -191,6 +205,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
         }
         this.decorator.decorate(classData);
         classData.setContextClass(this.isContextClassProvider());
+        classData.setRequireFullClasspath(this.isRequireFullClasspath());
         return classData;
     }
 
@@ -228,6 +243,16 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
 
             @Override
             public void setContextClass(boolean contextClass) {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public boolean isRequireFullClasspath() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public void setRequireFullClasspath(boolean requireFullClasspath) {
                 throw new IllegalStateException();
             }
 

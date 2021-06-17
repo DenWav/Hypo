@@ -224,7 +224,7 @@ public final class HypoContext implements AutoCloseable {
         @CanIgnoreReturnValue
         @Contract(value = "_ -> this", mutates = "this")
         public @NotNull HypoContext.Builder withProviders(
-            final @NotNull Collection<@NotNull ? extends ClassDataProvider> providers
+            final @NotNull Collection<? extends @NotNull ClassDataProvider> providers
         ) {
             this.providers.addAll(providers);
             return this;
@@ -279,7 +279,7 @@ public final class HypoContext implements AutoCloseable {
         @CanIgnoreReturnValue
         @Contract(value = "_ -> this", mutates = "this")
         public @NotNull HypoContext.Builder withContextProviders(
-            final @NotNull Collection<@NotNull ? extends ClassDataProvider> providers
+            final @NotNull Collection<? extends @NotNull ClassDataProvider> providers
         ) {
             this.contextProviders.addAll(providers);
             return this;
@@ -330,9 +330,11 @@ public final class HypoContext implements AutoCloseable {
 
             for (final ClassDataProvider provider : this.providers) {
                 provider.setContextClassProvider(false);
+                provider.setRequireFullClasspath(conf.isRequireFullClasspath());
             }
             for (final ClassDataProvider provider : this.contextProviders) {
                 provider.setContextClassProvider(true);
+                provider.setRequireFullClasspath(conf.isRequireFullClasspath());
             }
 
             final ArrayList<ClassDataProvider> provs = new ArrayList<>(this.providers);

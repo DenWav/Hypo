@@ -55,7 +55,7 @@ public interface ClassData extends HypoData {
     void setProvider(final @NotNull ClassDataProvider provider);
 
     /**
-     * Set whether or not this class data was loaded by the
+     * Set whether this class data was loaded by the
      * {@link ClassDataProvider#setContextClassProvider(boolean)} context provider}.
      *
      * @param contextClass {@code true} if this class data was loaded by the context provider.
@@ -71,6 +71,22 @@ public interface ClassData extends HypoData {
      * @see ClassDataProvider#isContextClassProvider()
      */
     boolean isContextClass();
+
+    /**
+     * Set whether additional class lookups made by this class which fail should result in an exception.
+     *
+     * @param requireFullClasspath {@code true} if class lookup failures from this class should result in an error.
+     * @see ClassDataProvider#setRequireFullClasspath(boolean)
+     */
+    void setRequireFullClasspath(final boolean requireFullClasspath);
+
+    /**
+     * Returns {@code true} if this class will throw an exception for class lookups which fail.
+     *
+     * @return {@code true} if this class will throw an exception for class lookups which fail.
+     * @see ClassDataProvider#isRequireFullClasspath()
+     */
+    boolean isRequireFullClasspath();
 
     /**
      * The name of this class data, in JVM internal format.

@@ -19,6 +19,7 @@
 package dev.denwav.hypo.hydrate;
 
 import dev.denwav.hypo.core.HypoContext;
+import dev.denwav.hypo.core.HypoException;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.MethodData;
@@ -89,7 +90,11 @@ public class DefaultClassDataHydrator implements ClassDataHydrator {
         while (iter.hasNext()) {
             final ClassData nextClass = iter.next();
             futures.add(executor.submit((Callable<Void>) () -> {
-                fillMethods(nextClass);
+                try {
+                    fillMethods(nextClass);
+                } catch (final Exception e) {
+                    throw new HypoException("Unhandled error while hydrating " + nextClass.name(), e);
+                }
                 return null;
             }));
         }

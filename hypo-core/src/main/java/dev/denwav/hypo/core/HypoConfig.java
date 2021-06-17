@@ -37,19 +37,23 @@ public final class HypoConfig {
     private final int parallelism;
     @SuppressWarnings("Immutable")
     private final @NotNull Function<ClassDataProvider, ClassDataDecorator> decorator;
+    private final boolean requireFullClasspath;
 
     /**
      * Create a new instance of {@link HypoConfig}. Use {@link #builder()} instead.
      *
      * @param parallelism The parallelism level to use for Hypo executions.
      * @param decorator The decorator to use for {@link ClassDataProvider#setDecorator(ClassDataDecorator)}.
+     * @param requireFullClasspath Set to {@code true} if a class lookup failure should result in an error.
      */
     HypoConfig(
         final int parallelism,
-        final @NotNull Function<ClassDataProvider, ClassDataDecorator> decorator
+        final @NotNull Function<ClassDataProvider, ClassDataDecorator> decorator,
+        final boolean requireFullClasspath
     ) {
         this.parallelism = parallelism;
         this.decorator = decorator;
+        this.requireFullClasspath = requireFullClasspath;
     }
 
     /**
@@ -68,6 +72,16 @@ public final class HypoConfig {
      */
     public @NotNull Function<ClassDataProvider, ClassDataDecorator> getDecorator() {
         return this.decorator;
+    }
+
+    /**
+     * Returns {@code true} if class lookup failures should be considered an error. If this is {@code false} then class
+     * lookup failures will simply return {@code null}, or will be omitted from returned collections.
+     *
+     * @return {@code true} if class lookup failures should be considered an error, {@code false} if not.
+     */
+    public boolean isRequireFullClasspath() {
+        return this.requireFullClasspath;
     }
 
     /**
@@ -90,6 +104,7 @@ public final class HypoConfig {
 
         private int parallelism = -1;
         private @NotNull Function<ClassDataProvider, ClassDataDecorator> decorator = DefaultClassDataDecorator::new;
+        private boolean requireFullClasspath = true;
 
         /**
          * Constructor for {@link Builder}. Use {@link HypoConfig#builder()} instead.
@@ -131,6 +146,25 @@ public final class HypoConfig {
         }
 
         /**
+         * Set strict classpath checking to {@code true} or {@code false}. If this is set to {@code true} then class
+         * data lookups which fail will be treated as an error, and an exception will be thrown. If this is set to
+         * {@code false} then {@code null} will be returned instead, or the class will be omitted from return
+         * collections.
+         *
+         * <p>Defaults to {@code true}.
+         *
+         * @param requireFullClasspath {@code true} if class lookup failures should be considered an error,
+         *                             {@code false} if not.
+         * @return {@code this} for chaining.
+         */
+        @CanIgnoreReturnValue
+        @Contract(value = "_ -> this", mutates = "this")
+        public @NotNull Builder setRequireFullClasspath(final boolean requireFullClasspath) {
+            this.requireFullClasspath = requireFullClasspath;
+            return this;
+        }
+
+        /**
          * Use the current values of this builder to create a new instance of {@link HypoConfig} and return it.
          *
          * @return The new instance of {@link HypoConfig} using the value set in this builder.
@@ -138,7 +172,11 @@ public final class HypoConfig {
         @CanIgnoreReturnValue
         @Contract(value = "-> new", pure = true)
         public @NotNull HypoConfig build() {
-            return new HypoConfig(this.parallelism, this.decorator);
+            return new HypoConfig(
+                this.parallelism,
+                this.decorator,
+                this.requireFullClasspath
+            );
         }
     }
 }
