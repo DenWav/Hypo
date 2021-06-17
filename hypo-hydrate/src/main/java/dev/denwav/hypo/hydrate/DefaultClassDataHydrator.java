@@ -36,6 +36,7 @@ import org.jetbrains.annotations.Nullable;
 import org.jgrapht.Graph;
 import org.jgrapht.event.EdgeTraversalEvent;
 import org.jgrapht.event.TraversalListenerAdapter;
+import org.jgrapht.event.VertexTraversalEvent;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.GraphIterator;
@@ -55,35 +56,27 @@ public class DefaultClassDataHydrator implements ClassDataHydrator {
 
         for (final ClassData classData : context.getProvider().allClasses()) {
             g.addVertex(classData);
-            addEdge(classData.superClass(), classData, g);
-            // For simplicity we'll re-use this same graph for outer classes too
+            final ClassData superClassData = classData.superClass();
+            if (superClassData != null) {
+                addEdge(superClassData, classData, g);
+                superClassData.childClasses().add(classData);
+            }
+            // For simplicity, we'll re-use this same graph for outer classes too.
             // This graph impl will ignore duplicate edges
             // Below when we hydrate the class data we need to remember to check which is which
-            addEdge(classData.outerClass(), classData, g);
+            final ClassData outerClassData = classData.outerClass();
+            if (outerClassData != null) {
+                addEdge(outerClassData, classData, g);
+                outerClassData.innerClasses().add(classData);
+            }
             for (final ClassData interData : classData.interfaces()) {
                 addEdge(interData, classData, g);
+                interData.childClasses().add(classData);
             }
         }
 
         // Walk graph to build out downward relationships
         final GraphIterator<ClassData, DefaultEdge> iter = new TopologicalOrderIterator<>(g);
-        iter.addTraversalListener(new TraversalListenerAdapter<ClassData, DefaultEdge>() {
-            @Override
-            public void edgeTraversed(EdgeTraversalEvent<DefaultEdge> e) {
-                final ClassData source = g.getEdgeSource(e.getEdge());
-                final ClassData target = g.getEdgeTarget(e.getEdge());
-
-                try {
-                    if (Objects.equals(target.outerClass(), source)) {
-                        source.innerClasses().add(target);
-                    } else {
-                        source.childClasses().add(target);
-                    }
-                } catch (final IOException ex) {
-                    HypoModelUtil.rethrow(ex);
-                }
-            }
-        });
         iter.setReuseEvents(true);
 
         final ArrayList<Future<?>> futures = new ArrayList<>();

@@ -2,11 +2,13 @@
 junit = "5.7.1"
 errorprone = "2.6.0"
 asm = "9.1"
+log4j = "2.14.1"
 
 [libraries]
 # Deps
 annotations = "org.jetbrains:annotations:20.1.0"
-log4j = "org.apache.logging.log4j:log4j-api:2.14.1"
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
 
 asm-core = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }

@@ -23,10 +23,10 @@ dependencies {
     // Additional libraries used in the test framework
     api(libs.lorenzTiny)
     api(libs.asm.commons)
+    api(libs.log4j.core)
 
     api(libs.junit.api)
-
-    testRuntimeOnly(libs.junit.runtime)
+    runtimeOnly(libs.junit.runtime)
 }
 
 tasks.withType<JavaCompile>().configureEach {

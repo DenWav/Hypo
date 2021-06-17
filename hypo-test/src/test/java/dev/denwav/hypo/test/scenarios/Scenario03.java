@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 03 - Simple Synthetic Methods")
+@DisplayName("[integration] Scenario 03 - Simple Synthetic Methods")
 public class Scenario03 extends TestScenarioBase {
     @Override
     public @NotNull Env env() {

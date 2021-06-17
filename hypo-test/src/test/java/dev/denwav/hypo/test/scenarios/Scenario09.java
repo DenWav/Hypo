@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 09 - Mixture Constructor Calls")
+@DisplayName("[integration] Scenario 09 - Mixture Constructor Calls")
 public class Scenario09 extends TestScenarioBase {
 
     @Override

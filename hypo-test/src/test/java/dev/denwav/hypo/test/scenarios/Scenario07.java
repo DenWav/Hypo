@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 07 - Complex Constructors")
+@DisplayName("[integration] Scenario 07 - Complex Constructors")
 public class Scenario07 extends TestScenarioBase {
 
     @Override

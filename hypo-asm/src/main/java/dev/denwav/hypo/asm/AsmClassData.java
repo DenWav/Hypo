@@ -28,6 +28,7 @@ import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -36,6 +37,7 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InnerClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
@@ -56,6 +58,7 @@ public class AsmClassData extends LazyClassData {
 
     /**
      * Returns the {@link ClassNode} which backs this {@link AsmClassData}.
+     *
      * @return The {@link ClassNode} which backs this {@link AsmClassData}.
      */
     public @NotNull ClassNode getNode() {
@@ -73,19 +76,35 @@ public class AsmClassData extends LazyClassData {
 
     @Override
     public @Nullable ClassData computeOuterClass() throws IOException {
-        if (this.node.outerClass == null) {
-            return null;
+        // Simple case (anonymous classes & local classes)
+        if (this.node.outerClass != null) {
+            return this.prov().findClass(this.node.outerClass);
         }
-        return this.prov().findClass(this.node.outerClass);
+        // Standard nested classes are more annoying
+        final String thisName = this.name();
+        for (int i = 0; i < this.node.innerClasses.size(); i++) {
+            final InnerClassNode innerClassNode = this.node.innerClasses.get(i);
+            if (Objects.equals(thisName, innerClassNode.name) && innerClassNode.outerName != null) {
+                return this.prov().findClass(innerClassNode.outerName);
+            }
+        }
+        // Not able to find outer class
+        return null;
     }
 
     @Override
     public boolean computeStaticInnerClass() {
-        return this.isStaticInnerClass();
-    }
-    @Override
-    public boolean isStaticInnerClass() {
-        return this.node.outerClass != null && (this.node.access & Opcodes.ACC_STATIC) != 0;
+        if (this.node.outerClass != null) {
+            return (this.node.access & Opcodes.ACC_STATIC) != 0;
+        }
+        final String thisName = this.name();
+        for (int i = 0; i < this.node.innerClasses.size(); i++) {
+            final InnerClassNode innerClassNode = this.node.innerClasses.get(i);
+            if (Objects.equals(thisName, innerClassNode.name) && innerClassNode.outerName != null) {
+                return (innerClassNode.access & Opcodes.ACC_STATIC) != 0;
+            }
+        }
+        return false;
     }
 
     @Override

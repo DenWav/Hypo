@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 01 - Simple Hierarchy")
+@DisplayName("[integration] Scenario 01 - Simple Hierarchy")
 public class Scenario01 extends TestScenarioBase {
 
     @Override

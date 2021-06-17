@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 04 - Conflicting Name Synthetics")
+@DisplayName("[integration] Scenario 04 - Conflicting Name Synthetics")
 public class Scenario04 extends TestScenarioBase {
 
     @Override

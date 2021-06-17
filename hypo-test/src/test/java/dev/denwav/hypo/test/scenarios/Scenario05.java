@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 05 - Duplicate Name Synthetics")
+@DisplayName("[integration] Scenario 05 - Duplicate Name Synthetics")
 public class Scenario05 extends TestScenarioBase {
 
     @Override

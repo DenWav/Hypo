@@ -27,7 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 02 - Extended Hierarchy")
+@DisplayName("[integration] Scenario 02 - Extended Hierarchy")
 public class Scenario02 extends TestScenarioBase {
 
     @Override

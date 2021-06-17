@@ -3,11 +3,27 @@ plugins {
     `hypo-java`
     `hypo-module`
     `hypo-publish`
+    `hypo-test-scenario`
+}
+
+hypoTest {
+    testDataProject.set(projects.hypoAsm.hypoAsmTestData)
+}
+
+repositories {
+    // for tests
+    maven("https://maven.quiltmc.org/repository/release/")
 }
 
 dependencies {
     api(projects.hypoCore)
     api(libs.bundles.asm)
+
+    testImplementation(projects.hypoTest)
+}
+
+tasks.compileTestJava {
+    options.release.set(16)
 }
 
 tasks.jar {

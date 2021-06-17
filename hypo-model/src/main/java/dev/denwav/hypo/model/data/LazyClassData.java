@@ -125,13 +125,13 @@ public abstract class LazyClassData extends AbstractClassData {
         return this.outerClass.getOrThrow();
     }
 
-    private final LazyValue<Boolean, ?> staticInnerClass = LazyValue.of(this::computeIsFinal);
+    private final LazyValue<Boolean, ?> staticInnerClass = LazyValue.of(this::computeStaticInnerClass);
     @Override
     public boolean isStaticInnerClass() {
         return this.staticInnerClass.getNotNull();
     }
 
-    private final LazyValue<Boolean, ?> isFinal = LazyValue.of(this::computeStaticInnerClass);
+    private final LazyValue<Boolean, ?> isFinal = LazyValue.of(this::computeIsFinal);
     @Override
     public boolean isFinal() {
         return this.isFinal.getNotNull();

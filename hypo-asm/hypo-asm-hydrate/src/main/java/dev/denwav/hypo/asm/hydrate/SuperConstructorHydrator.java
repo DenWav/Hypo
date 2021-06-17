@@ -86,7 +86,10 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
         try {
             this.hydrate0(data);
         } catch (final IllegalStateException e) {
-            logger.debug("Failed to determine super constructor linking for method {}: {}", data.name(), e.getMessage());
+            logger.debug(
+                "Failed to determine super constructor linking for {}#{}{}: {}",
+                data.parentClass().name(), data.name(), data.descriptorText(), e.getMessage()
+            );
         }
     }
 

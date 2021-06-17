@@ -3,6 +3,7 @@ rootProject.name = "hypo"
 include(
         "hypo-asm",
         "hypo-asm:hypo-asm-hydrate",
+        "hypo-asm:hypo-asm-test-data",
         "hypo-core",
         "hypo-hydrate",
         "hypo-mappings",

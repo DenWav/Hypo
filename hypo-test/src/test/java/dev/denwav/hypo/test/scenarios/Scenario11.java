@@ -29,7 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("Scenario 11 - Complex Generics")
+@DisplayName("[integration] Scenario 11 - Complex Generics")
 public class Scenario11 extends TestScenarioBase {
 
     @Override
