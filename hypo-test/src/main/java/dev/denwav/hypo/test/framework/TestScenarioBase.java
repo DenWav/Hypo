@@ -252,7 +252,7 @@ public abstract class TestScenarioBase {
         if (this.includeJdk()) {
             builder.withContextProvider(AsmClassDataProvider.of(ClassProviderRoot.ofJdk()));
         }
-        builder.withConfig(this.env().config());
+        builder.withConfig(this.env().config().setRequireFullClasspath(false).build());
         return builder.build();
     }
 
@@ -306,8 +306,8 @@ public abstract class TestScenarioBase {
          *
          * @return The {@link HypoConfig} to use when building the {@link HypoContext}.
          */
-        default @NotNull HypoConfig config() {
-            return HypoConfig.builder().build();
+        default @NotNull HypoConfig.Builder config() {
+            return HypoConfig.builder();
         }
 
         /**
