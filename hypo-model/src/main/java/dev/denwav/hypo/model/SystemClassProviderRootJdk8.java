@@ -19,6 +19,7 @@
 package dev.denwav.hypo.model;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -48,7 +49,8 @@ class SystemClassProviderRootJdk8 implements ClassProviderRoot {
             throw new IllegalStateException("Could not find location of " + classFileName + " file");
         }
 
-        final String expectedProtocol = "jar:file:";
+        final String jarProtocol = "jar:";
+        final String expectedProtocol = jarProtocol + "file:";
         final String classFileUrlString = classFileUrl.toString();
         if (!classFileUrlString.startsWith(expectedProtocol)) {
             throw new IllegalStateException("Unknown protocol: " + classFileUrlString);
@@ -59,10 +61,10 @@ class SystemClassProviderRootJdk8 implements ClassProviderRoot {
             throw new IllegalStateException("Could not determine where " + classFileUrlString + " refers to");
         }
 
-        final String rtJarPathString = classFileUrlString.substring(expectedProtocol.length(), index);
-        final Path rtJarPath = Paths.get(rtJarPathString);
+        final URI rtJarUri = URI.create(classFileUrlString.substring(jarProtocol.length(), index));
+        final Path rtJarPath = Paths.get(rtJarUri);
         if (Files.notExists(rtJarPath)) {
-            throw new IllegalStateException("JDK jar path is not a file: " + rtJarPathString);
+            throw new IllegalStateException("JDK jar path is not a file: " + rtJarPath);
         }
 
         this.delegate = ClassProviderRoot.fromJar(rtJarPath);
