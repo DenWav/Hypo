@@ -35,8 +35,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,6 +49,8 @@ import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * {@link HydrationProvider} for determining the target of {@code this()} and {@code super()} constructor calls, as well
@@ -62,7 +62,7 @@ import org.objectweb.asm.tree.VarInsnNode;
  */
 public class SuperConstructorHydrator implements HydrationProvider<AsmConstructorData> {
 
-    private static final Logger logger = LogManager.getLogger(SuperConstructorHydrator.class);
+    private static final Logger logger = LoggerFactory.getLogger(SuperConstructorHydrator.class);
 
     private SuperConstructorHydrator() {}
 

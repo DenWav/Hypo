@@ -8,7 +8,7 @@ plugins {
 
 dependencies {
     compileOnlyApi(libs.annotations)
-    api(libs.log4j.api)
+    api(libs.slf4j.api)
 }
 
 tasks.jar {
