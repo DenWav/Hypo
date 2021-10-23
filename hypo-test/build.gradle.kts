@@ -24,6 +24,7 @@ dependencies {
     api(libs.lorenzTiny)
     api(libs.asm.commons)
     api(libs.log4j.core)
+    api(libs.slf4j.log4j2.impl)
 
     api(libs.junit.api)
     runtimeOnly(libs.junit.runtime)
