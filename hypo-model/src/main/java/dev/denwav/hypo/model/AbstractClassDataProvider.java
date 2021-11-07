@@ -103,7 +103,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
     @Override
     public boolean isContextClassProvider() {
         return this.isContextClassProvider;
-}
+    }
 
     @Override
     public void setContextClassProvider(boolean contextClassProvider) {
