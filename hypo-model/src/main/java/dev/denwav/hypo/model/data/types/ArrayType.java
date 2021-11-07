@@ -62,6 +62,24 @@ public final class ArrayType implements JvmType {
         this.dimension = dimension;
     }
 
+    /**
+     * Get the base type of this array type.
+     *
+     * @return The base type of this array type.
+     */
+    public @NotNull JvmType baseType() {
+        return this.baseType;
+    }
+
+    /**
+     * Get the dimension of this array type.
+     *
+     * @return The dimension of this array type.
+     */
+    public int dimension() {
+        return this.dimension;
+    }
+
     private void internalPrefix(final @NotNull StringBuilder sb) {
         for (int i = 0; i < this.dimension; i++) {
             sb.append('[');
