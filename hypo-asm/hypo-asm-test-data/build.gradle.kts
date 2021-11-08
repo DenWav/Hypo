@@ -11,3 +11,7 @@ tasks.compileScenario01Java {
 tasks.compileScenario02Java {
     options.release.set(16)
 }
+
+tasks.compileScenario03Java {
+    options.release.set(16)
+}
