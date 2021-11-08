@@ -29,6 +29,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("[asm] Scenario 03 - Synthetic members (Java 16)")
@@ -43,12 +44,16 @@ public class Scenario03 extends TestScenarioBase {
     @DisplayName("Test expected synthetic members are synthetic")
     public void testSyntheticMembers() throws Exception {
         final var testClass = this.context().getProvider().findClass("scenario03/TestClass");
+        assertNotNull(testClass);
         final var inner = this.context().getProvider().findClass("scenario03/TestClass$Inner");
+        assertNotNull(inner);
 
         final MethodData intSupplierSynth = testClass.method("lambda$intSupplier$0", MethodDescriptor.parseDescriptor("(Lscenario03/TestClass$Inner;)I"));
+        assertNotNull(intSupplierSynth, "Did not find expected lambda$intSupplier$0 synthetic member in TestClass");
         assertTrue(intSupplierSynth.isSynthetic());
 
         final FieldData innerSyntheticOuterThisField = inner.field("this$0", new ClassType("scenario03.TestClass"));
+        assertNotNull(innerSyntheticOuterThisField, "Did not find expected this$0 synthetic member in TestClass$Inner");
         assertTrue(innerSyntheticOuterThisField.isSynthetic());
     }
 
@@ -56,12 +61,16 @@ public class Scenario03 extends TestScenarioBase {
     @DisplayName("Test declared members are not synthetic")
     public void testNonSyntheticMembers() throws Exception {
         final var testClass = this.context().getProvider().findClass("scenario03/TestClass");
+        assertNotNull(testClass);
         final var inner = this.context().getProvider().findClass("scenario03/TestClass$Inner");
+        assertNotNull(inner);
 
         final MethodData intSupplier = testClass.method("intSupplier", MethodDescriptor.parseDescriptor("(Lscenario03/TestClass$Inner;)Ljava/util/function/IntSupplier;"));
+        assertNotNull(intSupplier, "Did not find expected method intSupplier in TestClass");
         assertFalse(intSupplier.isSynthetic());
 
         final FieldData innerDeclaredField = inner.field("notSynthetic", PrimitiveType.INT);
+        assertNotNull(innerDeclaredField, "Did not find expected field notSynthetic in TestClass$Inner");
         assertFalse(innerDeclaredField.isSynthetic());
     }
 }
