@@ -60,12 +60,6 @@ public interface MethodData extends MemberData {
     boolean isAbstract();
 
     /**
-     * Returns {@code true} if this method is synthetic.
-     * @return {@code true} if this method is synthetic.
-     */
-    boolean isSynthetic();
-
-    /**
      * Returns {@code true} if this is a bridge method.
      * @return {@code true} if this is a bridge method.
      */
