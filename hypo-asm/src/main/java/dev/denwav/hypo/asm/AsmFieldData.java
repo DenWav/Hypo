@@ -76,6 +76,11 @@ public class AsmFieldData extends AbstractFieldData implements FieldData {
     }
 
     @Override
+    public boolean isSynthetic() {
+        return (this.node.access & Opcodes.ACC_SYNTHETIC) != 0;
+    }
+
+    @Override
     public @NotNull String name() {
         return this.node.name;
     }
