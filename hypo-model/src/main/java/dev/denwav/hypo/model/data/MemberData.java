@@ -63,9 +63,9 @@ public interface MemberData extends HypoData {
     boolean isFinal();
 
     /**
-     * Returns {@code true} if this method is synthetic.
+     * Returns {@code true} if this member data is synthetic.
      *
-     * @return {@code true} if this method is a synthetic member.
+     * @return {@code true} if this member data is a synthetic member.
      */
     boolean isSynthetic();
 }
