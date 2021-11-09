@@ -56,7 +56,7 @@ public interface ClassData extends HypoData {
 
     /**
      * Set whether this class data was loaded by the
-     * {@link ClassDataProvider#setContextClassProvider(boolean)} context provider}.
+     * {@link ClassDataProvider#setContextClassProvider(boolean)} context provider.
      *
      * @param contextClass {@code true} if this class data was loaded by the context provider.
      * @see ClassDataProvider#setContextClassProvider(boolean)
@@ -235,7 +235,7 @@ public interface ClassData extends HypoData {
 
     /**
      * Return {@code true} if this class data implements the given class data. This method walks up the
-     * {@link #interfaces()} ()} chain, it does not check super classes.
+     * {@link #interfaces()} chain, it does not check super classes.
      *
      * @param that The class data to check if this class data implements it.
      * @return {@code true} if this class data implements the given class data.

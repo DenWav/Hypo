@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>This class is responsible for only the first part, the class hierarchy data hydration.
  *
  * <p>The default implementation of this interface is {@link DefaultClassDataHydrator}, and it is implemented using only
- * the base {@link ClassData ClassData} APIs so it should be okay for most cases.
+ * the base {@link ClassData ClassData} APIs, so it should be okay for most cases.
  *
  * <p>Use {@link HydrationManager} to handle the orchestration of all of the parts of hydration.
  */

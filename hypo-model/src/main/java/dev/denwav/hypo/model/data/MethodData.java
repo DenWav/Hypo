@@ -114,7 +114,7 @@ public interface MethodData extends MemberData {
      * with this method, only the LVT index. For positional index, use {@link #param(int)}.
      *
      * @param i The LVT index of the parameter to find.
-     * @return The parameter at the LVT index given, or {@code null} if no paramter could be found at the given LVT
+     * @return The parameter at the LVT index given, or {@code null} if no parameter could be found at the given LVT
      *         index.
      * @see #param(int)
      */

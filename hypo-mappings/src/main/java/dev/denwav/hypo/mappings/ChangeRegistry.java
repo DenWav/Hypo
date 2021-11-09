@@ -82,13 +82,11 @@ public final class ChangeRegistry {
     }
 
     /**
-     * For use by {@link MappingsCompletionManager} to allow for better error messages when mappings changes conflict
+     * For use by {@link MappingsCompletionManager} to allow for better error messages when mapping changes conflict
      * with each other. If this method is called before {@link #applyChanges(MappingSet)} then the name give here will
      * be included in the error message as the change contributor responsible for the conflicting changes.
      *
-     * @param currentContributorName The name of the
-     *                               {@link ChangeContributor ChangeContributor}
-     *                               currently running.
+     * @param currentContributorName The name of the currently running {@link ChangeContributor ChangeContributor}
      */
     public void setCurrentContributorName(final @Nullable String currentContributorName) {
         this.currentContributorName = currentContributorName;

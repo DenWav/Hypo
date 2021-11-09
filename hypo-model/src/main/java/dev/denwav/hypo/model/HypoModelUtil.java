@@ -75,7 +75,7 @@ public final class HypoModelUtil {
      * exception will be thrown - in reality this method never returns.
      *
      * <p>For example, the intended pattern for using this method when the compiler needs to know the code path will not
-     * continue (such as when initializing variables, etc) is this:
+     * continue (such as when initializing variables, etc.) is this:
      *
      * <pre>
      *     try {
@@ -85,8 +85,9 @@ public final class HypoModelUtil {
      *     }
      * </pre>
      *
-     * <p>The actual execution of the code is entirely unchanged whether or not the {@code throw} in the above code
-     * snippet exists, however including the {@code throw} keyword helps the Java compiler better understand the code.
+     * <p>The actual execution of the code is entirely unchanged regardless of whether the {@code throw} in the above
+     * code snippet exists, however including the {@code throw} keyword helps the Java compiler better understand the
+     * code.
      *
      * @param t The {@link Throwable} to unconditionally re-throw as unchecked.
      * @param <X> Generic hack to allow this method to trick the Java compiler into allowing this.

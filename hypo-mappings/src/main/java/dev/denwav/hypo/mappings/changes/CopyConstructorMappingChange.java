@@ -56,7 +56,7 @@ public class CopyConstructorMappingChange
      * Create a new instance of {@link CopyConstructorMappingChange}.
      *
      * @param target The {@link MemberReference} this change targets.
-     * @param superMapping The {@link MethodMapping} of the super constructor to copy the paramters from.
+     * @param superMapping The {@link MethodMapping} of the super constructor to copy the parameters from.
      * @return A new instance of {@link CopyConstructorMappingChange}.
      */
     @Contract(value = "_, _ -> new", pure = true)

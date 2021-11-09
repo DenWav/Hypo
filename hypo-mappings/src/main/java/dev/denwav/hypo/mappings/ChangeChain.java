@@ -65,7 +65,7 @@ public final class ChangeChain {
     }
 
     /**
-     * Add a link to this chain with the list of {@link ChangeContributor change contributors} to run in this link.
+     * Add a link to this chain with the list of {@link ChangeContributor change contributors} to run in the link.
      *
      * @param changes The list of contributors to run for this link.
      * @return {@code this} for chaining.
@@ -77,7 +77,7 @@ public final class ChangeChain {
     }
 
     /**
-     * Add a link to this chain with a single {@link ChangeContributor change contributor} to run in this link..
+     * Add a link to this chain with a single {@link ChangeContributor change contributor} to run in the link.
      *
      * @param change The contributor to run for this link.
      * @return {@code this} for chaining.
@@ -89,7 +89,7 @@ public final class ChangeChain {
     }
 
     /**
-     * Add a link to this chain with the list of {@link ChangeContributor change contributors} to run in this link.
+     * Add a link to this chain with the list of {@link ChangeContributor change contributors} to run in the link.
      *
      * @param changes The contributors to run for this link.
      * @return {@code this} for chaining.
@@ -121,7 +121,7 @@ public final class ChangeChain {
     /**
      * Add a listener which will be called after the changes in each link have been applied to the {@link MappingSet}.
      *
-     * <p>Only a single mapping set listener mayh be registered at a time, calling this method multiple times will
+     * <p>Only a single mapping set listener may be registered at a time, calling this method multiple times will
      * overwrite the previous setting.
      *
      * @param listener The listener to run after the {@link MappingSet} for each link has been modified.

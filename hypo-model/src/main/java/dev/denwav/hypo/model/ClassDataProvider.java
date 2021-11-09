@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * The core source of {@link ClassData} objects, retrieved from a given class name, and for enumerating all of the
+ * The core source of {@link ClassData} objects, retrieved from a given class name, and for enumerating all the
  * classes available in the set. This interface does not specify where the class file data is coming from, or even what
  * format they are in - only two things are needed to implement this interface:
  *
@@ -152,7 +152,7 @@ public interface ClassDataProvider extends AutoCloseable {
     }
 
     /**
-     * Returns an {@link Iterable} which will iterate over all classes available in this provider. By default this
+     * Returns an {@link Iterable} which will iterate over all classes available in this provider. By default, this
      * method simply calls {@link #stream()} and returns that stream's iterator. The default implementation of
      * {@link #stream()} in {@link AbstractClassDataProvider} is implemented to lazily load {@link ClassData} objects,
      * however this is not a requirement of implementing this method.
