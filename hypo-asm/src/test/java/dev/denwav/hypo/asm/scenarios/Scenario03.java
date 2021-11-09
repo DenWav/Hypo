@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 03 - Synthetic members (Java 16)")
+@DisplayName("[asm] Scenario 03 - Synthetic classes and members (Java 16)")
 public class Scenario03 extends TestScenarioBase {
 
     @Override
@@ -72,5 +72,25 @@ public class Scenario03 extends TestScenarioBase {
         final FieldData innerDeclaredField = inner.field("notSynthetic", PrimitiveType.INT);
         assertNotNull(innerDeclaredField, "Did not find expected field notSynthetic in TestClass$Inner");
         assertFalse(innerDeclaredField.isSynthetic());
+    }
+
+    @Test
+    @DisplayName("Test declared classes are not synthetic")
+    public void testNonSyntheticClasses() throws Exception {
+        final var testClass = this.context().getProvider().findClass("scenario03/TestClass");
+        assertNotNull(testClass);
+        assertFalse(testClass.isSynthetic());
+
+        final var inner = this.context().getProvider().findClass("scenario03/TestClass$Inner");
+        assertNotNull(inner);
+        assertFalse(inner.isSynthetic());
+    }
+
+    @Test
+    @DisplayName("Test expected synthetic classes are synthetic")
+    public void testSyntheticClasses() throws Exception {
+        final var syntheticInner = this.context().getProvider().findClass("scenario03/TestClass$1");
+        assertNotNull(syntheticInner, "Did not find expected TestClass$1 synthetic inner class");
+        assertTrue(syntheticInner.isSynthetic());
     }
 }
