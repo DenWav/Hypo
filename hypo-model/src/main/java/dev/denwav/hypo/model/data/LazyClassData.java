@@ -70,6 +70,13 @@ public abstract class LazyClassData extends AbstractClassData {
     public abstract boolean computeIsFinal();
 
     /**
+     * {@code compute} variant of {@link #isSynthetic()}.
+     *
+     * @return {@code true} if this class is synthetic.
+     */
+    public abstract boolean computeIsSynthetic();
+
+    /**
      * {@code compute} variant of {@link #kind()}.
      *
      * @return The {@link ClassKind kind} of this class.
@@ -135,6 +142,12 @@ public abstract class LazyClassData extends AbstractClassData {
     @Override
     public boolean isFinal() {
         return this.isFinal.getNotNull();
+    }
+
+    private final LazyValue<Boolean, ?> isSynthetic = LazyValue.of(this::computeIsSynthetic);
+    @Override
+    public boolean isSynthetic() {
+        return this.isSynthetic.getNotNull();
     }
 
     private final @NotNull LazyValue<ClassKind, ?> classKind = LazyValue.of(this::computeClassKind);

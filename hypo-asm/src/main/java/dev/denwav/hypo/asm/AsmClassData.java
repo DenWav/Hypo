@@ -117,6 +117,15 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
+    public boolean computeIsSynthetic() {
+        return this.isSynthetic();
+    }
+    @Override
+    public boolean isSynthetic() {
+        return (this.node.access & Opcodes.ACC_SYNTHETIC) != 0;
+    }
+
+    @Override
     public @NotNull ClassKind computeClassKind() {
         return this.kind();
     }

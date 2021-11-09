@@ -116,6 +116,13 @@ public interface ClassData extends HypoData {
     boolean isFinal();
 
     /**
+     * Returns {@code true} if this class data is synthetic.
+     *
+     * @return {@code true} if this class data is synthetic.
+     */
+    boolean isSynthetic();
+
+    /**
      * Get the {@link ClassKind kind} of this class data.
      *
      * @return The kind of class this class data is.

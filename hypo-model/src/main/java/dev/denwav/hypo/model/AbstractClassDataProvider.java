@@ -277,6 +277,11 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
+            public boolean isSynthetic() {
+                throw new IllegalStateException();
+            }
+
+            @Override
             public @NotNull ClassKind kind() {
                 throw new IllegalStateException();
             }
