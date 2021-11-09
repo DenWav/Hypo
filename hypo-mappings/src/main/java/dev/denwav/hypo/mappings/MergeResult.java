@@ -110,7 +110,7 @@ public final class MergeResult<T extends MergeableMappingsChange<T>> {
      *
      * <p>This method will always return the opposite of {@link #isSuccess()}.
      *
-     * @return {@code true} if this merge result respresents a failed merge.
+     * @return {@code true} if this merge result represents a failed merge.
      */
     public boolean isFailure() {
         return !this.isSuccess();

@@ -49,8 +49,8 @@ public class CopyMappingsDown implements ChangeContributor {
     private CopyMappingsDown() {}
 
     /**
-     * Create a new instance of {@link CopyMappingsDown}/
-     * @return A new instance of {@link CopyMappingsDown}/
+     * Create a new instance of {@link CopyMappingsDown}.
+     * @return A new instance of {@link CopyMappingsDown}.
      */
     @Contract(value = "-> new", pure = true)
     public static @NotNull CopyMappingsDown create() {
@@ -128,7 +128,7 @@ public class CopyMappingsDown implements ChangeContributor {
             if (childClassMapping != null) {
                 final MethodMapping childMapping = getMethodMapping(childClassMapping, childConst.name(), childConst.descriptorText());
                 if (childMapping != null) {
-                    // This constructor has it's own mappings, so don't copy ours
+                    // This constructor has its own mappings, so don't copy ours
                     continue;
                 }
             }

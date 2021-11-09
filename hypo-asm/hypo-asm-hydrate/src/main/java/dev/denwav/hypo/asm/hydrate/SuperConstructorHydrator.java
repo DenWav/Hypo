@@ -151,7 +151,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
                 varArgument = (Variable) arg;
             } else if (arg instanceof MethodCall) {
                 // We will still match the name if a constructor parameter is the only argument passed to a method
-                // This could be for example where the sub-class calls a method to transform the input, but it's
+                // This could be for example where the subclass calls a method to transform the input, but it's
                 // still the same input. For example maybe something like:
                 //
                 //     public SomeClass(String s) {

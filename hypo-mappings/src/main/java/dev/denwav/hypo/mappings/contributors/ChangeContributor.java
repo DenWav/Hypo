@@ -32,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * {@link HypoContext}.
  *
  * <p>All change contributors must have a {@link #name() name}, which may simply be the class name. This name is for
- * error reporting and debuggin purposes only.
+ * error reporting and debugging purposes only.
  */
 public interface ChangeContributor {
 
@@ -47,11 +47,11 @@ public interface ChangeContributor {
      * <p>If {@code classMapping} is {@code null} that means the {@link ClassData} exists in the {@link HypoContext}
      * without a corresponding {@link ClassMapping} in the mapping set.
      *
-     * <p>Either {@code currentClass} or {@code classMapping} may be {@code null}, but they cannot both but {@code null}
-     * at the same time. They probably usually both be present.
+     * <p>Either {@code currentClass} or {@code classMapping} may be {@code null}, but they cannot both be {@code null}
+     * at the same time. They will usually both be present.
      *
      * <p>This contributor may submit any number of mappings changes to the {@link ChangeRegistry}, but generally it
-     * should only submit changes relevent to the current {@link ClassData} and/or {@link ClassMapping} being processed.
+     * should only submit changes relevant to the current {@link ClassData} and/or {@link ClassMapping} being processed.
      *
      * @param currentClass The {@link ClassData} for this mapping, may be {@code null} if the mapping exists without a
      *                     corresponding class in the context.

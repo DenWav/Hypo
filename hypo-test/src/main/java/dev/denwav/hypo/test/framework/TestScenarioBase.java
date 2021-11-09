@@ -104,7 +104,7 @@ public abstract class TestScenarioBase {
     public abstract @NotNull Env env();
 
     /**
-     * Whether or not the JDK should be included as a context provider in the {@link HypoContext}. By default this is
+     * Whether the JDK should be included as a context provider in the {@link HypoContext}. By default, this is
      * {@code false} as it's usually not needed. Including the JDK in the context may slow down the hydration process.
      *
      * @return {@code true} if the JDK should be included as a context provider.

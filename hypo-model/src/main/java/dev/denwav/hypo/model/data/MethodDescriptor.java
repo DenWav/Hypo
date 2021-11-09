@@ -106,7 +106,7 @@ public final class MethodDescriptor {
          * is an array of length 1 - there aren't any validation checks here as this is a private method.
          *
          * This method also returns the index _before_ the next index. So each of the single-character types simply
-         * return return `index` instead of `index + 1`. This is intentional for 2 reasons:
+         * return `index` instead of `index + 1`. This is intentional for 2 reasons:
          *
          *  1. The calling method, `parseString`, is doing range checks on the `desc` string. If the character just
          *     parsed is the final character in the string we don't want to overrun that on accident.

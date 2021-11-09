@@ -35,7 +35,7 @@ import static dev.denwav.hypo.mappings.LorenzUtil.getFieldMapping;
 import static dev.denwav.hypo.mappings.LorenzUtil.getMethodMapping;
 
 /**
- * {@link MappingsChange MappingsChange} which removes the a member mapping.
+ * {@link MappingsChange MappingsChange} which removes a member mapping.
  */
 public class RemoveMappingChange
     extends AbstractMappingsChange

@@ -107,8 +107,7 @@ public final class HypoContext implements AutoCloseable {
      * executor will be created according to the {@link #getConfig() configuration} and returned. This executor will be
      * used for all subsequent requests until this context is {@link #close() closed}.
      *
-     * <p>This method is thread safe: Multiple threads may call it concurrently and they will all receive the same
-     * executor. Concurrent accesses to this method while the executor is being created will all receive the same
+     * <p>This method is thread safe: Multiple threads may call it concurrently, and will all receive the same
      * executor.
      *
      * @return The current {@link ExecutorService executor}.

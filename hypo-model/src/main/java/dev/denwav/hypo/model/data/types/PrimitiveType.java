@@ -100,7 +100,7 @@ public enum PrimitiveType implements JvmType {
      * type character.
      *
      * @param c The character to match to a primitive type.
-     * @return The primitive type associated with the given chatacter.
+     * @return The primitive type associated with the given character.
      * @throws IllegalStateException If the given character does not match an internal JVM primitive type character.
      * @see #asInternalName()
      */

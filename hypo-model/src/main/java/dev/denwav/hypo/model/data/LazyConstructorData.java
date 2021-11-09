@@ -30,7 +30,6 @@ public abstract class LazyConstructorData extends AbstractConstructorData {
      *
      * @return This constructor's descriptor.
      */
-
     public abstract @NotNull MethodDescriptor computeDescriptor();
 
     private final @NotNull LazyValue<MethodDescriptor, ?> descriptor = LazyValue.of(this::computeDescriptor);
