@@ -53,12 +53,12 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > dependencies {
 >     implementation(platform("dev.denwav.hypo:hypo-platform:1.2.4"))
 >     // Whichever modules you need:
->     implemenatation("dev.denwav.hypo:hypo-model")
->     implemenatation("dev.denwav.hypo:hypo-core")
->     implemenatation("dev.denwav.hypo:hypo-hydrate")
->     implemenatation("dev.denwav.hypo:hypo-asm")
->     implemenatation("dev.denwav.hypo:hypo-asm-hydrate")
->     implemenatation("dev.denwav.hypo:hypo-mappings")
+>     implementation("dev.denwav.hypo:hypo-model")
+>     implementation("dev.denwav.hypo:hypo-core")
+>     implementation("dev.denwav.hypo:hypo-hydrate")
+>     implementation("dev.denwav.hypo:hypo-asm")
+>     implementation("dev.denwav.hypo:hypo-asm-hydrate")
+>     implementation("dev.denwav.hypo:hypo-mappings")
 > }
 > ```
 > </details>
@@ -76,12 +76,12 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > dependencies {
 >     implementation platform('dev.denwav.hypo:hypo-platform:1.2.4')
 >     // Whichever modules you need:
->     implemenatation 'dev.denwav.hypo:hypo-model'
->     implemenatation 'dev.denwav.hypo:hypo-core'
->     implemenatation 'dev.denwav.hypo:hypo-hydrate'
->     implemenatation 'dev.denwav.hypo:hypo-asm'
->     implemenatation 'dev.denwav.hypo:hypo-asm-hydrate'
->     implemenatation 'dev.denwav.hypo:hypo-mappings'
+>     implementation 'dev.denwav.hypo:hypo-model'
+>     implementation 'dev.denwav.hypo:hypo-core'
+>     implementation 'dev.denwav.hypo:hypo-hydrate'
+>     implementation 'dev.denwav.hypo:hypo-asm'
+>     implementation 'dev.denwav.hypo:hypo-asm-hydrate'
+>     implementation 'dev.denwav.hypo:hypo-mappings'
 > }
 > ```
 > </details>
