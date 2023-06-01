@@ -1,5 +1,3 @@
-import org.gradle.api.initialization.dsl.VersionCatalogBuilder.AliasBuilder
-
 plugins {
     `version-catalog`
     `hypo-publish`
@@ -11,19 +9,19 @@ hypoPublish {
 
 catalog {
     versionCatalog {
-        alias("hypo-platform").to(projects.hypoMeta.hypoPlatform)
-        alias("hypo-asm-base").to(projects.hypoAsm)
-        alias("hypo-asm-hydrate").to(projects.hypoAsm.hypoAsmHydrate)
-        alias("hypo-core").to(projects.hypoCore)
-        alias("hypo-hydrate").to(projects.hypoHydrate)
-        alias("hypo-mappings").to(projects.hypoMappings)
-        alias("hypo-model").to(projects.hypoModel)
+        library("hypo-platform", projects.hypoMeta.hypoPlatform)
+        library("hypo-asm-base", projects.hypoAsm)
+        library("hypo-asm-hydrate", projects.hypoAsm.hypoAsmHydrate)
+        library("hypo-core", projects.hypoCore)
+        library("hypo-hydrate", projects.hypoHydrate)
+        library("hypo-mappings", projects.hypoMappings)
+        library("hypo-model", projects.hypoModel)
 
         bundle("hypo-base", listOf("hypo-model", "hypo-core", "hypo-hydrate"))
         bundle("hypo-asm", listOf("hypo-asm-base", "hypo-asm-hydrate"))
     }
 }
 
-fun AliasBuilder.to(dep: ProjectDependency) {
-    to(dep.group!!, dep.name).version(dep.version!!)
+fun VersionCatalogBuilder.library(alias: String, dep: ProjectDependency) {
+    library(alias, dep.group!!, dep.name).version(dep.version!!)
 }

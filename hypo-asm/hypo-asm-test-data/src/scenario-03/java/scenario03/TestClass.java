@@ -2,7 +2,7 @@ package scenario03;
 
 import java.util.function.IntSupplier;
 
-// Compiled with JDK 16
+// Compiled with JDK 17
 public class TestClass {
 
     public void doSwitch(SomeEnum someEnum) {

@@ -61,11 +61,11 @@ publishing {
 }
 
 // Don't configure signing unless this is present
-val sonatypeUsername = providers.gradleProperty("sonatypeUsername").forUseAtConfigurationTime()
-val sonatypePassword = providers.gradleProperty("sonatypePassword").forUseAtConfigurationTime()
+val sonatypeUsername = providers.gradleProperty("sonatypeUsername")
+val sonatypePassword = providers.gradleProperty("sonatypePassword")
 
-val gpgSigningKey = providers.environmentVariable("GPG_SIGNING_KEY").forUseAtConfigurationTime()
-val gpgPassphrase = providers.environmentVariable("GPG_PASSPHRASE").forUseAtConfigurationTime()
+val gpgSigningKey = providers.environmentVariable("GPG_SIGNING_KEY")
+val gpgPassphrase = providers.environmentVariable("GPG_PASSPHRASE")
 
 if (sonatypeUsername.isPresent && sonatypePassword.isPresent) {
     signing {

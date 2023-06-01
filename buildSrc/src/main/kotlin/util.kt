@@ -5,7 +5,7 @@ import org.gradle.external.javadoc.StandardJavadocDocletOptions
 import org.gradle.kotlin.dsl.getByType
 
 fun Project.lib(name: String) =
-    rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs").findDependency(name).get()
+    rootProject.extensions.getByType<VersionCatalogsExtension>().named("libs").findLibrary(name).get()
 
 val Javadoc.opt
     get() = options as StandardJavadocDocletOptions

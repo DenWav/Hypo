@@ -1,6 +1,6 @@
 package scenario02;
 
-// Compiled with JDK 16
+// Compiled with JDK 17
 public class TestClass {
 
     public void test() {

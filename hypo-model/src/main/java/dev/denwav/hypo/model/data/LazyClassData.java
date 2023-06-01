@@ -1,7 +1,7 @@
 /*
  * Hypo, an extensible and pluggable Java bytecode analytical model.
  *
- * Copyright (C) 2021  Kyle Wood (DenWav)
+ * Copyright (C) 2023  Kyle Wood (DenWav)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Lesser GNU General Public License as published by

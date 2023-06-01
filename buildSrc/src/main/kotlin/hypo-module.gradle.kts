@@ -37,5 +37,5 @@ tasks.javadoc {
 }
 
 configure<LicenseExtension> {
-    header = rootProject.file("header.txt")
+    header(rootProject.file("header.txt"))
 }

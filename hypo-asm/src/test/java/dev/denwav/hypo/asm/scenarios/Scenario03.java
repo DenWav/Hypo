@@ -1,7 +1,7 @@
 /*
  * Hypo, an extensible and pluggable Java bytecode analytical model.
  *
- * Copyright (C) 2021  Kyle Wood (DenWav)
+ * Copyright (C) 2023  Kyle Wood (DenWav)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Lesser GNU General Public License as published by
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 03 - Synthetic classes and members (Java 16)")
+@DisplayName("[asm] Scenario 03 - Synthetic classes and members (Java 17)")
 public class Scenario03 extends TestScenarioBase {
 
     @Override

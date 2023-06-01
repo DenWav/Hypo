@@ -8,20 +8,12 @@ jobs:
     name: Deploy
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          java-version: 16
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/jdks
-            ~/.gradle/native
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+          distribution: 'temurin'
+          java-version: 17
+          cache: 'gradle'
       - uses: gradle/wrapper-validation-action@v1
       - run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository --no-daemon --stacktrace
         env:
@@ -37,7 +29,7 @@ jobs:
           echo ::set-output name=tag::$tag_name
       - name: Generate release changelog
         id: generate-release-changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           onlyLastTag: true

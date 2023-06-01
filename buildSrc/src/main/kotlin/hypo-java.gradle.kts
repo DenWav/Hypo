@@ -6,7 +6,7 @@ val hypoJava = extensions.create("hypoJava", HypoJavaExtension::class)
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(16))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
     withSourcesJar()
 }
@@ -18,7 +18,7 @@ tasks.withType<JavaCompile>().configureEach {
 afterEvaluate {
     tasks.jar {
         for (projDep in hypoJava.jdkVersionProjects.get()) {
-            val task = projDep.dependencyProject.tasks.compileJava
+            val task = projDep.dependencyProject.sourceSets.main.map { it.output }
             dependsOn(task)
 
             from(task)
@@ -53,6 +53,11 @@ afterEvaluate {
 
             val url = "$base/${p.group}/${p.name}/${p.version}"
             opt.linksOffline(url, javadocTask.get().destinationDir!!.absolutePath)
+        }
+
+        doLast {
+            // a lot of tools still require a package-list file instead of element-list
+            destinationDir!!.resolve("element-list").copyTo(destinationDir!!.resolve("package-list"))
         }
     }
 }

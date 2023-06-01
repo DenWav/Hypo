@@ -1,7 +1,7 @@
 /*
  * Hypo, an extensible and pluggable Java bytecode analytical model.
  *
- * Copyright (C) 2021  Kyle Wood (DenWav)
+ * Copyright (C) 2023  Kyle Wood (DenWav)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Lesser GNU General Public License as published by
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * {@link ClassProviderRoot} implementation for system classes for Java 9+. Tested on JDKs up to Java 16.
+ * {@link ClassProviderRoot} implementation for system classes for Java 9+. Tested on JDKs up to Java 17.
  */
 @SuppressWarnings("unused") // Loaded dynamically
 class  SystemClassProviderRootJdk9 implements ClassProviderRoot {

@@ -1,7 +1,7 @@
 /*
  * Hypo, an extensible and pluggable Java bytecode analytical model.
  *
- * Copyright (C) 2021  Kyle Wood (DenWav)
+ * Copyright (C) 2023  Kyle Wood (DenWav)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the Lesser GNU General Public License as published by
@@ -64,7 +64,7 @@ import org.jetbrains.annotations.Nullable;
  * </ol>
  *
  * <p>The system JDK root will use the currently running JVM to provide class file data for core JVM classes. Specific
- * implementations compatible with and tested against Java 8 through Java 16 will be returned based on the version of
+ * implementations compatible with and tested against Java 8 through Java 17 will be returned based on the version of
  * the currently running JVM. Later versions of Java may also be supported, but this cannot be guaranteed.
  *
  * <p>Roots are {@link AutoCloseable} as they operate over file system resources. Roots passed into an
@@ -95,7 +95,7 @@ public interface ClassProviderRoot extends AutoCloseable {
     /**
      * Return the system root, which allows reading class data for the currently running JVM. This method will return
      * different implementations depending on the version of the JVM currently running, it is compatible with and has
-     * been tested against at least Java 8 through Java 16. Later version of Java may also be compatible as well, but
+     * been tested against at least Java 8 through Java 17. Later version of Java may also be compatible as well, but
      * that cannot be guaranteed.
      *
      * @return The root corresponding to the currently running JVM's system class files.

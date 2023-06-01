@@ -32,7 +32,7 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     // For tests, lets use the better APIs
-    options.release.set(16)
+    options.release.set(17)
 }
 
 hypoJava {
@@ -51,4 +51,8 @@ hypoJava {
         projects.hypoAsm.hypoAsmHydrate,
         projects.hypoMappings
     )
+}
+
+tasks.javadoc {
+    isEnabled = false
 }
