@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
@@ -154,6 +155,21 @@ public interface ClassData extends HypoData {
      * @throws IOException If an IO error occurs while reading the interfaces.
      */
     @NotNull Set<ClassData> interfaces() throws IOException;
+
+    /**
+     * Returns {@code true} if this class data is {@code sealed}.
+     * @return {@code true} if this class data is {@code sealed}.
+     */
+    boolean isSealed();
+
+    /**
+     * If this class data {@link #isSealed() represents a sealed class}, return the set of classes which are permitted
+     * to extend this one. For any classes which aren't sealed, {@code null} is returned.
+     *
+     * @return The set of classes which are permitted to extend this sealed class.
+     * @throws IOException If an IO error occurs while reading one of the permitted classes.
+     */
+    @Nullable Set<ClassData> permittedClasses() throws IOException;
 
     /**
      * Return a {@link Stream} which iterates over all class datas this class data either extends or implements.

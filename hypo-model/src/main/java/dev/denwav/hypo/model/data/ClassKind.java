@@ -41,5 +41,9 @@ public enum ClassKind {
     /**
      * Annotation class.
      */
-    ANNOTATION
+    ANNOTATION,
+    /**
+     * Record class.
+     */
+    RECORD,
 }

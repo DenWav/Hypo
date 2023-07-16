@@ -21,6 +21,7 @@ package dev.denwav.hypo.mappings;
 import dev.denwav.hypo.mappings.changes.MemberReference;
 import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -45,7 +46,7 @@ import static dev.denwav.hypo.model.HypoModelUtil.cast;
  * <p>The current registry may be re-used by calling {@link #clear()} between iterations of change submission and
  * change application, but in practice it's not any cheaper than to simply create a new instance of this class.
  *
- * <h2>Handling multiple changes to a single target</h2>
+ * <br><h2>Handling multiple changes to a single target</h2>
  * <p>In either case of {@link #submitChange(ClassMappingsChange) class mappings changes} or
  * {@link #submitChange(MappingsChange) member mappings changes} only a single change may target a class or member per
  * change application. The one exception is if all changes targeting a give member implement
@@ -68,7 +69,7 @@ public final class ChangeRegistry {
      * @param change The change to submit to this registry.
      */
     public void submitChange(final @NotNull MappingsChange change) {
-        this.changes.computeIfAbsent(change.target(), k -> new ArrayList<>()).add(change);
+        this.changes.computeIfAbsent(change.target(), k -> Collections.synchronizedList(new ArrayList<>())).add(change);
     }
 
     /**
@@ -78,7 +79,7 @@ public final class ChangeRegistry {
      * @param change The change to submit to this registry.
      */
     public void submitChange(final @NotNull ClassMappingsChange change) {
-        this.classChanges.computeIfAbsent(change.targetClass(), k -> new ArrayList<>()).add(change);
+        this.classChanges.computeIfAbsent(change.targetClass(), k -> Collections.synchronizedList(new ArrayList<>())).add(change);
     }
 
     /**

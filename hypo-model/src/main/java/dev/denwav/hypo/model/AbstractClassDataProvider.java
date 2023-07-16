@@ -282,6 +282,16 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
+            public boolean isSealed() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public @Nullable Set<ClassData> permittedClasses() {
+                throw new IllegalStateException();
+            }
+
+            @Override
             public @NotNull ClassKind kind() {
                 throw new IllegalStateException();
             }

@@ -77,6 +77,21 @@ public abstract class LazyClassData extends AbstractClassData {
     public abstract boolean computeIsSynthetic();
 
     /**
+     * {@code compute} variant of {@link #isSealed()}.
+     *
+     * @return {@code true} if this class is sealed.
+     */
+    public abstract boolean computeIsSealed();
+
+    /**
+     * {@code compute} variant of {@link #permittedClasses()} .
+     *
+     * @return The set of permitted classes for this sealed class.
+     * @throws IOException If an IO error occurs while reading the permitted classes.
+     */
+    public abstract @Nullable Set<ClassData> computePermittedClasses() throws IOException;
+
+    /**
      * {@code compute} variant of {@link #kind()}.
      *
      * @return The {@link ClassKind kind} of this class.
@@ -148,6 +163,18 @@ public abstract class LazyClassData extends AbstractClassData {
     @Override
     public boolean isSynthetic() {
         return this.isSynthetic.getNotNull();
+    }
+
+    private final LazyValue<Boolean, ?> isSealed = LazyValue.of(this::computeIsSealed);
+    @Override
+    public boolean isSealed() {
+        return this.isSealed.getNotNull();
+    }
+
+    private final LazyValue<Set<ClassData>, IOException> permittedClasses = LazyValue.of(this::computePermittedClasses);
+    @Override
+    public @Nullable Set<ClassData> permittedClasses() throws IOException {
+        return this.permittedClasses.getOrThrow();
     }
 
     private final @NotNull LazyValue<ClassKind, ?> classKind = LazyValue.of(this::computeClassKind);

@@ -28,6 +28,7 @@ import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import org.jetbrains.annotations.Contract;
@@ -126,6 +127,28 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
+    public boolean computeIsSealed() {
+        return this.isSealed();
+    }
+    @Override
+    public boolean isSealed() {
+        return this.node.permittedSubclasses != null;
+    }
+
+    @Override
+    public @Nullable Set<ClassData> computePermittedClasses() throws IOException {
+        final List<String> permitted = this.node.permittedSubclasses;
+        if (permitted == null) {
+            return null;
+        }
+        final HashSet<ClassData> result = new HashSet<>(permitted.size());
+        for (final String name : permitted) {
+            result.add(this.prov().findClass(name));
+        }
+        return result;
+    }
+
+    @Override
     public @NotNull ClassKind computeClassKind() {
         return this.kind();
     }
@@ -139,6 +162,8 @@ public class AsmClassData extends LazyClassData {
             return ClassKind.ABSTRACT_CLASS;
         } else if ((this.node.access & Opcodes.ACC_ENUM) != 0) {
             return ClassKind.ENUM;
+        } else if ((this.node.access & Opcodes.ACC_RECORD) != 0) {
+            return ClassKind.RECORD;
         } else {
             return ClassKind.CLASS;
         }

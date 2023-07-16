@@ -63,7 +63,7 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
 
     @Override
     public void hydrate(@NotNull AsmMethodData data, @NotNull HypoContext context) throws IOException {
-        if (!data.isSynthetic() || !data.isBridge() || data.name().indexOf('$') != -1) {
+        if (!data.isSynthetic() || data.name().indexOf('$') != -1) {
             return;
         }
 
