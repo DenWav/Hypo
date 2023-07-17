@@ -27,6 +27,7 @@ import dev.denwav.hypo.model.data.LazyClassData;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -40,10 +41,15 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InnerClassNode;
 import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.RecordComponentNode;
+
+import static dev.denwav.hypo.asm.HypoAsmUtil.toJvmType;
+import static org.objectweb.asm.Type.getType;
 
 /**
  * Implementation of {@link ClassData} based on {@code asm}'s {@link ClassNode}.
  */
+@SuppressWarnings("resource")
 public class AsmClassData extends LazyClassData {
 
     private final @NotNull ClassNode node;
@@ -145,6 +151,24 @@ public class AsmClassData extends LazyClassData {
         for (final String name : permitted) {
             result.add(this.prov().findClass(name));
         }
+        return result;
+    }
+
+    @Override
+    public @Nullable List<@NotNull FieldData> computeRecordComponents() {
+        final List<RecordComponentNode> components = this.node.recordComponents;
+        if (components == null) {
+            return null;
+        }
+
+        final ArrayList<@NotNull FieldData> result = new ArrayList<>();
+        for (final RecordComponentNode componentNode : components) {
+            final FieldData field = this.field(componentNode.name, toJvmType(getType(componentNode.descriptor)));
+            if (field != null) {
+                result.add(field);
+            }
+        }
+
         return result;
     }
 

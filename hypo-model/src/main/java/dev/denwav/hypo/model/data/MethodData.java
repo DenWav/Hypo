@@ -20,6 +20,7 @@ package dev.denwav.hypo.model.data;
 
 import dev.denwav.hypo.model.data.types.JvmType;
 import dev.denwav.hypo.model.data.types.PrimitiveType;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -118,9 +119,20 @@ public interface MethodData extends MemberData {
      *         index.
      * @see #param(int)
      */
+    @SuppressWarnings("EmptyCatch")
     default @Nullable JvmType paramLvt(final int i) {
         final List<@NotNull JvmType> params = this.descriptor().getParams();
+        // `this`
         int index = this.isStatic() ? 0 : 1;
+
+        // `this$0`
+        final ClassData parent = this.parentClass();
+        try {
+            if (this.isConstructor() && !parent.isStaticInnerClass() && parent.outerClass() != null) {
+                index++;
+            }
+        } catch (final IOException ignored) {}
+
         for (final JvmType param : params) {
             if (index == i) {
                 return param;

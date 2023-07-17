@@ -19,9 +19,9 @@
 package dev.denwav.hypo.mappings.changes;
 
 import dev.denwav.hypo.mappings.LorenzUtil;
+import dev.denwav.hypo.mappings.MappingsChange;
 import dev.denwav.hypo.mappings.MergeResult;
 import dev.denwav.hypo.mappings.MergeableMappingsChange;
-import dev.denwav.hypo.mappings.MappingsChange;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.model.ClassMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
@@ -60,7 +60,10 @@ public class RemoveParameterMappingChange
     }
 
     @Override
-    public void applyChange(final @NotNull MappingSet input, final @NotNull MemberReference target) {
+    public void applyChange(
+        final @NotNull MappingSet input,
+        final @NotNull MemberReference target
+    ) {
         if (target.desc() == null) {
             return;
         }
@@ -98,5 +101,19 @@ public class RemoveParameterMappingChange
 
     private static boolean isBitSet(final long bitset, final int index) {
         return ((bitset >> index) & 1) == 1;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 64; i++) {
+            if (isBitSet(this.indices, i)) {
+                if (sb.length() != 0) {
+                    sb.append(", ");
+                }
+                sb.append(i);
+            }
+        }
+        return "Remove parameter mappings for indices [" + sb + "] from " + this.target();
     }
 }

@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
  * {@link ClassProviderRoot} implementation for system classes for Java 9+. Tested on JDKs up to Java 17.
  */
 @SuppressWarnings("unused") // Loaded dynamically
-class  SystemClassProviderRootJdk9 implements ClassProviderRoot {
+class SystemClassProviderRootJdk9 implements ClassProviderRoot {
 
     private final @NotNull List<ModuleReader> readers;
 
@@ -73,13 +73,13 @@ class  SystemClassProviderRootJdk9 implements ClassProviderRoot {
     }
 
     @Override
-    public @NotNull List<? extends ClassDataReference> getAllClasses() throws IOException {
-        List<ClassDataReference> refs = null;
+    public @NotNull List<? extends FileDataReference> getAllClasses() throws IOException {
+        List<FileDataReference> refs = null;
 
         for (final ModuleReader reader : this.readers) {
-            final List<ClassDataReference> list = reader.list()
+            final List<FileDataReference> list = reader.list()
                 .filter(n -> n.endsWith(".class"))
-                .map(n -> new SystemClassDataReference(n, reader))
+                .map(n -> new SystemFileDataReference(n, reader))
                 .collect(Collectors.toList());
 
             if (refs == null) {
@@ -107,20 +107,20 @@ class  SystemClassProviderRootJdk9 implements ClassProviderRoot {
     }
 
     /**
-     * Implementation of {@link ClassDataReference} for {@link SystemClassProviderRootJdk9}.
+     * Implementation of {@link FileDataReference} for {@link SystemClassProviderRootJdk9}.
      */
-    static final class SystemClassDataReference implements ClassDataReference {
+    static final class SystemFileDataReference implements FileDataReference {
 
         private final @NotNull String name;
         private final @NotNull ModuleReader reader;
 
         /**
-         * Construct a new instance of {@link SystemClassDataReference}.
+         * Construct a new instance of {@link SystemFileDataReference}.
          *
          * @param name The file name.
          * @param reader The {@link ModuleReader} to read the class from.
          */
-        SystemClassDataReference(final @NotNull String name, final @NotNull ModuleReader reader) {
+        SystemFileDataReference(final @NotNull String name, final @NotNull ModuleReader reader) {
             this.name = name;
             this.reader = reader;
         }

@@ -68,9 +68,9 @@ public record BytecodeRenamer(
     }
 
     @Override
-    public @NotNull List<? extends ClassDataReference> getAllClasses() throws IOException {
+    public @NotNull List<? extends FileDataReference> getAllClasses() throws IOException {
         return this.delegate.getAllClasses().stream()
-            .map(r -> new WrappedClassDataReference(r, this.map))
+            .map(r -> new WrappedFileDataReference(r, this.map))
             .collect(Collectors.toList());
     }
 
@@ -80,13 +80,13 @@ public record BytecodeRenamer(
     }
 
     /**
-     * {@link ClassDataReference} implementation for {@link BytecodeRenamer}. This will call
+     * {@link FileDataReference} implementation for {@link BytecodeRenamer}. This will call
      * {@link #rename(byte[], Map)} on the class data before returning it.
      */
-    record WrappedClassDataReference(
-        @NotNull ClassProviderRoot.ClassDataReference delegate,
+    record WrappedFileDataReference(
+        @NotNull ClassProviderRoot.FileDataReference delegate,
         @NotNull Map<String, Map<String, String>> map
-    ) implements ClassDataReference {
+    ) implements FileDataReference {
 
         @Override
         public @NotNull String name() {

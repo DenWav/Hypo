@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -83,14 +84,29 @@ public interface ClassProviderRoot extends AutoCloseable {
     byte @Nullable [] getClassData(final @NotNull String fileName) throws IOException;
 
     /**
-     * Find all of the classes available to this root and return {@link ClassDataReference references} to them, without
+     * Find all of the classes available to this root and return {@link FileDataReference references} to them, without
      * actually loading and returning the whole file itself. This allows providers to enumerate the full list of all
      * class files while still being able to lazily load the class data itself.
      *
-     * @return A list of {@link ClassDataReference} corresponding to every class file available to this root.
+     * @return A list of {@link FileDataReference} corresponding to every class file available to this root.
      * @throws IOException If an IO error occurs while enumerating the file list.
      */
-    @NotNull List<? extends ClassDataReference> getAllClasses() throws IOException;
+    @NotNull List<? extends FileDataReference> getAllClasses() throws IOException;
+
+    /**
+     * Get a {@link Stream} which walks the full file tree of this root, including all non-class files. This is an
+     * experimental API which is not guaranteed to be implemented. If not implemented, it will simply return an empty
+     * stream.
+     *
+     * <p>The returned {@link Stream} must be closed, as it will contain references to open file handles.
+     *
+     * @return A {@link Stream} which walks the full file tree of this root, include all non-class files.
+     * @throws IOException If an IO error occurs creating the stream.
+     */
+    @ApiStatus.Experimental
+    default @NotNull Stream<? extends FileDataReference> walkAllFiles() throws IOException {
+        return Stream.of();
+    }
 
     /**
      * Return the system root, which allows reading class data for the currently running JVM. This method will return
@@ -122,6 +138,7 @@ public interface ClassProviderRoot extends AutoCloseable {
      * @param paths An array of {@link Path paths} to use as root directories for multiple roots.
      * @return A new list of roots corresponding to the array of directories.
      */
+    @SuppressWarnings("resource")
     static @NotNull List<@NotNull ClassProviderRoot> fromDirs(final @NotNull Path @NotNull ... paths) {
         final ClassProviderRoot[] roots = new ClassProviderRoot[paths.length];
         for (int i = 0; i < paths.length; i++) {
@@ -150,6 +167,7 @@ public interface ClassProviderRoot extends AutoCloseable {
      * @return A new list of roots corresponding to the array of jars.
      * @throws IOException If an IO error occurs while trying to read one of the jar files.
      */
+    @SuppressWarnings("resource")
     static @NotNull List<@NotNull ClassProviderRoot> fromJars(final @NotNull Path @NotNull ... paths) throws IOException {
         final ClassProviderRoot[] roots = new ClassProviderRoot[paths.length];
         for (int i = 0; i < paths.length; i++) {
@@ -161,12 +179,14 @@ public interface ClassProviderRoot extends AutoCloseable {
     /**
      * A reference to a class file, with the ability to later load the data for the referenced class via the
      * {@link #readData()} method.
+     *
      * @see #getAllClasses()
      */
-    interface ClassDataReference {
+    interface FileDataReference {
 
         /**
          * The name of the class, in the internal JVM format.
+         *
          * @return The name of the class, in the internal JVM format.
          */
         @NotNull String name();
@@ -177,7 +197,7 @@ public interface ClassProviderRoot extends AutoCloseable {
          * by the time this method is called.
          *
          * @return The raw binary data for the class file this is referencing, or {@code null} if the class file cannot
-         *         be found anymore.
+         * be found anymore.
          * @throws IOException If an IO error occurs while reading the file.
          */
         byte @Nullable [] readData() throws IOException;
@@ -185,20 +205,20 @@ public interface ClassProviderRoot extends AutoCloseable {
 }
 
 /**
- * Generic implementation of {@link ClassProviderRoot.ClassDataReference} for {@link Path} objects.
+ * Generic implementation of {@link ClassProviderRoot.FileDataReference} for {@link Path} objects.
  */
-final class PathClassDataReference implements ClassProviderRoot.ClassDataReference {
+final class PathFileDataReference implements ClassProviderRoot.FileDataReference {
 
     private final @NotNull String name;
     private final @NotNull Path path;
 
     /**
-     * Constructor for {@link PathClassDataReference}.
+     * Constructor for {@link PathFileDataReference}.
      *
      * @param name The name of the class this is a reference to.
      * @param path The {@link Path} object referring to the class file.
      */
-    PathClassDataReference(final @NotNull String name, final @NotNull Path path) {
+    PathFileDataReference(final @NotNull String name, final @NotNull Path path) {
         this.name = name;
         this.path = path;
     }
@@ -244,16 +264,24 @@ final class DirClassProviderRoot implements ClassProviderRoot {
     }
 
     @Override
-    public @NotNull List<? extends ClassDataReference> getAllClasses() throws IOException {
+    public @NotNull List<? extends FileDataReference> getAllClasses() throws IOException {
         final PathMatcher pathMatcher = this.root.getFileSystem().getPathMatcher("glob:*.class");
-        final List<ClassDataReference> result;
+        final List<FileDataReference> result;
         try (final Stream<Path> stream = Files.walk(this.root)) {
             result = stream.filter(Files::isRegularFile)
                 .filter(p -> pathMatcher.matches(p.getFileName()))
-                .map(p -> new PathClassDataReference(this.root.relativize(p).toString(), p))
+                .map(p -> new PathFileDataReference(this.root.relativize(p).toString(), p))
                 .collect(Collectors.toList());
         }
         return result;
+    }
+
+    @SuppressWarnings({"resource", "StreamResourceLeak"})
+    @Override
+    public @NotNull Stream<? extends FileDataReference> walkAllFiles() throws IOException {
+        return Files.walk(this.root)
+            .filter(Files::isRegularFile)
+            .map(p -> new PathFileDataReference(this.root.relativize(p).toString(), p));
     }
 
     @Override
@@ -296,15 +324,15 @@ final class JarClassProviderRoot implements ClassProviderRoot {
     }
 
     @Override
-    public @NotNull List<? extends ClassDataReference> getAllClasses() throws IOException {
+    public @NotNull List<? extends FileDataReference> getAllClasses() throws IOException {
         final PathMatcher pathMatcher = this.fileSystem.getPathMatcher("glob:*.class");
-        List<ClassDataReference> result = null;
+        List<FileDataReference> result = null;
         for (final Path root : this.roots) {
             try (final Stream<Path> stream = Files.walk(root)) {
-                final List<ClassDataReference> r = stream
+                final List<FileDataReference> r = stream
                     .filter(Files::isRegularFile)
                     .filter(p -> pathMatcher.matches(p.getFileName()))
-                    .map(p -> new PathClassDataReference(root.relativize(p).toString(), p))
+                    .map(p -> new PathFileDataReference(root.relativize(p).toString(), p))
                     .collect(Collectors.toList());
 
                 if (result == null) {
@@ -315,6 +343,16 @@ final class JarClassProviderRoot implements ClassProviderRoot {
             }
         }
         return result == null ? Collections.emptyList() : result;
+    }
+
+    @SuppressWarnings({"resource", "StreamResourceLeak", "RedundantThrows"})
+    @Override
+    public @NotNull Stream<? extends FileDataReference> walkAllFiles() throws IOException {
+        return this.roots.stream()
+            .flatMap(HypoModelUtil.wrapFunction(root ->
+                Files.walk(root)
+                    .filter(Files::isRegularFile)
+                    .map(p -> new PathFileDataReference(root.relativize(p).toString(), p))));
     }
 
     @Override

@@ -19,6 +19,7 @@
 package dev.denwav.hypo.model.data;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -84,12 +85,19 @@ public abstract class LazyClassData extends AbstractClassData {
     public abstract boolean computeIsSealed();
 
     /**
-     * {@code compute} variant of {@link #permittedClasses()} .
+     * {@code compute} variant of {@link #permittedClasses()}.
      *
      * @return The set of permitted classes for this sealed class.
      * @throws IOException If an IO error occurs while reading the permitted classes.
      */
     public abstract @Nullable Set<ClassData> computePermittedClasses() throws IOException;
+
+    /**
+     * {@code compute} variant of {@link #recordComponents()}.
+     *
+     * @return The list of fields representing the components of this record.
+     */
+    public abstract @Nullable List<@NotNull FieldData> computeRecordComponents();
 
     /**
      * {@code compute} variant of {@link #kind()}.
@@ -175,6 +183,12 @@ public abstract class LazyClassData extends AbstractClassData {
     @Override
     public @Nullable Set<ClassData> permittedClasses() throws IOException {
         return this.permittedClasses.getOrThrow();
+    }
+
+    private final LazyValue<List<FieldData>, ?> recordComponents = LazyValue.of(this::computeRecordComponents);
+    @Override
+    public @Nullable List<@NotNull FieldData> recordComponents() {
+        return this.recordComponents.get();
     }
 
     private final @NotNull LazyValue<ClassKind, ?> classKind = LazyValue.of(this::computeClassKind);

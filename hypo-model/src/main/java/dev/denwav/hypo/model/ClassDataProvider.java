@@ -22,6 +22,7 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.types.ClassType;
 import dev.denwav.hypo.model.data.types.JvmType;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -115,7 +116,7 @@ public interface ClassDataProvider extends AutoCloseable {
      *
      * @param className The internal JVM name of the class.
      * @return The parsed {@link ClassData} object corresponding with the given name, or {@code null} if the class name
-     *         cannot be found.
+     * cannot be found.
      * @throws IOException If an IO error occurs while attempting to read the class file.
      * @see #findClass(JvmType)
      */
@@ -139,7 +140,7 @@ public interface ClassDataProvider extends AutoCloseable {
      * @param type The {@link JvmType} of the class to find. Must be an instance of {@link ClassType} or this method
      *             will always return {@code null}.
      * @return The {@link ClassData} object corresponding with the given {@link JvmType}, or {@code null} if the type is
-     *         not a {@link ClassType} or the class name cannot be found.
+     * not a {@link ClassType} or the class name cannot be found.
      * @throws IOException If an IO error occurs while attempting to read the class file.
      * @see #findClass(String)
      */
@@ -202,4 +203,11 @@ public interface ClassDataProvider extends AutoCloseable {
      * @throws IOException If an IO error occurs while reading the classes.
      */
     @NotNull Stream<ClassData> stream() throws IOException;
+
+    /**
+     * Returns the collection of {@link ClassProviderRoot roots} used by this provider.
+     *
+     * @return The collection of {@link ClassProviderRoot roots} used by this provider.
+     */
+    @NotNull Collection<ClassProviderRoot> roots();
 }

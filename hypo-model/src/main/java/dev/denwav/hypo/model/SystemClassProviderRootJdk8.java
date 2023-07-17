@@ -76,7 +76,7 @@ class SystemClassProviderRootJdk8 implements ClassProviderRoot {
     }
 
     @Override
-    public @NotNull List<? extends ClassDataReference> getAllClasses() throws IOException {
+    public @NotNull List<? extends FileDataReference> getAllClasses() throws IOException {
         return this.delegate.getAllClasses();
     }
 

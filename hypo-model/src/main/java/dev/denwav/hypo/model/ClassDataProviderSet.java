@@ -22,6 +22,7 @@ import dev.denwav.hypo.model.data.ClassData;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -124,5 +125,12 @@ public class ClassDataProviderSet implements ClassDataProvider {
         if (thrown != null) {
             throw thrown;
         }
+    }
+
+    @Override
+    public @NotNull Collection<ClassProviderRoot> roots() {
+        return this.delegateProviders.stream()
+            .flatMap(p -> p.roots().stream())
+            .collect(Collectors.toList());
     }
 }

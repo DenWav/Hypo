@@ -18,13 +18,14 @@
 
 package dev.denwav.hypo.mappings.changes;
 
+import com.google.errorprone.annotations.Immutable;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.MethodData;
-import com.google.errorprone.annotations.Immutable;
 import java.util.Objects;
 import org.cadixdev.bombe.type.FieldType;
 import org.cadixdev.lorenz.model.FieldMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
+import org.cadixdev.lorenz.model.MethodParameterMapping;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,16 +33,18 @@ import org.jetbrains.annotations.Nullable;
 import static dev.denwav.hypo.mappings.LorenzUtil.getType;
 
 /**
- * A reference to a class member.
+ * A reference to a class or method member.
  *
  * <p>Class member references are made of up 3 parts:
  * <ol>
  *     <li>{@link #className() Class name}</li>
  *     <li>{@link #name() Member name}</li>
  *     <li>{@link #desc() Member desccriptor}</li>
+ *     <li>{@link #index() Member index}</li>
  * </ol>
  *
  * <p>The descriptor is optional for fields, but is required for methods.
+ * <p>The index specifies parameter references.
  *
  * <p>Member references are immutable.
  */
@@ -51,6 +54,7 @@ public final class MemberReference {
     private final @NotNull String className;
     private final @NotNull String memberName;
     private final @Nullable String memberDesc;
+    private final int index;
 
     /**
      * Construct a new {@link MemberReference}.
@@ -67,6 +71,27 @@ public final class MemberReference {
         this.className = className;
         this.memberName = memberName;
         this.memberDesc = memberDesc;
+        this.index = -1;
+    }
+
+    /**
+     * Construct a new {@link MemberReference} for a parameter.
+     *
+     * @param className The name of the class.
+     * @param memberName The name of the member.
+     * @param memberDesc The descriptor of the member.
+     * @param index The index of the parameter.
+     */
+    public MemberReference(
+        final @NotNull String className,
+        final @NotNull String memberName,
+        final @NotNull String memberDesc,
+        final int index
+    ) {
+        this.className = className;
+        this.memberName = memberName;
+        this.memberDesc = memberDesc;
+        this.index = index;
     }
 
     /**
@@ -87,6 +112,17 @@ public final class MemberReference {
      */
     public static @NotNull MemberReference of(final @NotNull FieldData field) {
         return new MemberReference(field.parentClass().name(), field.name(), field.fieldType().asInternalName());
+    }
+
+    /**
+     * Create a parameter reference pointing to the given {@link MethodData} at the specified index.
+     *
+     * @param method The method the reference should point to.
+     * @param index The parameter index the reference should point to.
+     * @return The new {@link MemberReference}.
+     */
+    public static @NotNull MemberReference of(final @NotNull MethodData method, final int index) {
+        return new MemberReference(method.parentClass().name(), method.name(), method.descriptorText(), index);
     }
 
     /**
@@ -121,6 +157,22 @@ public final class MemberReference {
     }
 
     /**
+     * Create a reference pointing to the obfuscated name of the given {@link MethodParameterMapping}.
+     *
+     * @param mapping The parameter mapping the reference should point to.
+     * @return The new {@link MemberReference}.
+     */
+    public static @NotNull MemberReference of(final @NotNull MethodParameterMapping mapping) {
+        final MethodMapping method = mapping.getParent();
+        return new MemberReference(
+            method.getParent().getFullObfuscatedName(),
+            method.getObfuscatedName(),
+            method.getObfuscatedDescriptor(),
+            mapping.getIndex()
+        );
+    }
+
+    /**
      * Returns the name of the class the member this refers to is declared in.
      * @return The name of the class the member this refers to is declared in.
      */
@@ -144,6 +196,14 @@ public final class MemberReference {
         return this.memberDesc;
     }
 
+    /**
+     * Returns the parameter index of the reference.
+     * @return The parameter index of the reference.
+     */
+    public int index() {
+        return this.index;
+    }
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
@@ -151,18 +211,23 @@ public final class MemberReference {
         final MemberReference that = (MemberReference) o;
         return this.className.equals(that.className)
             && this.memberName.equals(that.memberName)
-            && Objects.equals(this.memberDesc, that.memberDesc);
+            && Objects.equals(this.memberDesc, that.memberDesc)
+            && this.index == that.index;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.className, this.memberName, this.memberDesc);
+        return Objects.hash(this.className, this.memberName, this.memberDesc, this.index);
     }
 
     @Override
     public String toString() {
         if (this.memberDesc != null) {
-            return this.className + "#" + this.memberName + " " + this.memberDesc;
+            if (this.index != -1) {
+                return this.className + "#" + this.memberName + this.memberDesc + "##" + this.index;
+            } else {
+                return this.className + "#" + this.memberName + " " + this.memberDesc;
+            }
         } else {
             return this.className + "#" + this.memberName;
         }

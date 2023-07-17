@@ -28,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -169,7 +170,16 @@ public interface ClassData extends HypoData {
      * @return The set of classes which are permitted to extend this sealed class.
      * @throws IOException If an IO error occurs while reading one of the permitted classes.
      */
-    @Nullable Set<ClassData> permittedClasses() throws IOException;
+    @Nullable Set<@NotNull ClassData> permittedClasses() throws IOException;
+
+    /**
+     * If this class data {@link ClassKind#RECORD represents a record}, return the set of fields associated with the
+     * components of this record. For any classes which aren't records, {@code null} is returned.
+     *
+     * @return the list of fields reprsenting the components of this record.
+     */
+    @ApiStatus.Experimental
+    @Nullable List<@NotNull FieldData> recordComponents();
 
     /**
      * Return a {@link Stream} which iterates over all class datas this class data either extends or implements.
@@ -270,7 +280,7 @@ public interface ClassData extends HypoData {
             return true;
         }
         try {
-            for (final ClassData iface :this.interfaces()){
+            for (final ClassData iface : this.interfaces()) {
                 if (iface != null) {
                     return iface.doesExtend(that);
                 }

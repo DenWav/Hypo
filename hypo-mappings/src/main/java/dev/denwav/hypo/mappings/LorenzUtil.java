@@ -163,9 +163,12 @@ public final class LorenzUtil {
      * @see #unwrap(Optional)
      */
     public static @Nullable ClassMapping<?, ?> getClassMapping(
-        final @NotNull MappingSet mappings,
+        final @Nullable MappingSet mappings,
         final @NotNull String obfuscatedName
     ) {
+        if (mappings == null) {
+            return null;
+        }
         return unwrap(mappings.getClassMapping(obfuscatedName));
     }
 
@@ -179,10 +182,13 @@ public final class LorenzUtil {
      * @see #unwrap(Optional)
      */
     public static @Nullable MethodMapping getMethodMapping(
-        final @NotNull ClassMapping<?, ?> mapping,
+        final @Nullable ClassMapping<?, ?> mapping,
         final @NotNull String name,
         final @NotNull String desc
     ) {
+        if (mapping == null) {
+            return null;
+        }
         return unwrap(mapping.getMethodMapping(name, desc));
     }
 
@@ -195,9 +201,12 @@ public final class LorenzUtil {
      * @see #unwrap(Optional)
      */
     public static @Nullable FieldMapping getFieldMapping(
-        final @NotNull ClassMapping<?, ?> mapping,
+        final @Nullable ClassMapping<?, ?> mapping,
         final @NotNull String name
     ) {
+        if (mapping == null) {
+            return null;
+        }
         return unwrap(mapping.getFieldMapping(name));
     }
 
@@ -210,9 +219,12 @@ public final class LorenzUtil {
      * @see #unwrap(Optional)
      */
     public static @Nullable FieldMapping getFieldMapping(
-        final @NotNull ClassMapping<?, ?> mapping,
+        final @Nullable ClassMapping<?, ?> mapping,
         final @NotNull FieldSignature sig
     ) {
+        if (mapping == null) {
+            return null;
+        }
         return unwrap(mapping.getFieldMapping(sig));
     }
 
@@ -225,9 +237,12 @@ public final class LorenzUtil {
      * @see #unwrap(Optional)
      */
     public static @Nullable MethodParameterMapping getParameterMapping(
-        final @NotNull MethodMapping mapping,
+        final @Nullable MethodMapping mapping,
         final int index
     ) {
+        if (mapping == null) {
+            return null;
+        }
         return unwrap(mapping.getParameterMapping(index));
     }
 

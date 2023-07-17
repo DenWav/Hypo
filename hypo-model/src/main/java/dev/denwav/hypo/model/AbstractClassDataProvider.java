@@ -18,14 +18,15 @@
 
 package dev.denwav.hypo.model;
 
+import com.google.errorprone.annotations.ForOverride;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ClassKind;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
-import com.google.errorprone.annotations.ForOverride;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -229,6 +230,11 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
         }
     }
 
+    @Override
+    public @NotNull Collection<ClassProviderRoot> roots() {
+        return this.rootProviders;
+    }
+
     private static @NotNull ClassData createNullData() {
         return new ClassData() {
             @Override
@@ -288,6 +294,11 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
 
             @Override
             public @Nullable Set<ClassData> permittedClasses() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public @Nullable List<@NotNull FieldData> recordComponents() {
                 throw new IllegalStateException();
             }
 
