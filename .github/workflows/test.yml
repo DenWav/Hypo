@@ -1,9 +1,9 @@
 name: Test
 on:
   push:
-    branches: ['*']
+    branches: ['**']
   pull_request:
-    branches: ['*']
+    branches: ['**']
 
 jobs:
   test:
@@ -15,6 +15,7 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
-          cache: 'gradle'
       - uses: gradle/wrapper-validation-action@v1
-      - run: ./gradlew build --no-daemon --stacktrace
+      - uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build --stacktrace
