@@ -84,7 +84,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *                 Either one or the other of:
  *                 <ul>
  *                     <li>The expected ending set of mappings which the system should product</li>
- *                     <li></li>
  *                 </ul>
  *             </li>
  *             <li>The expected ending set of mappings which the system should product</li>
@@ -102,16 +101,6 @@ public abstract class TestScenarioBase {
      * @return The {@link Env environment} for this scenario.
      */
     public abstract @NotNull Env env();
-
-    /**
-     * Whether the JDK should be included as a context provider in the {@link HypoContext}. By default, this is
-     * {@code false} as it's usually not needed. Including the JDK in the context may slow down the hydration process.
-     *
-     * @return {@code true} if the JDK should be included as a context provider.
-     */
-    public boolean includeJdk() {
-        return false;
-    }
 
     /**
      * Retrieve {@link #context} as {@code non-null}. This should be set during test setup, so in practice it should
@@ -252,7 +241,7 @@ public abstract class TestScenarioBase {
         final HypoContext.Builder builder = HypoContext.builder()
             .withProvider(AsmClassDataProvider.of(root));
 
-        if (this.includeJdk()) {
+        if (this.env().includeJdk()) {
             builder.withContextProvider(AsmClassDataProvider.of(ClassProviderRoot.ofJdk()));
         }
         builder.withConfig(this.env().config().setRequireFullClasspath(false).build());
@@ -342,6 +331,16 @@ public abstract class TestScenarioBase {
          */
         default @Nullable Map<String, Map<String, String>> renames() {
             return null;
+        }
+
+        /**
+         * Whether the JDK should be included as a context provider in the {@link HypoContext}. By default, this is
+         * {@code false} as it's usually not needed. Including the JDK in the context may slow down the hydration process.
+         *
+         * @return {@code true} if the JDK should be included as a context provider.
+         */
+        default boolean includeJdk() {
+            return false;
         }
     }
 

@@ -18,6 +18,7 @@
 
 package dev.denwav.hypo.hydrate.generic;
 
+import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import java.util.List;
@@ -46,4 +47,12 @@ public final class HypoHydration {
      * The {@link SuperCall super call} the constructor this {@link HypoKey} is set on calls.
      */
     public static final HypoKey<SuperCall> SUPER_CALL_TARGET = HypoKey.create("Constructor Super Call Target");
+
+    public static final HypoKey<List<MethodClosure<ClassData>>> LOCAL_CLASSES = HypoKey.create("Local Classes");
+
+    /**
+     * The list of {@link MethodData methods} representing lambdas present in the method this {@link HypoKey} is set
+     * on. These are the synthetic methods which are generated as the implementation of the lambda expression.
+     */
+    public static final HypoKey<List<MethodClosure<MethodData>>> LAMBDA_CALLS = HypoKey.create("Lambda Calls");
 }

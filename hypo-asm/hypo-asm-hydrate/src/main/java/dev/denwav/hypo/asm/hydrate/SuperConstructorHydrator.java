@@ -131,7 +131,6 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
         // Store our value
         data.store(HypoHydration.SUPER_CALL_TARGET, superCallData);
         final List<SuperCall> superCallers = targetConstructor.compute(HypoHydration.SUPER_CALLER_SOURCES, ArrayList::new);
-        //noinspection SynchronizationOnLocalVariableOrMethodParameter
         synchronized (superCallers) {
             superCallers.add(superCallData);
         }
