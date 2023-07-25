@@ -1,3 +1,21 @@
+/*
+ * Hypo, an extensible and pluggable Java bytecode analytical model.
+ *
+ * Copyright (C) 2023  Kyle Wood (DenWav)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package dev.denwav.hypo.asm.hydrate;
 
 import dev.denwav.hypo.asm.AsmMethodData;
@@ -23,6 +41,11 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import static dev.denwav.hypo.model.data.MethodDescriptor.parseDescriptor;
 
+/**
+ * This is a {@link HydrationProvider} for determining lambda expressions present in methods, and the
+ * local variables which they capture. It sets {@link HypoHydration#LAMBDA_CALLS} on both the methods which contain
+ * the lambda expressions, and the lambda methods themselves.
+ */
 public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData> {
 
     private static final Handle lambdaMetafactoryHandle = new Handle(
@@ -43,6 +66,10 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
 
     private LambdaCallHydrator() {}
 
+    /**
+     * Create a new instance of {@link LambdaCallHydrator}.
+     * @return A new instance of {@link LambdaCallHydrator}.
+     */
     @Contract(value = "-> new", pure = true)
     public static @NotNull LambdaCallHydrator create() {
         return new LambdaCallHydrator();
@@ -118,7 +145,7 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 continue;
             }
 
-            final MethodClosure<MethodData> call = new MethodClosure<>(data, targetMethod, finished ? closureIndices : MethodClosure.EMPTY);
+            final MethodClosure<MethodData> call = new MethodClosure<>(data, targetMethod, finished ? closureIndices : MethodClosure.EMPTY_INT_ARRAY);
 
             final List<MethodClosure<MethodData>> methodClosures = data.compute(HypoHydration.LAMBDA_CALLS, ArrayList::new);
             synchronized (methodClosures) {

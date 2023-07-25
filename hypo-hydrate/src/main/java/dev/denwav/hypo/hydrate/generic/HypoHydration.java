@@ -48,11 +48,19 @@ public final class HypoHydration {
      */
     public static final HypoKey<SuperCall> SUPER_CALL_TARGET = HypoKey.create("Constructor Super Call Target");
 
+    /**
+     * The list of {@link ClassData classes} representing local and anonymous classes present in the method this
+     * {@link HypoKey} is set on.
+     *
+     * <p>This key is symmetric, it is set for both the containing and the local / anonymous class.
+     */
     public static final HypoKey<List<MethodClosure<ClassData>>> LOCAL_CLASSES = HypoKey.create("Local Classes");
 
     /**
      * The list of {@link MethodData methods} representing lambdas present in the method this {@link HypoKey} is set
      * on. These are the synthetic methods which are generated as the implementation of the lambda expression.
+     *
+     * <p>This key is symmetric, it is set for both the containing and lambda methods.
      */
     public static final HypoKey<List<MethodClosure<MethodData>>> LAMBDA_CALLS = HypoKey.create("Lambda Calls");
 }

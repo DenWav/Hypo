@@ -1,3 +1,21 @@
+/*
+ * Hypo, an extensible and pluggable Java bytecode analytical model.
+ *
+ * Copyright (C) 2023  Kyle Wood (DenWav)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the Lesser GNU General Public License as published by
+ * the Free Software Foundation, version 3 of the License only.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package dev.denwav.hypo.asm.hydrate;
 
 import dev.denwav.hypo.asm.AsmClassData;
@@ -27,10 +45,19 @@ import org.objectweb.asm.tree.VarInsnNode;
 import static dev.denwav.hypo.asm.HypoAsmUtil.toJvmType;
 import static org.objectweb.asm.Type.getType;
 
+/**
+ * This is a {@link HydrationProvider} for determining local and anonymous classes present in methods, and the
+ * local variables which they capture. It sets {@link HypoHydration#LOCAL_CLASSES} on both the methods which contain
+ * the local or anonymous classes, and the classes themselves.
+ */
 public final class LocalClassHydrator implements HydrationProvider<AsmMethodData> {
 
     private LocalClassHydrator() {}
 
+    /**
+     * Create a new instace of {@link LocalClassHydrator}.
+     * @return A new instace of {@link LocalClassHydrator}.
+     */
     @Contract(value = "-> new", pure = true)
     public static @NotNull LocalClassHydrator create() {
         return new LocalClassHydrator();
@@ -88,10 +115,10 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
                     continue;
                 }
 
-                final int @Nullable [] closureIndices = this.handleNestedConst(node, methodInsn, nestedClass);
+                final int @Nullable [] closureIndices = this.handleNestedConst(methodInsn, nestedClass);
                 handledNestedClasses.add(nestedClass);
 
-                final MethodClosure<ClassData> call = new MethodClosure<>(data, nestedClass, closureIndices != null ? closureIndices : MethodClosure.EMPTY);
+                final MethodClosure<ClassData> call = new MethodClosure<>(data, nestedClass, closureIndices != null ? closureIndices : MethodClosure.EMPTY_INT_ARRAY);
 
                 final List<MethodClosure<ClassData>> closures = data.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
                 synchronized (closures) {
@@ -106,7 +133,7 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
         }
     }
 
-    private int @Nullable [] handleNestedConst(final MethodNode node, final MethodInsnNode insn, final AsmClassData nestedClass) {
+    private int @Nullable [] handleNestedConst(final MethodInsnNode insn, final AsmClassData nestedClass) {
         final ArrayList<JvmType> capturedVariables = new ArrayList<>();
         for (final FieldNode field : nestedClass.getNode().fields) {
             if (field.name.startsWith("this")) {
