@@ -4,7 +4,7 @@ on:
     branches: ['main']
     paths-ignore:
       - '.idea/**'
-      - 'COPYING*'
+      - 'license.txt'
       - 'header.txt'
       - 'readme.md'
       - '.gitignore'

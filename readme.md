@@ -343,4 +343,4 @@ model.
 
 ## License
 
-[Hypo is licensed under the LGPL version 3.0 only (no later versions).](COPYING.lesser)
+[Hypo is licensed under the LGPL version 3.0 only (no later versions).](license.txt)
