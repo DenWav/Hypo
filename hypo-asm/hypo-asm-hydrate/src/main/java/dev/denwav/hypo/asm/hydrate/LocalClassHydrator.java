@@ -25,10 +25,12 @@ import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.MethodClosure;
 import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.types.JvmType;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.Contract;
@@ -107,7 +109,10 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
                 continue;
             }
 
-            for (final AsmClassData nestedClass : nestedClasses) {
+            final Iterator<AsmClassData> it = nestedClasses.iterator();
+            while (it.hasNext()) {
+                final AsmClassData nestedClass = it.next();
+
                 if (handledNestedClasses.contains(nestedClass)) {
                     continue;
                 }
@@ -118,18 +123,35 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
                 final int @Nullable [] closureIndices = this.handleNestedConst(methodInsn, nestedClass);
                 handledNestedClasses.add(nestedClass);
 
-                final MethodClosure<ClassData> call = new MethodClosure<>(data, nestedClass, closureIndices != null ? closureIndices : MethodClosure.EMPTY_INT_ARRAY);
-
-                final List<MethodClosure<ClassData>> closures = data.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
-                synchronized (closures) {
-                    closures.add(call);
-                }
-
-                final List<MethodClosure<ClassData>> targetClosures = nestedClass.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
-                synchronized (targetClosures) {
-                    targetClosures.add(call);
-                }
+                setCall(data, nestedClass, closureIndices != null ? closureIndices : MethodClosure.EMPTY_INT_ARRAY);
+                it.remove();
             }
+        }
+
+        if (nestedClasses.isEmpty()) {
+            return;
+        }
+
+        // If a local or anonymous class is defined in a lambda expression then the `outerMethod` will be
+        // the method which contains the lambda, not the lambda itself.
+        // At this time we will still mark it, we just won't track LVT. This at least tells us scoping.
+
+        for (final AsmClassData nestedClass : nestedClasses) {
+            setCall(data, nestedClass, MethodClosure.EMPTY_INT_ARRAY);
+        }
+    }
+
+    private static void setCall(final MethodData data, final ClassData nestedClass, final int[] params) {
+        final MethodClosure<ClassData> call = new MethodClosure<>(data, nestedClass, params);
+
+        final List<MethodClosure<ClassData>> closures = data.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
+        synchronized (closures) {
+            closures.add(call);
+        }
+
+        final List<MethodClosure<ClassData>> targetClosures = nestedClass.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
+        synchronized (targetClosures) {
+            targetClosures.add(call);
         }
     }
 
