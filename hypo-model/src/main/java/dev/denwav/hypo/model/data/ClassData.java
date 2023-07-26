@@ -282,7 +282,7 @@ public interface ClassData extends HypoData {
         try {
             for (final ClassData iface : this.interfaces()) {
                 if (iface != null) {
-                    return iface.doesExtend(that);
+                    return iface.doesImplement(that);
                 }
             }
         } catch (final IOException ignored) {
