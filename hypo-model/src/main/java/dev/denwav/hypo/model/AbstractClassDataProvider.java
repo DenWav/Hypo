@@ -293,7 +293,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
-            public @Nullable Set<ClassData> permittedClasses() {
+            public @Nullable List<ClassData> permittedClasses() {
                 throw new IllegalStateException();
             }
 
@@ -318,17 +318,17 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
-            public @NotNull Set<ClassData> interfaces() {
+            public @NotNull List<ClassData> interfaces() {
                 throw new IllegalStateException();
             }
 
             @Override
-            public @NotNull Set<FieldData> fields() {
+            public @NotNull List<FieldData> fields() {
                 throw new IllegalStateException();
             }
 
             @Override
-            public @NotNull Set<MethodData> methods() {
+            public @NotNull List<MethodData> methods() {
                 throw new IllegalStateException();
             }
 

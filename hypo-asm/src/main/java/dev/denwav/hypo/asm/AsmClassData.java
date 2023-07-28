@@ -142,12 +142,12 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
-    public @Nullable Set<ClassData> computePermittedClasses() throws IOException {
+    public @Nullable List<ClassData> computePermittedClasses() throws IOException {
         final List<String> permitted = this.node.permittedSubclasses;
         if (permitted == null) {
             return null;
         }
-        final HashSet<ClassData> result = new HashSet<>(permitted.size());
+        final ArrayList<ClassData> result = new ArrayList<>(permitted.size());
         for (final String name : permitted) {
             result.add(this.prov().findClass(name));
         }
@@ -217,9 +217,9 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
-    public @NotNull Set<ClassData> computeInterfaces() throws IOException {
+    public @NotNull List<ClassData> computeInterfaces() throws IOException {
         final ClassDataProvider prov = this.prov();
-        final HashSet<ClassData> res = new HashSet<>();
+        final ArrayList<ClassData> res = new ArrayList<>();
         for (final String inter : this.node.interfaces) {
             final ClassData interfaceData = prov.findClass(inter);
             if (interfaceData != null) {
@@ -235,8 +235,8 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
-    public @NotNull Set<FieldData> computeFields() {
-        final Set<FieldData> res = new HashSet<>();
+    public @NotNull List<FieldData> computeFields() {
+        final ArrayList<FieldData> res = new ArrayList<>();
         for (final FieldNode field : this.node.fields) {
             res.add(new AsmFieldData(this, field));
         }
@@ -244,8 +244,8 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
-    public @NotNull Set<MethodData> computeMethods() {
-        final Set<MethodData> res = new HashSet<>();
+    public @NotNull List<MethodData> computeMethods() {
+        final ArrayList<MethodData> res = new ArrayList<>();
         for (final MethodNode method : this.node.methods) {
             if (method.name.equals("<init>")) {
                 res.add(new AsmConstructorData(this, method));

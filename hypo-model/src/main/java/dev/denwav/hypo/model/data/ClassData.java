@@ -22,6 +22,7 @@ import dev.denwav.hypo.model.ClassDataProvider;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.types.JvmType;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -149,13 +150,13 @@ public interface ClassData extends HypoData {
     @Nullable ClassData superClass() throws IOException;
 
     /**
-     * Get the set of interface class datas this class data implements. If this class data doesn't implement any
-     * interfaces this method returns an empty set.
+     * Get the list of interface class datas this class data implements. If this class data doesn't implement any
+     * interfaces this method returns an empty set. The list is in declaration order.
      *
      * @return The set of classes this class data implements.
      * @throws IOException If an IO error occurs while reading the interfaces.
      */
-    @NotNull Set<ClassData> interfaces() throws IOException;
+    @NotNull List<ClassData> interfaces() throws IOException;
 
     /**
      * Returns {@code true} if this class data is {@code sealed}.
@@ -165,12 +166,13 @@ public interface ClassData extends HypoData {
 
     /**
      * If this class data {@link #isSealed() represents a sealed class}, return the set of classes which are permitted
-     * to extend this one. For any classes which aren't sealed, {@code null} is returned.
+     * to extend this one. For any classes which aren't sealed, {@code null} is returned. The list is in declaration
+     * order.
      *
      * @return The set of classes which are permitted to extend this sealed class.
      * @throws IOException If an IO error occurs while reading one of the permitted classes.
      */
-    @Nullable Set<@NotNull ClassData> permittedClasses() throws IOException;
+    @Nullable List<@NotNull ClassData> permittedClasses() throws IOException;
 
     /**
      * If this class data {@link ClassKind#RECORD represents a record}, return the set of fields associated with the
@@ -189,7 +191,7 @@ public interface ClassData extends HypoData {
      */
     default @NotNull Stream<@NotNull ClassData> allSuperClasses() throws IOException {
         final ClassData superClass = this.superClass();
-        final Set<ClassData> superInterfaces = this.interfaces();
+        final List<ClassData> superInterfaces = this.interfaces();
         if (superClass == null && superInterfaces.isEmpty()) {
             return Stream.empty();
         } else if (superClass == null) {
@@ -229,18 +231,18 @@ public interface ClassData extends HypoData {
     }
 
     /**
-     * Get a set of all fields this class data declares.
+     * Get a list of all fields this class data declares. The list is in declaration order.
      *
      * @return A set of all fields this class data declares.
      */
-    @NotNull Set<FieldData> fields();
+    @NotNull List<FieldData> fields();
 
     /**
-     * Get a set of all methods this class data declares.
+     * Get a set of all methods this class data declares. The list is in declaration order.
      *
      * @return A set of all methods this class data declares.
      */
-    @NotNull Set<MethodData> methods();
+    @NotNull List<MethodData> methods();
 
     /**
      * Return {@code true} if this class data extends the given class data. This method walks up the
@@ -312,14 +314,14 @@ public interface ClassData extends HypoData {
     }
 
     /**
-     * Get a set of all fields this class data declares which have the given name.
+     * Get a set of all fields this class data declares which have the given name. The list is in declaration order.
      *
      * @param name The name of the fields to find.
      * @return The set of fields this class data declares which have the given name.
      */
     @SuppressWarnings("DuplicatedCode")
-    default @NotNull Set<@NotNull FieldData> fields(final @NotNull String name) {
-        LinkedHashSet<FieldData> result = null;
+    default @NotNull List<@NotNull FieldData> fields(final @NotNull String name) {
+        List<FieldData> result = null;
         FieldData singleResult = null;
 
         for (final FieldData field : this.fields()) {
@@ -327,7 +329,7 @@ public interface ClassData extends HypoData {
                 if (singleResult == null) {
                     singleResult = field;
                 } else if (result == null) {
-                    result = new LinkedHashSet<>();
+                    result = new ArrayList<>();
                     result.add(singleResult);
                     result.add(field);
                 } else {
@@ -336,11 +338,11 @@ public interface ClassData extends HypoData {
             }
         }
         if (result != null) {
-            return Collections.unmodifiableSet(result);
+            return Collections.unmodifiableList(result);
         } else if (singleResult != null) {
-            return Collections.singleton(singleResult);
+            return Collections.singletonList(singleResult);
         } else {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
     }
 
@@ -362,14 +364,14 @@ public interface ClassData extends HypoData {
     }
 
     /**
-     * Get a set of all methods this class data declares which have the given name.
+     * Get a set of all methods this class data declares which have the given name. The list is in declaration order.
      *
      * @param name The name of the methods to find.
      * @return The set of methods this class data declares which have the given name.
      */
     @SuppressWarnings("DuplicatedCode")
-    default @NotNull Set<@NotNull MethodData> methods(final @NotNull String name) {
-        LinkedHashSet<MethodData> result = null;
+    default @NotNull List<@NotNull MethodData> methods(final @NotNull String name) {
+        List<MethodData> result = null;
         MethodData singleResult = null;
 
         for (final MethodData method : this.methods()) {
@@ -377,7 +379,7 @@ public interface ClassData extends HypoData {
                 if (singleResult == null) {
                     singleResult = method;
                 } else if (result == null) {
-                    result = new LinkedHashSet<>();
+                    result = new ArrayList<>();
                     result.add(singleResult);
                     result.add(method);
                 } else {
@@ -387,11 +389,11 @@ public interface ClassData extends HypoData {
         }
 
         if (result != null) {
-            return Collections.unmodifiableSet(result);
+            return Collections.unmodifiableList(result);
         } else if (singleResult != null) {
-            return Collections.singleton(singleResult);
+            return Collections.singletonList(singleResult);
         } else {
-            return Collections.emptySet();
+            return Collections.emptyList();
         }
     }
 

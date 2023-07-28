@@ -20,7 +20,6 @@ package dev.denwav.hypo.model.data;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -90,7 +89,7 @@ public abstract class LazyClassData extends AbstractClassData {
      * @return The set of permitted classes for this sealed class.
      * @throws IOException If an IO error occurs while reading the permitted classes.
      */
-    public abstract @Nullable Set<ClassData> computePermittedClasses() throws IOException;
+    public abstract @Nullable List<ClassData> computePermittedClasses() throws IOException;
 
     /**
      * {@code compute} variant of {@link #recordComponents()}.
@@ -127,21 +126,21 @@ public abstract class LazyClassData extends AbstractClassData {
      * @return This class's interfaces.
      * @throws IOException If an IO error occurs while reading the interface classes.
      */
-    public abstract @NotNull Set<ClassData> computeInterfaces() throws IOException;
+    public abstract @NotNull List<ClassData> computeInterfaces() throws IOException;
 
     /**
      * {@code compute} variant of {@link #fields()}.
      *
      * @return This class's declared fields.
      */
-    public abstract @NotNull Set<FieldData> computeFields();
+    public abstract @NotNull List<FieldData> computeFields();
 
     /**
      * {@code compute} variant of {@link #methods()}.
      *
      * @return This class's declared methods.
      */
-    public abstract @NotNull Set<MethodData> computeMethods();
+    public abstract @NotNull List<MethodData> computeMethods();
 
     private final @NotNull LazyValue<String, ?> name = LazyValue.of(this::computeName);
     @Override
@@ -179,9 +178,9 @@ public abstract class LazyClassData extends AbstractClassData {
         return this.isSealed.getNotNull();
     }
 
-    private final LazyValue<Set<ClassData>, IOException> permittedClasses = LazyValue.of(this::computePermittedClasses);
+    private final LazyValue<List<ClassData>, IOException> permittedClasses = LazyValue.of(this::computePermittedClasses);
     @Override
-    public @Nullable Set<ClassData> permittedClasses() throws IOException {
+    public @Nullable List<ClassData> permittedClasses() throws IOException {
         return this.permittedClasses.getOrThrow();
     }
 
@@ -209,21 +208,21 @@ public abstract class LazyClassData extends AbstractClassData {
         return this.superClass.getOrThrow();
     }
 
-    private final @NotNull LazyValue<Set<ClassData>, IOException> interfaces = LazyValue.of(this::computeInterfaces);
+    private final @NotNull LazyValue<List<ClassData>, IOException> interfaces = LazyValue.of(this::computeInterfaces);
     @Override
-    public @NotNull Set<ClassData> interfaces() throws IOException {
+    public @NotNull List<ClassData> interfaces() throws IOException {
         return this.interfaces.getOrThrowNotNull();
     }
 
-    private final @NotNull LazyValue<Set<FieldData>, ?> fields = LazyValue.of(this::computeFields);
+    private final @NotNull LazyValue<List<FieldData>, ?> fields = LazyValue.of(this::computeFields);
     @Override
-    public @NotNull Set<FieldData> fields() {
+    public @NotNull List<FieldData> fields() {
         return this.fields.getNotNull();
     }
 
-    private final @NotNull LazyValue<Set<MethodData>, ?> methods = LazyValue.of(this::computeMethods);
+    private final @NotNull LazyValue<List<MethodData>, ?> methods = LazyValue.of(this::computeMethods);
     @Override
-    public @NotNull Set<MethodData> methods() {
+    public @NotNull List<MethodData> methods() {
         return this.methods.getNotNull();
     }
 }

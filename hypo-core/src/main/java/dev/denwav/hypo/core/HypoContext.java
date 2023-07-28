@@ -124,7 +124,9 @@ public final class HypoContext implements AutoCloseable {
                 return e;
             }
 
-            if (this.config.getParallelism() <= 0) {
+            if (this.config.getParallelism() == 1) {
+                e = Executors.newSingleThreadExecutor();
+            } else if (this.config.getParallelism() <= 0) {
                 e = Executors.newWorkStealingPool();
             } else {
                 e = Executors.newWorkStealingPool(this.config.getParallelism());

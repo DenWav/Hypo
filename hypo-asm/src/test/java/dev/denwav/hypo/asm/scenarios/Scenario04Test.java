@@ -19,6 +19,7 @@
 package dev.denwav.hypo.asm.scenarios;
 
 import dev.denwav.hypo.test.framework.TestScenarioBase;
+import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -69,9 +70,9 @@ public class Scenario04Test extends TestScenarioBase {
         final var testSubSubClass = this.context().getProvider().findClass("scenario04/TestSubSubClass");
         assertNotNull(testSubSubClass);
 
-        assertEquals(Set.of(testSubClass, testSealedSubClass), testClass.permittedClasses());
+        assertEquals(List.of(testSubClass, testSealedSubClass), testClass.permittedClasses());
         assertNull(testSubClass.permittedClasses());
-        assertEquals(Set.of(testSubSubClass), testSealedSubClass.permittedClasses());
+        assertEquals(List.of(testSubSubClass), testSealedSubClass.permittedClasses());
         assertNull(testSubSubClass.permittedClasses());
     }
 }

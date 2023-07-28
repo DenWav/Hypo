@@ -28,9 +28,9 @@ import dev.denwav.hypo.model.data.types.JvmType;
 import dev.denwav.hypo.model.data.types.PrimitiveType;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.cadixdev.bombe.type.FieldType;
 import org.cadixdev.bombe.type.signature.FieldSignature;
 import org.cadixdev.bombe.type.signature.MethodSignature;
@@ -99,7 +99,7 @@ public final class LorenzUtil {
      */
 
     @Contract(pure = true)
-    public static @NotNull Set<@NotNull FieldData> findField(
+    public static @NotNull List<@NotNull FieldData> findField(
         final @NotNull ClassData classData,
         final @NotNull FieldMapping mapping
     ) {
@@ -109,9 +109,9 @@ public final class LorenzUtil {
         } else {
             final FieldData field = classData.field(mapping.getObfuscatedName(), convertType(type));
             if (field == null) {
-                return Collections.emptySet();
+                return Collections.emptyList();
             } else {
-                return Collections.singleton(field);
+                return Collections.singletonList(field);
             }
         }
     }
