@@ -118,7 +118,7 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 continue;
             }
 
-            final MethodDescriptor desc = parseDescriptor(handle.getDesc());
+            final MethodDescriptor desc = parseDescriptor(dyn.desc);
             final List<@NotNull JvmType> params = desc.getParams();
             final int paramsSize = params.size();
             final int[] closureIndices = new int[paramsSize];
@@ -140,7 +140,7 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 }
             }
 
-            final MethodData targetMethod = owner.method(handle.getName(), desc);
+            final MethodData targetMethod = owner.method(handle.getName(), parseDescriptor(handle.getDesc()));
             if (targetMethod == null) {
                 continue;
             }
