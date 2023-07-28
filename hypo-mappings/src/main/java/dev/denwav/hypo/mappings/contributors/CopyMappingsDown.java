@@ -128,14 +128,23 @@ public class CopyMappingsDown implements ChangeContributor {
             if (childClassMapping != null) {
                 final MethodMapping childMapping = getMethodMapping(childClassMapping, childConst.name(), childConst.descriptorText());
                 if (childMapping != null) {
-                    // This constructor has its own mappings, so don't copy ours
-                    continue;
+                    boolean hasParamMappings = false;
+                    final int len = method.params().size();
+                    for (int i = 0; i < len; i++) {
+                        if (childMapping.hasParameterMapping(i)) {
+                            hasParamMappings = true;
+                            break;
+                        }
+                    }
+                    if (hasParamMappings) {
+                        // This constructor has its own mappings, so don't copy ours
+                        continue;
+                    }
                 }
             }
 
-
             final MemberReference thisReference = MemberReference.of(childConst);
-            final CopyConstructorMappingChange change = CopyConstructorMappingChange.of(thisReference, mapping);
+            final CopyConstructorMappingChange change = CopyConstructorMappingChange.of(thisReference, method, mapping);
             registry.submitChange(change);
 
             final SuperCall thisSuperCall;
