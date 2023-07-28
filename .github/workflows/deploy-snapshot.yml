@@ -31,7 +31,7 @@ jobs:
           echo "version=$project_version" >> $GITHUB_OUTPUT
       - name: Deploy snapshot version
         if: endsWith(steps.get_version.outputs.version, '-SNAPSHOT')
-        run: ./gradlew publishMavenPublicationToSonatypeRepository --no-daemon
+        run: ./gradlew publishMavenPublicationToSonatypeRepository
         env:
           GPG_SIGNING_KEY: ${{ secrets.GPG_SIGNING_KEY }}
           GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
