@@ -18,13 +18,12 @@
 
 package dev.denwav.hypo.mappings.changes;
 
-import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.SuperCall;
+import dev.denwav.hypo.mappings.MappingsChange;
 import dev.denwav.hypo.mappings.MergeResult;
 import dev.denwav.hypo.mappings.MergeableMappingsChange;
-import dev.denwav.hypo.mappings.MappingsChange;
-import dev.denwav.hypo.model.data.MethodData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.model.ClassMapping;
@@ -43,17 +42,14 @@ public class CopyConstructorMappingChange
     extends AbstractMappingsChange
     implements MergeableMappingsChange<CopyConstructorMappingChange> {
 
-    private final @NotNull MethodData superMethod;
     private final @NotNull MethodMapping superMapping;
     private final @NotNull List<SuperCall.SuperCallParameter> params = new ArrayList<>();
 
     private CopyConstructorMappingChange(
         final @NotNull MemberReference target,
-        final @NotNull MethodData superMethod,
         final @NotNull MethodMapping superMapping
     ) {
         super(target);
-        this.superMethod = superMethod;
         this.superMapping = superMapping;
     }
 
@@ -61,17 +57,15 @@ public class CopyConstructorMappingChange
      * Create a new instance of {@link CopyConstructorMappingChange}.
      *
      * @param target The {@link MemberReference} this change targets.
-     * @param superMethod The {@link MethodData} of the super method constructor.
      * @param superMapping The {@link MethodMapping} of the super constructor to copy the parameters from.
      * @return A new instance of {@link CopyConstructorMappingChange}.
      */
-    @Contract(value = "_, _, _ -> new", pure = true)
+    @Contract(value = "_, _ -> new", pure = true)
     public static @NotNull CopyConstructorMappingChange of(
         final @NotNull MemberReference target,
-        final @NotNull MethodData superMethod,
         final @NotNull MethodMapping superMapping
     ) {
-        return new CopyConstructorMappingChange(target, superMethod, superMapping);
+        return new CopyConstructorMappingChange(target, superMapping);
     }
 
     /**
@@ -121,60 +115,53 @@ public class CopyConstructorMappingChange
     public @NotNull MergeResult<CopyConstructorMappingChange> mergeWith(
         final @NotNull CopyConstructorMappingChange that
     ) {
-        final int thisSuperSize = this.superMapping.getDescriptor().getParamTypes().size();
-        final int thatSuperSize = that.superMapping.getDescriptor().getParamTypes().size();
-        final int maxSuperSize = Math.max(thisSuperSize, thatSuperSize);
+        final int thisCount = this.superMapping.getParameterMappings().size();
+        final int thatCount = that.superMapping.getParameterMappings().size();
 
-        boolean thisPresent = false;
-        boolean thatPresent = false;
-
-        for (int i = 0; i < maxSuperSize; i++) {
-            if (!thisPresent) {
-                if (this.superMapping.hasParameterMapping(i)) {
-                    thisPresent = true;
-                }
-            }
-            if (!thatPresent) {
-                if (that.superMapping.hasParameterMapping(i)) {
-                    thatPresent = true;
-                }
-            }
-        }
-
-        if (!thisPresent) {
+        if (thisCount == 0 && thatCount != 0) {
             return MergeResult.success(that);
         }
-        if (!thatPresent) {
+        if (thatCount == 0) {
             return MergeResult.success(this);
         }
 
-        // Try to find which method is "higher"
-        MethodData target = this.superMethod;
-        while (true) {
-            if (target.equals(that.superMethod)) {
-                return MergeResult.success(that);
+        final HashMap<Integer, String> mergedParams = new HashMap<>();
+        // both `this` and `that` carry mappings
+        for (final MethodParameterMapping thisParamMapping : this.superMapping.getParameterMappings()) {
+            final int index = thisParamMapping.getIndex();
+            for (final SuperCall.SuperCallParameter thisParam : this.params) {
+                if (index == thisParam.getSuperIndex()) {
+                    mergedParams.put(thisParam.getThisIndex(), thisParamMapping.getDeobfuscatedName());
+                    break;
+                }
             }
-            final SuperCall superCall = target.get(HypoHydration.SUPER_CALL_TARGET);
-            if (superCall == null) {
-                break;
-            }
-            target = superCall.getSuperConstructor();
         }
 
-        target = that.superMethod;
-        while (true) {
-            if (target.equals(this.superMethod)) {
-                return MergeResult.success(this);
+        for (final MethodParameterMapping thatParamMapping : that.superMapping.getParameterMappings()) {
+            final int index = thatParamMapping.getIndex();
+            for (final SuperCall.SuperCallParameter thatParam : that.params) {
+                if (index == thatParam.getSuperIndex()) {
+                    final String existingMapping = mergedParams.get(thatParam.getThisIndex());
+                    if (existingMapping == null) {
+                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                    } else {
+                        if (existingMapping.equals(thatParamMapping.getDeobfuscatedName())) {
+                            // nothing to do, they match
+                            break;
+                        }
+                        return MergeResult.failure("Cannot merge super calls from two constructors with " +
+                            "different parameter mapping results");
+                    }
+                }
             }
-            final SuperCall superCall = target.get(HypoHydration.SUPER_CALL_TARGET);
-            if (superCall == null) {
-                break;
-            }
-            target = superCall.getSuperConstructor();
         }
 
-        // If we can't find the other either direction then these 2 changes are completely diverged
-        return MergeResult.failure("Cannot merge super calls from two constructors from different trees");
+        // they both agree, keep the one with more
+        if (thisCount > thatCount) {
+            return MergeResult.success(this);
+        } else {
+            return MergeResult.success(that);
+        }
     }
 
     @Override

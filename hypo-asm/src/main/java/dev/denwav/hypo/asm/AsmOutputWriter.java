@@ -21,16 +21,20 @@ package dev.denwav.hypo.asm;
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.core.HypoOutputWriter;
 import dev.denwav.hypo.model.ClassProviderRoot;
-import dev.denwav.hypo.model.HypoModelUtil;
+import dev.denwav.hypo.model.JarClassProviderRoot;
 import dev.denwav.hypo.model.data.ClassData;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.stream.Stream;
+import java.util.zip.Adler32;
+import java.util.zip.CheckedOutputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
@@ -63,16 +67,31 @@ public final class AsmOutputWriter implements HypoOutputWriter {
     public void write(final @NotNull HypoContext context) throws IOException {
         createParentDirectories(this.outputFile);
 
-        final HashMap<String, Object> options = new HashMap<>();
-        options.put("create", true);
-        try (final FileSystem fs = FileSystems.newFileSystem(URI.create("jar:" + this.outputFile.toUri()), options)) {
-            final Path outputRoot = fs.getPath("/");
-
+        try (
+            final OutputStream out = Files.newOutputStream(this.outputFile);
+            final BufferedOutputStream bos = new BufferedOutputStream(out);
+            final ZipOutputStream zos = new ZipOutputStream(bos)
+        ) {
             for (final ClassProviderRoot root : context.getProvider().roots()) {
-                try (final Stream<? extends ClassProviderRoot.FileDataReference> stream = root.walkAllFiles()) {
-                    stream.forEach(HypoModelUtil.wrapConsumer(f -> {
-                        this.writeFile(context, outputRoot, f);
-                    }));
+                if (root instanceof JarClassProviderRoot) {
+                    final JarClassProviderRoot jarRoot = (JarClassProviderRoot) root;
+                    final Path jarFile = jarRoot.getJarFile();
+                    try (
+                        final InputStream in = Files.newInputStream(jarFile);
+                        final BufferedInputStream bis = new BufferedInputStream(in);
+                        final ZipInputStream zis = new ZipInputStream(bis)
+                    ) {
+                        ZipEntry entry;
+                        while ((entry = zis.getNextEntry()) != null) {
+                            final ZipEntry outEntry = new ZipEntry(entry);
+                            zos.putNextEntry(outEntry);
+                            try {
+                                this.writeFile(context, outEntry, zis, zos);
+                            } finally {
+                                zos.closeEntry();
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -80,25 +99,22 @@ public final class AsmOutputWriter implements HypoOutputWriter {
 
     private void writeFile(
         final @NotNull HypoContext context,
-        final @NotNull Path outputRoot,
-        final @NotNull ClassProviderRoot.FileDataReference ref
+        final @NotNull ZipEntry entry,
+        final @NotNull ZipInputStream in,
+        final @NotNull ZipOutputStream out
     ) throws IOException {
-        final Path output = outputRoot.resolve(ref.name());
-        createParentDirectories(output);
-
-        if (!ref.name().endsWith(".class")) {
+        if (entry.isDirectory()) {
+            return;
+        }
+        if (!entry.getName().endsWith(".class")) {
             // simple copy
-            final byte[] data = ref.readData();
-            if (data == null) {
-                throw new IllegalStateException("Can no longer find " + ref.name());
-            }
-            Files.write(output, data);
+            copy(in, out);
             return;
         }
 
-        final ClassData data = context.getProvider().findClass(removeClassSuffix(ref.name()));
+        final ClassData data = context.getProvider().findClass(removeClassSuffix(entry.getName()));
         if (data == null) {
-            throw new IllegalStateException("Can no longer find " + ref.name());
+            throw new IllegalStateException("Can no longer find " + entry.getName());
         }
         if (!(data instanceof AsmClassData)) {
             throw new IllegalStateException("Cannot handle ClassData objects which are not " +
@@ -110,7 +126,15 @@ public final class AsmOutputWriter implements HypoOutputWriter {
         node.accept(writer);
 
         final byte[] classBytes = writer.toByteArray();
-        Files.write(output, classBytes);
+        out.write(classBytes);
+    }
+
+    private static void copy(final InputStream in, final OutputStream out) throws IOException {
+        final byte[] data = new byte[8096];
+        int read;
+        while ((read = in.read(data)) > 0) {
+            out.write(data, 0, read);
+        }
     }
 
     private static @NotNull String removeClassSuffix(final @NotNull String text) {

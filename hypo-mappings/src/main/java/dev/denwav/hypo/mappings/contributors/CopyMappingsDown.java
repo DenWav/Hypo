@@ -144,7 +144,7 @@ public class CopyMappingsDown implements ChangeContributor {
             }
 
             final MemberReference thisReference = MemberReference.of(childConst);
-            final CopyConstructorMappingChange change = CopyConstructorMappingChange.of(thisReference, method, mapping);
+            final CopyConstructorMappingChange change = CopyConstructorMappingChange.of(thisReference, mapping);
             registry.submitChange(change);
 
             final SuperCall thisSuperCall;

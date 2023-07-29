@@ -33,6 +33,7 @@ import dev.denwav.hypo.model.data.types.PrimitiveType;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.Contract;
@@ -146,8 +147,10 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
             // We only match simple cases
             final Variable varArgument;
 
+            boolean simpleArg = false;
             if (arg instanceof Variable) {
                 varArgument = (Variable) arg;
+                simpleArg = true;
             } else if (arg instanceof MethodCall) {
                 // We will still match the name if a constructor parameter is the only argument passed to a method
                 // This could be for example where the subclass calls a method to transform the input, but it's
@@ -186,6 +189,23 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
             if (varIndex > thisParamIndices[thisParamIndices.length - 1]) {
                 // This isn't a parameter
                 continue;
+            }
+
+            if (simpleArg) {
+                // arguments which are directly passed through take priority
+                superCallParams.removeIf(s -> s.getThisIndex() == varIndex);
+            } else {
+                // we only take method calls if they aren't overwriting anything else
+                boolean anyExist = false;
+                for (final SuperCall.SuperCallParameter superCallParam : superCallParams) {
+                    if (superCallParam.getThisIndex() == varIndex) {
+                        anyExist = true;
+                        break;
+                    }
+                }
+                if (anyExist) {
+                    continue;
+                }
             }
 
             superCallParams.add(new SuperCall.SuperCallParameter(varIndex, targetParamIndices[index]));

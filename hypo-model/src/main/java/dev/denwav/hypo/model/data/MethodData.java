@@ -125,14 +125,6 @@ public interface MethodData extends MemberData {
         // `this`
         int index = this.isStatic() ? 0 : 1;
 
-        // `this$0`
-        final ClassData parent = this.parentClass();
-        try {
-            if (this.isConstructor() && !parent.isStaticInnerClass() && parent.outerClass() != null) {
-                index++;
-            }
-        } catch (final IOException ignored) {}
-
         for (final JvmType param : params) {
             if (index == i) {
                 return param;
