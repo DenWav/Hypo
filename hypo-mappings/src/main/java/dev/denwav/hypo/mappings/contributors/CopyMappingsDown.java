@@ -46,15 +46,31 @@ import static dev.denwav.hypo.mappings.LorenzUtil.getMethodMapping;
  */
 public class CopyMappingsDown implements ChangeContributor {
 
-    private CopyMappingsDown() {}
+    private final boolean stopOnChildMapping;
+
+    private CopyMappingsDown(final boolean stopOnChildMapping) {
+        this.stopOnChildMapping = stopOnChildMapping;
+    }
 
     /**
-     * Create a new instance of {@link CopyMappingsDown}.
+     * Create a new instance of {@link CopyMappingsDown}. This instance will overwrite mappings any child method has
+     * with mappings provided by the parent method.
      * @return A new instance of {@link CopyMappingsDown}.
      */
     @Contract(value = "-> new", pure = true)
     public static @NotNull CopyMappingsDown create() {
-        return new CopyMappingsDown();
+        return new CopyMappingsDown(false);
+    }
+
+    /**
+     * Create a new instance of {@link CopyMappingsDown}. This instance will not overwrite mappings on any child method.
+     * If a child method already contains mappings, that method will become the new "root" and the mappings in that
+     * child method will be propagated to its children instead.
+     * @return A new instance of {@link CopyMappingsDown}.
+     */
+    @Contract(value = "-> new", pure = true)
+    public static @NotNull CopyMappingsDown createWithoutOverwrite() {
+        return new CopyMappingsDown(true);
     }
 
     @Override
@@ -75,36 +91,43 @@ public class CopyMappingsDown implements ChangeContributor {
             }
 
             if (!method.isConstructor()) {
-                walkDown(method, methodMapping, registry);
+                this.walkDown(method, methodMapping, registry);
             } else {
                 walkConstructor(method, methodMapping, registry, null);
             }
         }
     }
 
-    private static void walkDown(
+    private void walkDown(
         final @NotNull MethodData method,
         final @NotNull MethodMapping mapping,
         final @NotNull ChangeRegistry registry
     ) {
         for (final MethodData childMethod : method.childMethods()) {
-            setChangeAndWalkDown(childMethod, mapping, registry);
+            this.setChangeAndWalkDown(childMethod, mapping, registry);
         }
 
         final MethodData syntheticTarget = method.get(HypoHydration.SYNTHETIC_TARGET);
         if (syntheticTarget != null) {
-            setChangeAndWalkDown(syntheticTarget, mapping, registry);
+            this.setChangeAndWalkDown(syntheticTarget, mapping, registry);
         }
     }
 
-    private static void setChangeAndWalkDown(
+    private void setChangeAndWalkDown(
         final @NotNull MethodData method,
         final @NotNull MethodMapping mapping,
         final @NotNull ChangeRegistry registry
     ) {
+        if (this.stopOnChildMapping) {
+            final ClassMapping<?, ?> classMapping = getClassMapping(mapping.getMappings(), method.parentClass().name());
+            final MethodMapping methodMapping = getMethodMapping(classMapping, method.name(), method.descriptorText());
+            if (methodMapping != null) {
+                return;
+            }
+        }
         registry.submitChange(CopyMethodMappingChange.of(MemberReference.of(method), mapping));
 
-        walkDown(method, mapping, registry);
+        this.walkDown(method, mapping, registry);
     }
 
     private static void walkConstructor(

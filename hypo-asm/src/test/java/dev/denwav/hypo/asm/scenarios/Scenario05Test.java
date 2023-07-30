@@ -72,11 +72,11 @@ public class Scenario05Test extends TestScenarioBase {
         assertNotNull(methodClosure);
         final MethodData call = methodClosure.getClosure();
         assertNotNull(call);
-        assertArrayEquals(new int[] { 1, 2, 4 }, methodClosure.getParamLvtIndices());
+        assertArrayEquals(new int[] { 0, 1, 2, 4 }, methodClosure.getParamLvtIndices());
 
         assertEquals(testClass, call.parentClass());
         assertTrue(call.isSynthetic());
-        assertTrue(call.isStatic());
+        assertFalse(call.isStatic());
 
         final List<MethodClosure<MethodData>> nestedCalls = call.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(nestedCalls);
@@ -111,5 +111,29 @@ public class Scenario05Test extends TestScenarioBase {
             .findFirst()
             .orElse(null);
         assertNotNull(outerNestedMethodClosure);
+    }
+
+    @Test
+    @DisplayName("Test lambda call hydrator on statics")
+    public void testStaticLambdaCalls() throws Exception {
+        final var testClass = this.context().getProvider().findClass("scenario05/TestClass");
+        assertNotNull(testClass);
+
+        final MethodData testMethod = testClass.method("testStatic", parseDescriptor("()V"));
+        assertNotNull(testMethod);
+
+        final List<MethodClosure<MethodData>> methodClosures = testMethod.get(HypoHydration.LAMBDA_CALLS);
+        assertNotNull(methodClosures);
+        assertEquals(1, methodClosures.size());
+
+        final MethodClosure<MethodData> methodClosure = methodClosures.get(0);
+        assertNotNull(methodClosure);
+        final MethodData call = methodClosure.getClosure();
+        assertNotNull(call);
+        assertArrayEquals(new int[] { 0 }, methodClosure.getParamLvtIndices());
+
+        assertEquals(testClass, call.parentClass());
+        assertTrue(call.isSynthetic());
+        assertTrue(call.isStatic());
     }
 }

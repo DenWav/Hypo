@@ -6,13 +6,15 @@ import java.util.function.Function;
 // Compiled with JDK 17
 public class TestClass {
 
+    private long num = 0;
+
     public void test() {
         final String s3 = Integer.toString(new Random().nextInt());
         String s33 = Integer.toString(new Random().nextInt());
         StringBuilder sb = new StringBuilder();
         String str = sb.toString();
         final Runnable r = () -> {
-            final String s4 = s3 + s3;
+            final String s4 = s3 + s3 + this.num;
             final String s44 = s33 + s33;
             str.length();
             final Runnable r1 = () -> {
@@ -24,5 +26,12 @@ public class TestClass {
 
     public static Object thing(String in) {
         return null;
+    }
+
+    public static void testStatic() {
+        final String s = Integer.toString(new Random().nextInt());
+        final Runnable r = () -> {
+            System.out.println(s);
+        };
     }
 }
