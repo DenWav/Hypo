@@ -59,5 +59,13 @@ abstract class HypoModelUtilHelper {
      */
     abstract <T> @NotNull List<T> asImmutableList(final @NotNull Collection<T> list);
 
+    /**
+     * Create an immutable list from the given array.
+     *
+     * @param array The arry to return as an immutable list.
+     * @return The new immutable list.
+     * @param <T> The type param of the list.
+     */
+    @SuppressWarnings("unchecked")
     abstract <T> @NotNull List<T> immutableListOf(final @NotNull T @NotNull ... array);
 }

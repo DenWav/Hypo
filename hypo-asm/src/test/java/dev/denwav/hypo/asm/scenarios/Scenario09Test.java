@@ -63,6 +63,10 @@ public class Scenario09Test extends TestScenarioBase {
         assertTrue(testClass.isAll(ClassKind.ENUM, ClassKind.ABSTRACT_CLASS));
         assertTrue(testClass.isAll(EnumSet.of(ClassKind.ENUM, ClassKind.ABSTRACT_CLASS)));
 
+        // `true` isNot
+        assertTrue(testClass.isNot(ClassKind.INTERFACE));
+        assertTrue(testClass.isNot(ClassKind.RECORD));
+
         // `false` is
         assertFalse(testClass.is(ClassKind.INTERFACE));
         assertFalse(testClass.is(ClassKind.RECORD));

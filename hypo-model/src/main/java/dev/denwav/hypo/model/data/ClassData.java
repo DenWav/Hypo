@@ -183,6 +183,16 @@ public interface ClassData extends HypoData {
     }
 
     /**
+     * Returns {@code true} if this class data does not represent the given kind. This is the inverse of {@link #is(ClassKind)}.
+     * @param kind The {@link ClassKind} to test against this class data
+     * @return {@code true} if this class data does not represent the given kind.
+     * @see #is(ClassKind)
+     */
+    default boolean isNot(final @NotNull ClassKind kind) {
+        return !this.is(kind);
+    }
+
+    /**
      * Returns {@code true} if this class data represents <b>any</b> of the given kinds.
      * @param kinds The array of {@link ClassKind kinds} to test against this class data.
      * @return {@link ClassKind kinds} to test against this class data.

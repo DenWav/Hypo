@@ -170,6 +170,7 @@ public class DefaultHydrationManager implements HydrationManager {
         return false;
     }
 
+    @SuppressWarnings("ReferenceEquality")
     private @NotNull Graph<HydrationProvider<?>, DefaultEdge> createProviderGraph() {
         final ArrayList<HydrationProvider<?>> allProviders =
             new ArrayList<>(this.classProviders.size() + this.methodProviders.size() + this.fieldProviders.size());
