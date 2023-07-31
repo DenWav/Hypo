@@ -70,7 +70,7 @@ public final class CopyRecordParameters implements ChangeContributor {
             return;
         }
 
-        if (currentClass.kind() != ClassKind.RECORD) {
+        if (currentClass.is(ClassKind.RECORD)) {
             return;
         }
 

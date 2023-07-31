@@ -23,16 +23,23 @@ import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoData;
+import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.DefaultDirectedGraph;
+import org.jgrapht.graph.DefaultEdge;
 
 /**
  * Default implementation of {@link HydrationManager}.
@@ -84,47 +91,120 @@ public class DefaultHydrationManager implements HydrationManager {
     }
 
     @Override
-    public void hydrate(@NotNull HypoContext context) throws IOException {
-        final ExecutorService executor = context.getExecutor();
-
+    public void hydrate(final @NotNull HypoContext context) throws IOException {
         try {
             this.baseHydrator.hydrate(context);
 
-            final ArrayList<Future<?>> futures = new ArrayList<>();
+            final Graph<HydrationProvider<?>, DefaultEdge> providersGraph = this.createProviderGraph();
 
-            for (final ClassData classData : context.getProvider().allClasses()) {
-                futures.add(executor.submit((Callable<?>) () -> {
+            HashSet<HydrationProvider<?>> stage;
+            while (!(stage = this.getNextStage(providersGraph)).isEmpty()) {
+                this.executeProviderStage(context, stage);
+            }
+        } catch (final ExecutionException | InterruptedException e) {
+            HypoModelUtil.rethrow(e);
+        }
+    }
+
+    private void executeProviderStage(
+        final @NotNull HypoContext context,
+        final @NotNull HashSet<HydrationProvider<?>> stage
+    )throws ExecutionException, InterruptedException {
+        final ExecutorService executor = context.getExecutor();
+        ArrayList<Future<?>> futures = new ArrayList<>();
+
+        for (final ClassData classData : context.getProvider().allClasses()) {
+            futures.add(executor.submit((Callable<?>) () -> {
+                if (containsAny(stage, this.classProviders)) {
                     for (final HydrationProvider<?> provider : this.classProviders) {
+                        if (!stage.contains(provider)) {
+                            continue;
+                        }
                         if (classData.getClass().isAssignableFrom(provider.target())) {
                             provider.hydrate(HypoModelUtil.cast(classData), context);
                         }
                     }
+                }
 
+                if (containsAny(stage, this.methodProviders)) {
                     for (final MethodData method : classData.methods()) {
                         for (final HydrationProvider<?> provider : this.methodProviders) {
+                            if (!stage.contains(provider)) {
+                                continue;
+                            }
                             if (method.getClass().isAssignableFrom(provider.target())) {
                                 provider.hydrate(HypoModelUtil.cast(method), context);
                             }
                         }
                     }
+                }
 
+                if (containsAny(stage, this.fieldProviders)) {
                     for (final FieldData field : classData.fields()) {
                         for (final HydrationProvider<?> provider : this.fieldProviders) {
+                            if (!stage.contains(provider)) {
+                                continue;
+                            }
                             if (field.getClass().isAssignableFrom(provider.target())) {
                                 provider.hydrate(HypoModelUtil.cast(field), context);
                             }
                         }
                     }
+                }
 
-                    return null;
-                }));
-            }
-
-            for (final Future<?> future : futures) {
-                future.get();
-            }
-        } catch (final ExecutionException | InterruptedException e) {
-            HypoModelUtil.rethrow(e);
+                return null;
+            }));
         }
+
+        for (final Future<?> future : futures) {
+            future.get();
+        }
+    }
+
+    private static  <T> boolean containsAny(final Set<T> set, final List<T> list) {
+        for (final T t : list) {
+            if (set.contains(t)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private @NotNull Graph<HydrationProvider<?>, DefaultEdge> createProviderGraph() {
+        final ArrayList<HydrationProvider<?>> allProviders =
+            new ArrayList<>(this.classProviders.size() + this.methodProviders.size() + this.fieldProviders.size());
+        allProviders.addAll(this.classProviders);
+        allProviders.addAll(this.methodProviders);
+        allProviders.addAll(this.fieldProviders);
+
+        final Graph<HydrationProvider<?>, DefaultEdge> g = new DefaultDirectedGraph<>(DefaultEdge.class);
+
+        for (final HydrationProvider<?> currentProvider : allProviders) {
+            g.addVertex(currentProvider);
+
+            for (final HypoKey<?> dependentKey : currentProvider.dependsOn()) {
+                for (final HydrationProvider<?> providingProvider : allProviders) {
+                    for (final HypoKey<?> providedKey : providingProvider.provides()) {
+                        if (dependentKey == providedKey) {
+                            g.addVertex(providingProvider);
+                            g.addEdge(providingProvider, currentProvider);
+                        }
+                    }
+                }
+            }
+        }
+
+        return g;
+    }
+
+    private @NotNull HashSet<HydrationProvider<?>> getNextStage(final @NotNull Graph<HydrationProvider<?>, ?> graph) {
+        final LinkedHashSet<HydrationProvider<?>> stage = new LinkedHashSet<>();
+        for (final HydrationProvider<?> provider : graph.vertexSet()) {
+            if (graph.inDegreeOf(provider) == 0) {
+                stage.add(provider);
+            }
+        }
+        graph.removeAllVertices(stage);
+        return stage;
     }
 }

@@ -23,7 +23,9 @@ import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.MethodClosure;
+import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.model.data.types.JvmType;
@@ -73,6 +75,11 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
     @Contract(value = "-> new", pure = true)
     public static @NotNull LambdaCallHydrator create() {
         return new LambdaCallHydrator();
+    }
+
+    @Override
+    public List<HypoKey<?>> provides() {
+        return HypoModelUtil.immutableListOf(HypoHydration.LAMBDA_CALLS);
     }
 
     @Override

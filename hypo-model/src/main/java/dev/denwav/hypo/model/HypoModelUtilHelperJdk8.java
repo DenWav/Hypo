@@ -19,6 +19,7 @@
 package dev.denwav.hypo.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,5 +34,17 @@ class HypoModelUtilHelperJdk8 extends HypoModelUtilHelper {
     @Override
     @NotNull <T> List<T> asImmutableList(final @NotNull Collection<T> list) {
         return Collections.unmodifiableList(new ArrayList<>(list));
+    }
+
+    @SafeVarargs
+    @Override
+    final @NotNull <T> List<T> immutableListOf(final @NotNull T @NotNull ... array) {
+        if (array.length == 0) {
+            return Collections.emptyList();
+        } else if (array.length == 1) {
+            return Collections.singletonList(array[0]);
+        } else {
+            return Collections.unmodifiableList(Arrays.asList(array));
+        }
     }
 }

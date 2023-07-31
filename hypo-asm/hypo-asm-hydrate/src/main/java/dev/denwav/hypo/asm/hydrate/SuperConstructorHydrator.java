@@ -26,6 +26,7 @@ import dev.denwav.hypo.hydrate.generic.SuperCall;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ConstructorData;
+import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.model.data.types.JvmType;
@@ -33,7 +34,6 @@ import dev.denwav.hypo.model.data.types.PrimitiveType;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.Contract;
@@ -75,6 +75,11 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
     @Contract(value = "-> new", pure = true)
     public static @NotNull SuperConstructorHydrator create() {
         return new SuperConstructorHydrator();
+    }
+
+    @Override
+    public List<HypoKey<?>> provides() {
+        return HypoModelUtil.immutableListOf(HypoHydration.SUPER_CALL_TARGET, HypoHydration.SUPER_CALLER_SOURCES);
     }
 
     @Override

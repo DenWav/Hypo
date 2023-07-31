@@ -19,6 +19,7 @@
 package dev.denwav.hypo.model.data;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -102,8 +103,19 @@ public abstract class LazyClassData extends AbstractClassData {
      * {@code compute} variant of {@link #kind()}.
      *
      * @return The {@link ClassKind kind} of this class.
+     * @deprecated Because of {@link ClassData#kind()}. Define {@link #computeClassKinds()} instead.
      */
-    public abstract @NotNull ClassKind computeClassKind();
+    @Deprecated
+    public @NotNull ClassKind computeClassKind() {
+        throw new IllegalStateException();
+    }
+
+    /**
+     * Compute variant of {@link #kinds()}.
+     *
+     * @return The {@link ClassKind kinds} of this class.
+     */
+    public abstract @NotNull EnumSet<ClassKind> computeClassKinds();
 
     /**
      * {@code compute} variant of {@link #visibility()}.
@@ -190,10 +202,10 @@ public abstract class LazyClassData extends AbstractClassData {
         return this.recordComponents.get();
     }
 
-    private final @NotNull LazyValue<ClassKind, ?> classKind = LazyValue.of(this::computeClassKind);
+    private final @NotNull LazyValue<EnumSet<ClassKind>, ?> kinds = LazyValue.of(this::computeClassKinds);
     @Override
-    public @NotNull ClassKind kind() {
-        return this.classKind.getNotNull();
+    public @NotNull EnumSet<ClassKind> kinds() {
+        return this.kinds.getNotNull();
     }
 
     private final @NotNull LazyValue<@NotNull Visibility, ?> visibility = LazyValue.of(this::computeVisibility);

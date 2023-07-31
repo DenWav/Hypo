@@ -27,6 +27,7 @@ import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -303,7 +304,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
-            public @NotNull ClassKind kind() {
+            public @NotNull EnumSet<ClassKind> kinds() {
                 throw new IllegalStateException();
             }
 

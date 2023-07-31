@@ -19,11 +19,14 @@
 package dev.denwav.hypo.hydrate;
 
 import dev.denwav.hypo.core.HypoContext;
+import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoData;
 import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import java.io.IOException;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -55,4 +58,24 @@ public interface HydrationProvider<T extends HypoData> {
      * @throws IOException If an IO error occurs while hydrating the {@code data} object.
      */
     void hydrate(final @NotNull T data, final @NotNull HypoContext context) throws IOException;
+
+    /**
+     * Optionally marks which {@link HypoKey HypoKeys} this hydration providers provides. This is only really applicable
+     * for hydration provider dependency checking. An empty list does not imply this hydration provider does not produce
+     * any keys, it just means the provider does not report what it produces.
+     *
+     * @return The {@link HypoKey HypoKeys} this hydration provider provides, if it reports this information.
+     */
+    default List<HypoKey<?>> provides() {
+        return HypoModelUtil.immutableListOf();
+    }
+
+    /**
+     * Marks which {@link HypoKey HypoKeys} this hydration provider would like to have available during the hydration
+     * process, but are not required. This is used for determining the order the hydration providers should run in.
+     * @return Which {@link HypoKey HypoKeys} this hydration provider would like to have available during hydration.
+     */
+    default List<HypoKey<?>> dependsOn() {
+        return HypoModelUtil.immutableListOf();
+    }
 }

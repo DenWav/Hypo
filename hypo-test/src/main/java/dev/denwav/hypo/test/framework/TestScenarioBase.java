@@ -282,6 +282,7 @@ public abstract class TestScenarioBase {
      * <p>{@link #forContext()} is required, but the rest only need to be overridden in order to change the default
      * values.
      */
+    @FunctionalInterface
     public interface Env {
         /**
          * The name of the system property the test scenario should use to find the jar file for this scenario's

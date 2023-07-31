@@ -28,10 +28,9 @@ import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -173,24 +172,32 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
-    public @NotNull ClassKind computeClassKind() {
-        return this.kind();
-    }
-    @Override
-    public @NotNull ClassKind kind() {
+    public @NotNull EnumSet<ClassKind> computeClassKinds() {
+        final EnumSet<ClassKind> kinds = EnumSet.noneOf(ClassKind.class);
         if ((this.node.access & Opcodes.ACC_ANNOTATION) != 0) {
-            return ClassKind.ANNOTATION;
-        } else if ((this.node.access & Opcodes.ACC_INTERFACE) != 0) {
-            return ClassKind.INTERFACE;
-        } else if ((this.node.access & Opcodes.ACC_ABSTRACT) != 0) {
-            return ClassKind.ABSTRACT_CLASS;
-        } else if ((this.node.access & Opcodes.ACC_ENUM) != 0) {
-            return ClassKind.ENUM;
-        } else if ((this.node.access & Opcodes.ACC_RECORD) != 0) {
-            return ClassKind.RECORD;
-        } else {
-            return ClassKind.CLASS;
+            kinds.add(ClassKind.ANNOTATION);
         }
+        if ((this.node.access & Opcodes.ACC_INTERFACE) != 0) {
+            kinds.add(ClassKind.INTERFACE);
+        }
+        if ((this.node.access & Opcodes.ACC_ABSTRACT) != 0) {
+            kinds.add(ClassKind.ABSTRACT_CLASS);
+        }
+        if ((this.node.access & Opcodes.ACC_ENUM) != 0) {
+            kinds.add(ClassKind.ENUM);
+        }
+        if ((this.node.access & Opcodes.ACC_RECORD) != 0) {
+            kinds.add(ClassKind.RECORD);
+        }
+        if (kinds.isEmpty()) {
+            kinds.add(ClassKind.CLASS);
+        }
+        return kinds;
+    }
+
+    @Override
+    public @NotNull EnumSet<ClassKind> kinds() {
+        return EnumSet.copyOf(super.kinds());
     }
 
     @Override

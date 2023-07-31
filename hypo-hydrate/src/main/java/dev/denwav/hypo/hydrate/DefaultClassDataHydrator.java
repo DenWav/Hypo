@@ -140,7 +140,6 @@ public class DefaultClassDataHydrator implements ClassDataHydrator {
                 baseMethod.setSuperMethod(method);
 
                 final Set<MethodData> chi = method.childMethods();
-                //noinspection SynchronizationOnLocalVariableOrMethodParameter
                 synchronized (chi) {
                     chi.add(baseMethod);
                 }

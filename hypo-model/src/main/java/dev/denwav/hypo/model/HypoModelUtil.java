@@ -207,6 +207,18 @@ public final class HypoModelUtil {
     }
 
     /**
+     * Create an immutable list from the given array.
+     *
+     * @param array The array to copy as an immutable list.
+     * @param <T> The type param of the collection.
+     * @return The new immutable list.
+     */
+    @SafeVarargs
+    public static <T> @NotNull List<T> immutableListOf(final @NotNull T @NotNull ... array) {
+        return HypoModelUtilHelper.INSTANCE.immutableListOf(array);
+    }
+
+    /**
      * Version of {@link Function} which allows throwing checked exception inside the method implementation. When the
      * {@link Function#apply(Object)} method is invoked it will call {@link #applyThrowing(Object)}, rethrowing any
      * exceptions thrown as unchecked using {@link #rethrow(Throwable)}.

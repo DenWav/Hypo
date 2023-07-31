@@ -25,7 +25,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -130,8 +130,107 @@ public interface ClassData extends HypoData {
      *
      * @return The kind of class this class data is.
      * @see ClassKind
+     * @deprecated Some classes can be multiple kinds. This method will only return what is considered the "primary" kind. Use {@link #kinds()} or
+     *             {@link #is(ClassKind)} instead.
+     * @see #kinds()
+     * @see #is(ClassKind)
      */
-    @NotNull ClassKind kind();
+    @Deprecated
+    default @NotNull ClassKind kind() {
+        final EnumSet<ClassKind> kinds = this.kinds();
+        for (final ClassKind kind : kinds) {
+            // specific kinds get preference
+            // otherwise we don't care
+            switch (kind) {
+                case CLASS:
+                case ABSTRACT_CLASS:
+                case INTERFACE:
+                    continue;
+                case ENUM:
+                    return ClassKind.ENUM;
+                case ANNOTATION:
+                    return ClassKind.ANNOTATION;
+                case RECORD:
+                    return ClassKind.RECORD;
+            }
+        }
+        if (kinds.contains(ClassKind.INTERFACE)) {
+            return ClassKind.INTERFACE;
+        } else if (kinds.contains(ClassKind.ABSTRACT_CLASS)) {
+            return ClassKind.ABSTRACT_CLASS;
+        } else {
+            return ClassKind.CLASS;
+        }
+    }
+
+    /**
+     * Get all {@link ClassKind kinds} of class this class data represents.
+     * @return All kinds of class this class data represents.
+     */
+    @NotNull EnumSet<ClassKind> kinds();
+
+    /**
+     * Returns {@code true} if this class data represents the given kind.
+     * @param kind The {@link ClassKind} to test against this class data
+     * @return {@code true} if this class data represents the given kind.
+     * @see #isAny(ClassKind...)
+     * @see #isAny(EnumSet)
+     * @see #isAll(ClassKind...)
+     * @see #isAll(EnumSet)
+     */
+    default boolean is(final @NotNull ClassKind kind) {
+        return this.kinds().contains(kind);
+    }
+
+    /**
+     * Returns {@code true} if this class data represents <b>any</b> of the given kinds.
+     * @param kinds The array of {@link ClassKind kinds} to test against this class data.
+     * @return {@link ClassKind kinds} to test against this class data.
+     * @see #is(ClassKind)
+     */
+    default boolean isAny(final @NotNull ClassKind @NotNull ... kinds) {
+        for (final ClassKind kind : kinds) {
+            if (this.kinds().contains(kind)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns {@code true} if this class data represents <b>any</b> of the given kinds.
+     * @param kinds The set of {@link ClassKind kinds} to test against this class data.
+     * @return {@link ClassKind kinds} to test against this class data.
+     * @see #is(ClassKind)
+     */
+    default boolean isAny(final @NotNull EnumSet<ClassKind> kinds) {
+        for (final ClassKind kind : kinds) {
+            if (this.kinds().contains(kind)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Returns {@code true} if this class data represents <b>all</b> of the given kinds.
+     * @param kinds The array of {@link ClassKind kinds} to test against this class data.
+     * @return {@link ClassKind kinds} to test against this class data.
+     * @see #is(ClassKind)
+     */
+    default boolean isAll(final @NotNull ClassKind @NotNull ... kinds) {
+        return this.kinds().containsAll(Arrays.asList(kinds));
+    }
+
+    /**
+     * Returns {@code true} if this class data represents <b>all</b> of the given kinds.
+     * @param kinds The set of {@link ClassKind kinds} to test against this class data.
+     * @return {@link ClassKind kinds} to test against this class data.
+     * @see #is(ClassKind)
+     */
+    default boolean isAll(final @NotNull EnumSet<ClassKind> kinds) {
+        return this.kinds().containsAll(kinds);
+    }
 
     /**
      * Get the {@link Visibility visibility} of this class data.

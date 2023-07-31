@@ -71,11 +71,13 @@ public final class HypoKey<T> {
      * The following 2 methods are overridden solely to make it extra clear this class only has identity, no value.
      */
 
+    @SuppressWarnings("FinalMethodInFinalClass")
     @Override
     public final boolean equals(final Object o) {
         return this == o;
     }
 
+    @SuppressWarnings("FinalMethodInFinalClass")
     @Override
     public final int hashCode() {
         return System.identityHashCode(this);

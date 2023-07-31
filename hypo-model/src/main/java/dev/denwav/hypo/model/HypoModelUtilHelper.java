@@ -58,4 +58,6 @@ abstract class HypoModelUtilHelper {
      * @return The new immutable list.
      */
     abstract <T> @NotNull List<T> asImmutableList(final @NotNull Collection<T> list);
+
+    abstract <T> @NotNull List<T> immutableListOf(final @NotNull T @NotNull ... array);
 }
