@@ -188,8 +188,16 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
 
             if (interfaceMethod != null) {
                 final List<LambdaClosure> interfaceMethodLambdas = interfaceMethod.compute(HypoHydration.LAMBDA_CALLS, ArrayList::new);
-                synchronized (interfaceMethodLambdas) {
-                    interfaceMethodLambdas.add(call);
+                outer: {
+                    synchronized (interfaceMethodLambdas) {
+                        for (final LambdaClosure lambdaClosure : interfaceMethodLambdas) {
+                            if (lambdaClosure.getLambda().equals(targetMethod)) {
+                                break outer;
+                            }
+                        }
+                        // only add if the target method isn't already included in a lambda to avoid duplicates
+                        interfaceMethodLambdas.add(call);
+                    }
                 }
             }
         }
