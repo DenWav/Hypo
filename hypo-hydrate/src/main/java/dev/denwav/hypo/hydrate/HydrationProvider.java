@@ -20,9 +20,9 @@ package dev.denwav.hypo.hydrate;
 
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.model.HypoModelUtil;
+import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoData;
-import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import java.io.IOException;

@@ -18,8 +18,8 @@
 
 package dev.denwav.hypo.model.data;
 
-import dev.denwav.hypo.model.HypoModelUtil;
 import com.google.errorprone.annotations.concurrent.LazyInit;
+import dev.denwav.hypo.model.HypoModelUtil;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

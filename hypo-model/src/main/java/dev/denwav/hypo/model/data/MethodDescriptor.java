@@ -18,12 +18,12 @@
 
 package dev.denwav.hypo.model.data;
 
+import com.google.errorprone.annotations.Immutable;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.types.ArrayType;
 import dev.denwav.hypo.model.data.types.ClassType;
 import dev.denwav.hypo.model.data.types.JvmType;
 import dev.denwav.hypo.model.data.types.PrimitiveType;
-import com.google.errorprone.annotations.Immutable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

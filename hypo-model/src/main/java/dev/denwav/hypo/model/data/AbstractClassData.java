@@ -18,8 +18,8 @@
 
 package dev.denwav.hypo.model.data;
 
-import dev.denwav.hypo.model.ClassDataProvider;
 import com.google.errorprone.annotations.concurrent.LazyInit;
+import dev.denwav.hypo.model.ClassDataProvider;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;

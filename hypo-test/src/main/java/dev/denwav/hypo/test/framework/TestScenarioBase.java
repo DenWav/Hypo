@@ -18,6 +18,7 @@
 
 package dev.denwav.hypo.test.framework;
 
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import dev.denwav.hypo.asm.AsmClassDataProvider;
 import dev.denwav.hypo.core.HypoConfig;
 import dev.denwav.hypo.core.HypoContext;
@@ -28,7 +29,6 @@ import dev.denwav.hypo.mappings.MappingsCompletionManager;
 import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.model.ClassProviderRoot;
 import dev.denwav.hypo.model.HypoModelUtil;
-import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

@@ -18,10 +18,10 @@
 
 package dev.denwav.hypo.core;
 
-import dev.denwav.hypo.model.ClassDataDecorator;
-import dev.denwav.hypo.model.ClassDataProvider;
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.google.errorprone.annotations.Immutable;
+import dev.denwav.hypo.model.ClassDataDecorator;
+import dev.denwav.hypo.model.ClassDataProvider;
 import java.util.function.Function;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

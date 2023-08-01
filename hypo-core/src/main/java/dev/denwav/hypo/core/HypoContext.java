@@ -18,12 +18,12 @@
 
 package dev.denwav.hypo.core;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import com.google.errorprone.annotations.concurrent.LazyInit;
 import dev.denwav.hypo.model.ClassDataDecorator;
 import dev.denwav.hypo.model.ClassDataProvider;
 import dev.denwav.hypo.model.ClassDataProviderSet;
 import dev.denwav.hypo.model.HypoModelUtil;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import com.google.errorprone.annotations.concurrent.LazyInit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;

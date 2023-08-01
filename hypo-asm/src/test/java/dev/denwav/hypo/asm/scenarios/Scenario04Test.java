@@ -20,7 +20,6 @@ package dev.denwav.hypo.asm.scenarios;
 
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import java.util.List;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

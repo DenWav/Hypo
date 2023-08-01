@@ -18,8 +18,8 @@
 
 package dev.denwav.hypo.model.data.types;
 
-import dev.denwav.hypo.model.HypoModelUtil;
 import com.google.errorprone.annotations.Immutable;
+import dev.denwav.hypo.model.HypoModelUtil;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

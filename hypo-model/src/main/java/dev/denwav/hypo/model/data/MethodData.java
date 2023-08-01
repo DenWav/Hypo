@@ -20,7 +20,6 @@ package dev.denwav.hypo.model.data;
 
 import dev.denwav.hypo.model.data.types.JvmType;
 import dev.denwav.hypo.model.data.types.PrimitiveType;
-import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;

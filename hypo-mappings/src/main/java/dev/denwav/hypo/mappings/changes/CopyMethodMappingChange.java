@@ -18,9 +18,9 @@
 
 package dev.denwav.hypo.mappings.changes;
 
+import dev.denwav.hypo.mappings.MappingsChange;
 import dev.denwav.hypo.mappings.MergeResult;
 import dev.denwav.hypo.mappings.MergeableMappingsChange;
-import dev.denwav.hypo.mappings.MappingsChange;
 import java.util.Collection;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.model.ClassMapping;

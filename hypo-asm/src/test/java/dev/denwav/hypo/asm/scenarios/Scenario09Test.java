@@ -20,9 +20,6 @@ package dev.denwav.hypo.asm.scenarios;
 
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ClassKind;
-import dev.denwav.hypo.model.data.FieldData;
-import dev.denwav.hypo.model.data.types.ClassType;
-import dev.denwav.hypo.model.data.types.PrimitiveType;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import java.util.EnumSet;
 import java.util.List;

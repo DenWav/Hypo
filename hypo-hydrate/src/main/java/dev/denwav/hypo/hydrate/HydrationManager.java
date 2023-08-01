@@ -18,9 +18,9 @@
 
 package dev.denwav.hypo.hydrate;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.model.data.HypoData;
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import java.io.IOException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

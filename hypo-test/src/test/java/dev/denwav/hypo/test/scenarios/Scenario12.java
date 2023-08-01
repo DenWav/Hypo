@@ -20,7 +20,6 @@ package dev.denwav.hypo.test.scenarios;
 
 import dev.denwav.hypo.asm.hydrate.SuperConstructorHydrator;
 import dev.denwav.hypo.core.HypoConfig;
-import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.mappings.contributors.CopyMappingsDown;
