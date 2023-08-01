@@ -118,8 +118,6 @@ public final class CopyRecordParameters implements ChangeContributor {
                     newName = components.get(i).name();
                 }
 
-                // + 1 because all records are static, so there will never be a this$0 reference
-                // there will always be a this reference, though
                 final MemberReference ref = MemberReference.of(method, lvtIndex);
                 registry.submitChange(AddNewParameterMappingsChange.of(ref, newName));
 
