@@ -30,7 +30,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("resource")
 @DisplayName("[asm] Scenario 04 - Sealed classes (Java 17)")
 public class Scenario04Test extends TestScenarioBase {
 
@@ -41,14 +40,14 @@ public class Scenario04Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test isSealed()")
-    public void testIsSealed() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario04/TestClass");
+    public void testIsSealed() {
+        final var testClass = this.findClass("scenario04/TestClass");
         assertNotNull(testClass);
-        final var testSubClass = this.context().getProvider().findClass("scenario04/TestSubClass");
+        final var testSubClass = this.findClass("scenario04/TestSubClass");
         assertNotNull(testSubClass);
-        final var testSealedSubClass = this.context().getProvider().findClass("scenario04/TestSealedSubClass");
+        final var testSealedSubClass = this.findClass("scenario04/TestSealedSubClass");
         assertNotNull(testSealedSubClass);
-        final var testSubSubClass = this.context().getProvider().findClass("scenario04/TestSubSubClass");
+        final var testSubSubClass = this.findClass("scenario04/TestSubSubClass");
         assertNotNull(testSubSubClass);
 
         assertTrue(testClass.isSealed());
@@ -60,13 +59,13 @@ public class Scenario04Test extends TestScenarioBase {
     @Test
     @DisplayName("Test correct permitted classes are returned")
     public void testPermitted() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario04/TestClass");
+        final var testClass = this.findClass("scenario04/TestClass");
         assertNotNull(testClass);
-        final var testSubClass = this.context().getProvider().findClass("scenario04/TestSubClass");
+        final var testSubClass = this.findClass("scenario04/TestSubClass");
         assertNotNull(testSubClass);
-        final var testSealedSubClass = this.context().getProvider().findClass("scenario04/TestSealedSubClass");
+        final var testSealedSubClass = this.findClass("scenario04/TestSealedSubClass");
         assertNotNull(testSealedSubClass);
-        final var testSubSubClass = this.context().getProvider().findClass("scenario04/TestSubSubClass");
+        final var testSubSubClass = this.findClass("scenario04/TestSubSubClass");
         assertNotNull(testSubSubClass);
 
         assertEquals(List.of(testSubClass, testSealedSubClass), testClass.permittedClasses());

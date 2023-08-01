@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@SuppressWarnings("resource")
 @DisplayName("[asm] Scenario 07 - Local class scopes inside lambda scopes (Java 17)")
 public class Scenario07Test extends TestScenarioBase {
 
@@ -57,8 +56,8 @@ public class Scenario07Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test local classes hydrator")
-    public void testLocalClasses() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario07/TestClass");
+    public void testLocalClasses() {
+        final var testClass = this.findClass("scenario07/TestClass");
         assertNotNull(testClass);
 
         final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));

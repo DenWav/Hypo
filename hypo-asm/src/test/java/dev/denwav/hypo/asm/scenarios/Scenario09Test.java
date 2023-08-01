@@ -33,7 +33,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("resource")
 @DisplayName("[asm] Scenario 09 - Abstract enums test (Java 17)")
 public class Scenario09Test extends TestScenarioBase {
 
@@ -44,8 +43,8 @@ public class Scenario09Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test abstract enums")
-    public void testAbstractEnums() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario09/TestClass");
+    public void testAbstractEnums() {
+        final var testClass = this.findClass("scenario09/TestClass");
         assertNotNull(testClass);
 
         // `true` is

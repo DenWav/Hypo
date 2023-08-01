@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("resource")
 @DisplayName("[asm] Scenario 05 - Lambda scopes (Java 17)")
 public class Scenario05Test extends TestScenarioBase {
 
@@ -65,7 +64,7 @@ public class Scenario05Test extends TestScenarioBase {
     private MethodData functionApply;
 
     @BeforeEach
-    public void setupRunnable() throws Exception {
+    public void setupRunnable() {
         this.runnableRun = this.findClass("java/lang/Runnable")
             .method("run", parseDescriptor("()V"));
         this.functionApply = this.findClass("java/util/function/Function")

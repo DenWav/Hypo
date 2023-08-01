@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("resource")
 @DisplayName("[asm] Scenario 03 - Synthetic classes and members (Java 17)")
 public class Scenario03Test extends TestScenarioBase {
 
@@ -43,10 +42,10 @@ public class Scenario03Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test expected synthetic members are synthetic")
-    public void testSyntheticMembers() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario03/TestClass");
+    public void testSyntheticMembers() {
+        final var testClass = this.findClass("scenario03/TestClass");
         assertNotNull(testClass);
-        final var inner = this.context().getProvider().findClass("scenario03/TestClass$Inner");
+        final var inner = this.findClass("scenario03/TestClass$Inner");
         assertNotNull(inner);
 
         final MethodData intSupplierSynth = testClass.method("lambda$intSupplier$0", MethodDescriptor.parseDescriptor("(Lscenario03/TestClass$Inner;)I"));
@@ -60,10 +59,10 @@ public class Scenario03Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test declared members are not synthetic")
-    public void testNonSyntheticMembers() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario03/TestClass");
+    public void testNonSyntheticMembers() {
+        final var testClass = this.findClass("scenario03/TestClass");
         assertNotNull(testClass);
-        final var inner = this.context().getProvider().findClass("scenario03/TestClass$Inner");
+        final var inner = this.findClass("scenario03/TestClass$Inner");
         assertNotNull(inner);
 
         final MethodData intSupplier = testClass.method("intSupplier", MethodDescriptor.parseDescriptor("(Lscenario03/TestClass$Inner;)Ljava/util/function/IntSupplier;"));
@@ -77,20 +76,20 @@ public class Scenario03Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test declared classes are not synthetic")
-    public void testNonSyntheticClasses() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario03/TestClass");
+    public void testNonSyntheticClasses() {
+        final var testClass = this.findClass("scenario03/TestClass");
         assertNotNull(testClass);
         assertFalse(testClass.isSynthetic());
 
-        final var inner = this.context().getProvider().findClass("scenario03/TestClass$Inner");
+        final var inner = this.findClass("scenario03/TestClass$Inner");
         assertNotNull(inner);
         assertFalse(inner.isSynthetic());
     }
 
     @Test
     @DisplayName("Test expected synthetic classes are synthetic")
-    public void testSyntheticClasses() throws Exception {
-        final var syntheticInner = this.context().getProvider().findClass("scenario03/TestClass$1");
+    public void testSyntheticClasses() {
+        final var syntheticInner = this.findClass("scenario03/TestClass$1");
         assertNotNull(syntheticInner, "Did not find expected TestClass$1 synthetic inner class");
         assertTrue(syntheticInner.isSynthetic());
     }

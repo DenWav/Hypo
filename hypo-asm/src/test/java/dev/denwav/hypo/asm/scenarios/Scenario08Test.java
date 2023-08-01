@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SuppressWarnings("resource")
 @DisplayName("[asm] Scenario 08 - Java records tests (Java 17)")
 public class Scenario08Test extends TestScenarioBase {
 
@@ -43,8 +42,8 @@ public class Scenario08Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test records")
-    public void testRecords() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario08/TestClass");
+    public void testRecords() {
+        final var testClass = this.findClass("scenario08/TestClass");
         assertNotNull(testClass);
 
         assertTrue(testClass.is(ClassKind.RECORD));

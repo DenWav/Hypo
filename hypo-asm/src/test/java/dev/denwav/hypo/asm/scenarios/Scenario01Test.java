@@ -26,7 +26,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@SuppressWarnings("resource")
 @DisplayName("[asm] Scenario 01 - Inner classes (Java 8)")
 public class Scenario01Test extends TestScenarioBase {
 
@@ -37,8 +36,8 @@ public class Scenario01Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test inner classes")
-    void testInnerClasses() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario01.TestClass");
+    void testInnerClasses() {
+        final var testClass = this.findClass("scenario01.TestClass");
         Assertions.assertNotNull(testClass);
 
         final var innerClasses = testClass.innerClasses();
@@ -56,8 +55,8 @@ public class Scenario01Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test nested inner classes")
-    void testNestedInnerClasses() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario01.TestClass$InnerClass");
+    void testNestedInnerClasses() {
+        final var testClass = this.findClass("scenario01.TestClass$InnerClass");
         Assertions.assertNotNull(testClass);
 
         final var innerClasses = testClass.innerClasses();
@@ -74,8 +73,8 @@ public class Scenario01Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test double nested inner classes")
-    void testDoubleNestedInnerClasses() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario01.TestClass$InnerClass$NestedInnerClass");
+    void testDoubleNestedInnerClasses() {
+        final var testClass = this.findClass("scenario01.TestClass$InnerClass$NestedInnerClass");
         Assertions.assertNotNull(testClass);
 
         final var innerClasses = testClass.innerClasses();
@@ -91,8 +90,8 @@ public class Scenario01Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test static inner classes")
-    void testStaticInnerClasses() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario01.TestClass$StaticInnerClass");
+    void testStaticInnerClasses() {
+        final var testClass = this.findClass("scenario01.TestClass$StaticInnerClass");
         Assertions.assertNotNull(testClass);
 
         final var innerClasses = testClass.innerClasses();
