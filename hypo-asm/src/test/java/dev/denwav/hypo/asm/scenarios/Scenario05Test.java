@@ -21,11 +21,14 @@ package dev.denwav.hypo.asm.scenarios;
 import dev.denwav.hypo.asm.hydrate.LambdaCallHydrator;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
-import dev.denwav.hypo.hydrate.generic.MethodClosure;
+import dev.denwav.hypo.hydrate.generic.LambdaClosure;
+import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.MethodData;
+import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +55,21 @@ public class Scenario05Test extends TestScenarioBase {
             public @NotNull Iterable<HydrationProvider<?>> hydration() {
                 return List.of(LambdaCallHydrator.create());
             }
+
+            @Override
+            public boolean includeJdk() {
+                return true;
+            }
         };
+    }
+
+    private MethodData runnableRun;
+
+    @BeforeEach
+    public void setupRunnable() throws Exception {
+        final var data = this.context().getContextProvider().findClass("java/lang/Runnable");
+        assertNotNull(data);
+        this.runnableRun = data.method("run", MethodDescriptor.parseDescriptor("()V"));
     }
 
     @Test
@@ -64,13 +81,14 @@ public class Scenario05Test extends TestScenarioBase {
         final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));
         assertNotNull(testMethod);
 
-        final List<MethodClosure<MethodData>> methodClosures = testMethod.get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> methodClosures = testMethod.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(methodClosures);
         assertEquals(1, methodClosures.size());
 
-        final MethodClosure<MethodData> methodClosure = methodClosures.get(0);
+        final LambdaClosure methodClosure = methodClosures.get(0);
         assertNotNull(methodClosure);
-        final MethodData call = methodClosure.getClosure();
+        assertEquals(this.runnableRun, methodClosure.getInterfaceMethod());
+        final MethodData call = methodClosure.getLambda();
         assertNotNull(call);
         assertArrayEquals(new int[] { 0, 1, 2, 4 }, methodClosure.getParamLvtIndices());
 
@@ -78,36 +96,36 @@ public class Scenario05Test extends TestScenarioBase {
         assertTrue(call.isSynthetic());
         assertFalse(call.isStatic());
 
-        final List<MethodClosure<MethodData>> nestedCalls = call.get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> nestedCalls = call.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(nestedCalls);
         assertEquals(3, nestedCalls.size());
 
-        final MethodClosure<MethodData> firstNestedMethodClosure = nestedCalls.stream()
-            .filter(c -> c.getClosure().name().equals("thing"))
+        final LambdaClosure firstNestedMethodClosure = nestedCalls.stream()
+            .filter(c -> c.getLambda().name().equals("thing"))
             .findFirst()
             .orElse(null);
         assertNotNull(firstNestedMethodClosure);
-        final MethodData firstNestedCall = firstNestedMethodClosure.getClosure();
+        final MethodData firstNestedCall = firstNestedMethodClosure.getLambda();
         assertNotNull(firstNestedCall);
         assertEquals(testClass, firstNestedCall.parentClass());
         // this is a method reference
         assertFalse(firstNestedCall.isSynthetic());
         assertTrue(firstNestedCall.isStatic());
 
-        final MethodClosure<MethodData> secondNestedMethodClosure = nestedCalls.stream()
-            .filter(c -> !c.getClosure().name().equals("thing"))
+        final LambdaClosure secondNestedMethodClosure = nestedCalls.stream()
+            .filter(c -> !c.getLambda().name().equals("thing"))
             .filter(c -> !c.getContainingMethod().name().equals("test"))
             .findFirst()
             .orElse(null);
         assertNotNull(secondNestedMethodClosure);
-        final MethodData secondNestedCall = secondNestedMethodClosure.getClosure();
+        final MethodData secondNestedCall = secondNestedMethodClosure.getLambda();
         assertNotNull(secondNestedCall);
         assertEquals(testClass, secondNestedCall.parentClass());
         assertTrue(secondNestedCall.isSynthetic());
         assertTrue(secondNestedCall.isStatic());
 
-        final MethodClosure<MethodData> outerNestedMethodClosure = nestedCalls.stream()
-            .filter(c -> c.getClosure().name().equals("thing"))
+        final LambdaClosure outerNestedMethodClosure = nestedCalls.stream()
+            .filter(c -> c.getLambda().name().equals("thing"))
             .findFirst()
             .orElse(null);
         assertNotNull(outerNestedMethodClosure);
@@ -122,13 +140,13 @@ public class Scenario05Test extends TestScenarioBase {
         final MethodData testMethod = testClass.method("testStatic", parseDescriptor("()V"));
         assertNotNull(testMethod);
 
-        final List<MethodClosure<MethodData>> methodClosures = testMethod.get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> methodClosures = testMethod.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(methodClosures);
         assertEquals(1, methodClosures.size());
 
-        final MethodClosure<MethodData> methodClosure = methodClosures.get(0);
+        final LambdaClosure methodClosure = methodClosures.get(0);
         assertNotNull(methodClosure);
-        final MethodData call = methodClosure.getClosure();
+        final MethodData call = methodClosure.getLambda();
         assertNotNull(call);
         assertArrayEquals(new int[] { 0 }, methodClosure.getParamLvtIndices());
 

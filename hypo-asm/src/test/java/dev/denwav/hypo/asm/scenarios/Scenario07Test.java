@@ -22,8 +22,8 @@ import dev.denwav.hypo.asm.hydrate.LambdaCallHydrator;
 import dev.denwav.hypo.asm.hydrate.LocalClassHydrator;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
-import dev.denwav.hypo.hydrate.generic.MethodClosure;
-import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.hydrate.generic.LambdaClosure;
+import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import java.util.List;
@@ -64,27 +64,27 @@ public class Scenario07Test extends TestScenarioBase {
         final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));
         assertNotNull(testMethod);
 
-        final List<MethodClosure<MethodData>> firstLambdas = testMethod.get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> firstLambdas = testMethod.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(firstLambdas);
         assertEquals(1, firstLambdas.size());
-        final MethodClosure<MethodData> firstLambda = firstLambdas.get(0);
+        final LambdaClosure firstLambda = firstLambdas.get(0);
 
-        final List<MethodClosure<MethodData>> secondLambdas = firstLambda.getClosure().get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> secondLambdas = firstLambda.getLambda().get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(secondLambdas);
         assertEquals(2, secondLambdas.size());
-        final MethodClosure<MethodData> secondLambda = secondLambdas.stream().filter(l -> l.getContainingMethod().equals(firstLambda.getClosure())).findFirst().orElse(null);
+        final LambdaClosure secondLambda = secondLambdas.stream().filter(l -> l.getContainingMethod().equals(firstLambda.getLambda())).findFirst().orElse(null);
         assertNotNull(secondLambda);
 
-        final List<MethodClosure<MethodData>> thirdLambdas = secondLambda.getClosure().get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> thirdLambdas = secondLambda.getLambda().get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(thirdLambdas);
         assertEquals(2, thirdLambdas.size());
-        final MethodClosure<MethodData> thirdLambda = thirdLambdas.stream().filter(l -> l.getContainingMethod().equals(secondLambda.getClosure())).findFirst().orElse(null);
+        final LambdaClosure thirdLambda = thirdLambdas.stream().filter(l -> l.getContainingMethod().equals(secondLambda.getLambda())).findFirst().orElse(null);
         assertNotNull(thirdLambda);
 
-        final List<MethodClosure<ClassData>> locals = thirdLambda.getClosure().get(HypoHydration.LOCAL_CLASSES);
+        final List<LocalClassClosure> locals = thirdLambda.getLambda().get(HypoHydration.LOCAL_CLASSES);
         assertNotNull(locals);
         assertEquals(1, locals.size());
-        final MethodClosure<ClassData> local = locals.get(0);
+        final LocalClassClosure local = locals.get(0);
         assertNotNull(local);
 
         assertArrayEquals(new int[] { 0, 2, 3, 4 }, firstLambda.getParamLvtIndices());

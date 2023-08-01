@@ -19,10 +19,11 @@
 package dev.denwav.hypo.asm.hydrate;
 
 import dev.denwav.hypo.asm.AsmMethodData;
+import dev.denwav.hypo.asm.HypoAsmUtil;
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
-import dev.denwav.hypo.hydrate.generic.MethodClosure;
+import dev.denwav.hypo.hydrate.generic.LambdaClosure;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -152,14 +154,30 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 continue;
             }
 
-            final MethodClosure<MethodData> call = new MethodClosure<>(data, targetMethod, finished ? closureIndices : MethodClosure.EMPTY_INT_ARRAY);
+            @Nullable MethodData interfaceMethod = null;
+            final ClassData interfaceType = context.getContextProvider().findClass(desc.getReturnType());
+            if (interfaceType != null) {
+                for (final MethodData method : interfaceType.methods(dyn.name)) {
+                    if (method.isAbstract()) {
+                        interfaceMethod = method;
+                        break;
+                    }
+                }
+            }
 
-            final List<MethodClosure<MethodData>> methodClosures = data.compute(HypoHydration.LAMBDA_CALLS, ArrayList::new);
+            final LambdaClosure call = new LambdaClosure(
+                data,
+                interfaceMethod,
+                targetMethod,
+                finished ? closureIndices : HypoAsmUtil.EMPTY_INT_ARRAY
+            );
+
+            final List<LambdaClosure> methodClosures = data.compute(HypoHydration.LAMBDA_CALLS, ArrayList::new);
             synchronized (methodClosures) {
                 methodClosures.add(call);
             }
 
-            final List<MethodClosure<MethodData>> targetCalls = targetMethod.compute(HypoHydration.LAMBDA_CALLS, ArrayList::new);
+            final List<LambdaClosure> targetCalls = targetMethod.compute(HypoHydration.LAMBDA_CALLS, ArrayList::new);
             synchronized (targetCalls) {
                 targetCalls.add(call);
             }

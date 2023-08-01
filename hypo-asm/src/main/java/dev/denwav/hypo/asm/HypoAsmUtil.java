@@ -33,6 +33,11 @@ import org.objectweb.asm.Type;
 public final class HypoAsmUtil {
 
     /**
+     * For convenience, an empty {@code int[]} array.
+     */
+    public static final int[] EMPTY_INT_ARRAY = new int[0];
+
+    /**
      * Returns the {@link Visibility visibility level} from the given access modifiers.
      *
      * @param access The access modifiers to determine visibility from.

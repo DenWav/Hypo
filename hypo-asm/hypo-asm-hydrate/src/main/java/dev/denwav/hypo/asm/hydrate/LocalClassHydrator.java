@@ -20,10 +20,12 @@ package dev.denwav.hypo.asm.hydrate;
 
 import dev.denwav.hypo.asm.AsmClassData;
 import dev.denwav.hypo.asm.AsmMethodData;
+import dev.denwav.hypo.asm.HypoAsmUtil;
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
-import dev.denwav.hypo.hydrate.generic.MethodClosure;
+import dev.denwav.hypo.hydrate.generic.LambdaClosure;
+import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
@@ -118,19 +120,19 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
         // it captures.
 
         for (final AsmClassData nestedClass : nestedClasses) {
-            setCall(data, nestedClass, MethodClosure.EMPTY_INT_ARRAY);
+            setCall(data, nestedClass, HypoAsmUtil.EMPTY_INT_ARRAY);
         }
     }
 
     private static void setCall(final MethodData data, final ClassData nestedClass, final int[] params) {
-        final MethodClosure<ClassData> call = new MethodClosure<>(data, nestedClass, params);
+        final LocalClassClosure call = new LocalClassClosure(data, nestedClass, params);
 
-        final List<MethodClosure<ClassData>> closures = data.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
+        final List<LocalClassClosure> closures = data.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
         synchronized (closures) {
             closures.add(call);
         }
 
-        final List<MethodClosure<ClassData>> targetClosures = nestedClass.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
+        final List<LocalClassClosure> targetClosures = nestedClass.compute(HypoHydration.LOCAL_CLASSES, ArrayList::new);
         synchronized (targetClosures) {
             targetClosures.add(call);
         }
@@ -157,7 +159,7 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
                 }
 
                 final int @Nullable [] closureIndices = this.handleNestedConst(methodInsn, nestedClass);
-                setCall(method, nestedClass, closureIndices != null ? closureIndices : MethodClosure.EMPTY_INT_ARRAY);
+                setCall(method, nestedClass, closureIndices != null ? closureIndices : HypoAsmUtil.EMPTY_INT_ARRAY);
                 it.remove();
             }
         }
@@ -168,18 +170,18 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
 
         // there are classes we haven't found yet
         // if there are lambdas to look in, check each one
-        final List<MethodClosure<MethodData>> lambdaCalls = method.get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> lambdaCalls = method.get(HypoHydration.LAMBDA_CALLS);
         if (lambdaCalls == null) {
             return;
         }
 
-        for (final MethodClosure<MethodData> lambdaCall : lambdaCalls) {
+        for (final LambdaClosure lambdaCall : lambdaCalls) {
             if (nestedClasses.isEmpty()) {
                 return;
             }
 
             if (lambdaCall.getContainingMethod().equals(method)) {
-                this.findNewCalls(lambdaCall.getClosure(), nestedClasses);
+                this.findNewCalls(lambdaCall.getLambda(), nestedClasses);
             }
         }
     }

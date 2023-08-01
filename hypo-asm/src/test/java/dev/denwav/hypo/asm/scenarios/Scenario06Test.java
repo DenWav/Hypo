@@ -21,8 +21,7 @@ package dev.denwav.hypo.asm.scenarios;
 import dev.denwav.hypo.asm.hydrate.LocalClassHydrator;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
-import dev.denwav.hypo.hydrate.generic.MethodClosure;
-import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import java.util.List;
@@ -63,26 +62,26 @@ public class Scenario06Test extends TestScenarioBase {
         final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));
         assertNotNull(testMethod);
 
-        final List<MethodClosure<ClassData>> localClasses = testMethod.get(HypoHydration.LOCAL_CLASSES);
+        final List<LocalClassClosure> localClasses = testMethod.get(HypoHydration.LOCAL_CLASSES);
         assertNotNull(localClasses);
         assertEquals(3, localClasses.size());
 
-        final MethodClosure<ClassData> firstAnon = localClasses.get(0);
+        final LocalClassClosure firstAnon = localClasses.get(0);
         assertNotNull(firstAnon);
         assertEquals(testMethod, firstAnon.getContainingMethod());
-        assertEquals("scenario06/TestClass$1", firstAnon.getClosure().name());
+        assertEquals("scenario06/TestClass$1", firstAnon.getLocalClass().name());
         assertEquals(0, firstAnon.getParamLvtIndices().length);
 
-        final MethodClosure<ClassData> secondAnon = localClasses.get(1);
+        final LocalClassClosure secondAnon = localClasses.get(1);
         assertNotNull(secondAnon);
         assertEquals(testMethod, secondAnon.getContainingMethod());
-        assertEquals("scenario06/TestClass$2", secondAnon.getClosure().name());
+        assertEquals("scenario06/TestClass$2", secondAnon.getLocalClass().name());
         assertArrayEquals(new int [] { 1, 2 }, secondAnon.getParamLvtIndices());
 
-        final MethodClosure<ClassData> firstLocal = localClasses.get(2);
+        final LocalClassClosure firstLocal = localClasses.get(2);
         assertNotNull(firstLocal);
         assertEquals(testMethod, firstLocal.getContainingMethod());
-        assertEquals("scenario06/TestClass$1LocalClass", firstLocal.getClosure().name());
+        assertEquals("scenario06/TestClass$1LocalClass", firstLocal.getLocalClass().name());
         assertArrayEquals(new int [] { 1, 2 }, firstLocal.getParamLvtIndices());
     }
 }

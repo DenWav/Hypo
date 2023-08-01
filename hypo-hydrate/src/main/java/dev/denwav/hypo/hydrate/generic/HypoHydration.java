@@ -54,7 +54,7 @@ public final class HypoHydration {
      *
      * <p>This key is symmetric, it is set for both the containing and the local / anonymous class.
      */
-    public static final HypoKey<List<MethodClosure<ClassData>>> LOCAL_CLASSES = HypoKey.create("Local Classes");
+    public static final HypoKey<List<LocalClassClosure>> LOCAL_CLASSES = HypoKey.create("Local Classes");
 
     /**
      * The list of {@link MethodData methods} representing lambdas present in the method this {@link HypoKey} is set
@@ -62,5 +62,5 @@ public final class HypoHydration {
      *
      * <p>This key is symmetric, it is set for both the containing and lambda methods.
      */
-    public static final HypoKey<List<MethodClosure<MethodData>>> LAMBDA_CALLS = HypoKey.create("Lambda Calls");
+    public static final HypoKey<List<LambdaClosure>> LAMBDA_CALLS = HypoKey.create("Lambda Calls");
 }
