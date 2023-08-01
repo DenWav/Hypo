@@ -26,49 +26,33 @@ public class CopyLambdaParametersDown implements ChangeContributor {
         if (currentClass == null || classMapping == null || !currentClass.is(ClassKind.INTERFACE)) {
             return;
         }
-        boolean log = false;
         @Nullable MethodData notFinalInterfaceMethod = null;
-        if (currentClass.name().equals("net/minecraft/world/level/biome/BiomeResolver")) {
-            log = true;
-            System.out.println("current class match");
-        }
         for (final MethodData method : currentClass.methods()) {
             if (method.isAbstract()) {
                 if (notFinalInterfaceMethod != null) {
-                    if (log) System.out.println("multiple abstract methods");
                     return; // more than 1 abstract method in an interface is not a lambda
                 }
                 notFinalInterfaceMethod = method;
             }
         }
         if (notFinalInterfaceMethod == null) {
-            if (log) System.out.println("null interface method");
             return;
         }
         final MethodData interfaceMethod = notFinalInterfaceMethod;
         final Optional<MethodMapping> interfaceMethodMapping = classMapping.getMethodMapping(MethodSignature.of(interfaceMethod.name(), interfaceMethod.descriptorText()));
         if (!interfaceMethodMapping.isPresent()) {
-            if (log) System.out.println("no interface mappings");
             return;
         }
         final List<LambdaClosure> lambdaClosures = interfaceMethod.get(HypoHydration.LAMBDA_CALLS);
         if (lambdaClosures == null || lambdaClosures.isEmpty()) {
-            if (log) System.out.println("no lambdas " + interfaceMethod);
             return;
         }
-        if (log) {
-            System.out.println(interfaceMethod);
-        }
         for (final LambdaClosure closure : lambdaClosures) {
-            if (log) {
-                System.out.println(closure);
-            }
             if (closure.getContainingMethod().equals(closure.getLambda()) || !closure.getLambda().isSynthetic()) {
                 continue;
             }
             final MethodData lambda = closure.getLambda();
             final int paramOffset = closure.getParamLvtIndices().length - 1;
-            if (log) System.out.println(paramOffset);
             registry.submitChange(new MappingsChange() {
                 @Override
                 public @NotNull MemberReference target() {
