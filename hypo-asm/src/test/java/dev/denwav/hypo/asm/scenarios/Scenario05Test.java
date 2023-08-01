@@ -23,7 +23,6 @@ import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.LambdaClosure;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -63,18 +62,20 @@ public class Scenario05Test extends TestScenarioBase {
     }
 
     private MethodData runnableRun;
+    private MethodData functionApply;
 
     @BeforeEach
     public void setupRunnable() throws Exception {
-        final var data = this.context().getContextProvider().findClass("java/lang/Runnable");
-        assertNotNull(data);
-        this.runnableRun = data.method("run", MethodDescriptor.parseDescriptor("()V"));
+        this.runnableRun = this.findClass("java/lang/Runnable")
+            .method("run", parseDescriptor("()V"));
+        this.functionApply = this.findClass("java/util/function/Function")
+            .method("apply", parseDescriptor("(Ljava/lang/Object;)Ljava/lang/Object;"));
     }
 
     @Test
     @DisplayName("Test lambda call hydrator")
-    public void testLambdaCalls() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario05/TestClass");
+    public void testLambdaCalls() {
+        final var testClass = this.findClass("scenario05/TestClass");
         assertNotNull(testClass);
 
         final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));
@@ -132,8 +133,8 @@ public class Scenario05Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test lambda call hydrator on statics")
-    public void testStaticLambdaCalls() throws Exception {
-        final var testClass = this.context().getProvider().findClass("scenario05/TestClass");
+    public void testStaticLambdaCalls() {
+        final var testClass = this.findClass("scenario05/TestClass");
         assertNotNull(testClass);
 
         final MethodData testMethod = testClass.method("testStatic", parseDescriptor("()V"));
@@ -152,5 +153,25 @@ public class Scenario05Test extends TestScenarioBase {
         assertEquals(testClass, call.parentClass());
         assertTrue(call.isSynthetic());
         assertTrue(call.isStatic());
+    }
+
+    @Test
+    @DisplayName("Test lambda call hydrator collecting interface method")
+    public void testFunction() {
+        final var testClass = this.findClass("scenario05/TestClass");
+        assertNotNull(testClass);
+
+        final MethodData testMethod = testClass.method("testFunction", parseDescriptor("()V"));
+        assertNotNull(testMethod);
+
+        final List<LambdaClosure> lambdas = testMethod.get(HypoHydration.LAMBDA_CALLS);
+        assertNotNull(lambdas);
+
+        final LambdaClosure lambda = lambdas.get(0);
+        assertNotNull(lambda);
+
+        assertEquals(testMethod, lambda.getContainingMethod());
+
+        assertEquals(this.functionApply, lambda.getInterfaceMethod());
     }
 }

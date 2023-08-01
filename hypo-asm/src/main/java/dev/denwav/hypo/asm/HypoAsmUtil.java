@@ -18,6 +18,7 @@
 
 package dev.denwav.hypo.asm;
 
+import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.model.data.Visibility;
 import dev.denwav.hypo.model.data.types.ArrayType;
 import dev.denwav.hypo.model.data.types.ClassType;
@@ -63,6 +64,10 @@ public final class HypoAsmUtil {
      */
     @SuppressWarnings("ReferenceEquality")
     public static @NotNull JvmType toJvmType(final @NotNull Type type) {
+        if (type.getSort() == Type.METHOD) {
+            throw new IllegalArgumentException("Given type is a method descriptor: " + type);
+        }
+
         if (type == Type.CHAR_TYPE) {
             return PrimitiveType.CHAR;
         } else if (type == Type.BYTE_TYPE) {
@@ -89,5 +94,18 @@ public final class HypoAsmUtil {
         } else {
             return new ClassType(desc);
         }
+    }
+
+    /**
+     * Map an asm {@link Type} into a Hypo {@link MethodDescriptor}. The {@link Type} must represnet a method descriptor.
+     * @param type The asm {@link Type} to convert into a Hypo {@link MethodDescriptor}.
+     * @return A {@link MethodDescriptor} which matches the given {@link Type}
+     */
+    public static @NotNull MethodDescriptor toDescriptor(final @NotNull Type type) {
+        if (type.getSort() != Type.METHOD) {
+            throw new IllegalArgumentException("Given type is not a method descriptor: " + type);
+        }
+
+        return MethodDescriptor.parseDescriptor(type.getDescriptor());
     }
 }

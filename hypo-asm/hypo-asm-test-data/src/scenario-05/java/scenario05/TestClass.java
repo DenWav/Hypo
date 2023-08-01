@@ -34,4 +34,9 @@ public class TestClass {
             System.out.println(s);
         };
     }
+
+    public void testFunction() {
+        final String s = Integer.toString(new Random().nextInt());
+        final Function<String, String> func = s1 -> s1 + s;
+    }
 }

@@ -29,6 +29,7 @@ import dev.denwav.hypo.mappings.MappingsCompletionManager;
 import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.model.ClassProviderRoot;
 import dev.denwav.hypo.model.HypoModelUtil;
+import dev.denwav.hypo.model.data.ClassData;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -92,6 +93,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
  *     </li>
  * </ul>
  */
+@SuppressWarnings("resource")
 public abstract class TestScenarioBase {
 
     @LazyInit private @Nullable HypoContext context;
@@ -134,6 +136,16 @@ public abstract class TestScenarioBase {
     @AfterEach
     public void teardown() throws Exception {
         this.context().close();
+    }
+
+    public @NotNull ClassData findClass(final String name) {
+        try {
+            final ClassData classData = this.context().getContextProvider().findClass(name);
+            assertNotNull(classData);
+            return classData;
+        } catch (final IOException e) {
+            throw HypoModelUtil.rethrow(e);
+        }
     }
 
     /**

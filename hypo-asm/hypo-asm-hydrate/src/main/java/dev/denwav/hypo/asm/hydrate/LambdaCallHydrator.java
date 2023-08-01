@@ -38,11 +38,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import static dev.denwav.hypo.asm.HypoAsmUtil.toDescriptor;
 import static dev.denwav.hypo.model.data.MethodDescriptor.parseDescriptor;
 
 /**
@@ -114,8 +116,15 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 // This is also invalid bytecode
                 continue;
             }
-
             final Handle handle = (Handle) bsmArgHandle;
+
+            final Object bsmDesc = dyn.bsmArgs[0];
+            if (!(bsmDesc instanceof Type)) {
+                // This is also invalid bytecode
+                continue;
+            }
+            final Type interfaceDesc = (Type) bsmDesc;
+
             final ClassData owner;
             if (data.parentClass().name().equals(handle.getOwner())) {
                 owner = data.parentClass();
@@ -157,12 +166,7 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
             @Nullable MethodData interfaceMethod = null;
             final ClassData interfaceType = context.getContextProvider().findClass(desc.getReturnType());
             if (interfaceType != null) {
-                for (final MethodData method : interfaceType.methods(dyn.name)) {
-                    if (method.isAbstract()) {
-                        interfaceMethod = method;
-                        break;
-                    }
-                }
+                interfaceMethod = interfaceType.method(dyn.name, toDescriptor(interfaceDesc));
             }
 
             final LambdaClosure call = new LambdaClosure(
