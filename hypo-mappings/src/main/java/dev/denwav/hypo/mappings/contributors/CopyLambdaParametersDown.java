@@ -16,10 +16,41 @@ import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.model.ClassMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
 import org.cadixdev.lorenz.model.MethodParameterMapping;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * Implementation of {@link ChangeContributor} which copies {@link MethodMapping method mappings} from a lambda interface
+ * method to any synthetic lambdas in the source.
+ */
 public class CopyLambdaParametersDown implements ChangeContributor {
+
+    private final boolean overrideLambdaMappings;
+
+    private CopyLambdaParametersDown(final boolean overrideLambdaMappings) {
+        this.overrideLambdaMappings = overrideLambdaMappings;
+    }
+
+    /**
+     * Create a new instance of {@link CopyLambdaParametersDown}. This instance <b>will</b> overwrite any mappings that
+     * are set on the synthetic lambda method.
+     * @return A new instance of {@link CopyLambdaParametersDown}.
+     */
+    @Contract(value = "-> new", pure = true)
+    public static @NotNull CopyLambdaParametersDown create() {
+        return new CopyLambdaParametersDown(true);
+    }
+
+    /**
+     * Create a new instance of {@link CopyLambdaParametersDown}. This instance <b>will not</b> overwrite any mappings that
+     * are set on the synthetic lambda method.
+     * @return A new instance of {@link CopyLambdaParametersDown}.
+     */
+    @Contract(value = "-> new", pure = true)
+    public static @NotNull CopyLambdaParametersDown createWithoutOverwrite() {
+        return new CopyLambdaParametersDown(false);
+    }
 
     @Override
     public void contribute(final @Nullable ClassData currentClass, final @Nullable ClassMapping<?, ?> classMapping, final @NotNull HypoContext context, final @NotNull ChangeRegistry registry) throws Throwable {
@@ -53,6 +84,7 @@ public class CopyLambdaParametersDown implements ChangeContributor {
             }
             final MethodData lambda = closure.getLambda();
             final int paramOffset = closure.getParamLvtIndices().length - 1;
+            final MethodSignature lambdaMethodSignature = MethodSignature.of(lambda.name(), lambda.descriptorText());
             registry.submitChange(new MappingsChange() {
                 @Override
                 public @NotNull MemberReference target() {
@@ -61,13 +93,17 @@ public class CopyLambdaParametersDown implements ChangeContributor {
 
                 @Override
                 public void applyChange(final @NotNull MappingSet input) {
-                    final MethodMapping methodMapping = input.getOrCreateClassMapping(lambda.parentClass().name()).getOrCreateMethodMapping(MethodSignature.of(lambda.name(), lambda.descriptorText()));
                     for (int i = 1; i <= interfaceMethod.descriptor().getParams().size(); i++) { // 1, skip "this" (I think)
-                        final Optional<MethodParameterMapping> parameterMapping = interfaceMethodMapping.get().getParameterMapping(i);
-                        if (parameterMapping.isPresent() && !methodMapping.hasParameterMapping(i + paramOffset)) {
-                            methodMapping.createParameterMapping(i + paramOffset, parameterMapping.get().getDeobfuscatedName());
+                        final int lambdaParamIdx = i + paramOffset;
+                        final Optional<MethodParameterMapping> interfaceMethodParamMapping = interfaceMethodMapping.get().getParameterMapping(i);
+                        if (interfaceMethodParamMapping.isPresent() && (CopyLambdaParametersDown.this.overrideLambdaMappings || !this.hasParameterMapping(lambda, input, lambdaParamIdx))) {
+                            input.getOrCreateClassMapping(lambda.parentClass().name()).getOrCreateMethodMapping(lambdaMethodSignature).getOrCreateParameterMapping(lambdaParamIdx).setDeobfuscatedName(interfaceMethodParamMapping.get().getDeobfuscatedName());
                         }
                     }
+                }
+
+                private boolean hasParameterMapping(final MethodData lambdaMethod, final MappingSet input, int paramIdx) {
+                    return input.getClassMapping(lambdaMethod.parentClass().name()).flatMap(c -> c.getMethodMapping(lambdaMethodSignature)).map(m -> m.hasParameterMapping(paramIdx)).orElse(false);
                 }
 
                 @Override
