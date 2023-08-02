@@ -30,6 +30,8 @@ import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.model.ClassProviderRoot;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.model.data.HypoData;
+import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

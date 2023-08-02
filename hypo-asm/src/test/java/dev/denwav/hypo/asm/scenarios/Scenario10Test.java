@@ -18,11 +18,18 @@
 
 package dev.denwav.hypo.asm.scenarios;
 
+import dev.denwav.hypo.asm.hydrate.LocalClassHydrator;
+import dev.denwav.hypo.hydrate.HydrationProvider;
+import dev.denwav.hypo.hydrate.generic.HypoHydration;
+import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -31,7 +38,17 @@ public class Scenario10Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
-        return () -> "scenario-10";
+        return new Env() {
+            @Override
+            public @NotNull String forContext() {
+                return "scenario-10";
+            }
+
+            @Override
+            public @NotNull Iterable<HydrationProvider<?>> hydration() {
+                return List.of(LocalClassHydrator.create());
+            }
+        };
     }
 
     @Test
@@ -47,7 +64,7 @@ public class Scenario10Test extends TestScenarioBase {
     }
 
     @Test
-    @DisplayName("Test isStaticInnerClass() in instance method")
+    @DisplayName("Test isStaticInnerClass() in static method")
     public void testIsStaticInStaticMethod() {
         final var testClass = this.findClass("scenario10/TestClass$2LocalClass");
         final var testRecord = this.findClass("scenario10/TestClass$2LocalRecord");
@@ -56,5 +73,16 @@ public class Scenario10Test extends TestScenarioBase {
         assertTrue(testClass.isStaticInnerClass());
         assertTrue(testRecord.isStaticInnerClass());
         assertTrue(testEnum.isStaticInnerClass());
+    }
+
+    @Test
+    @DisplayName("Test LocalClassHydrator field collection")
+    public void testLocalClassHydratorFields() {
+        final var testClass = this.findClass("scenario10/TestClass$1LocalClass");
+        final List<LocalClassClosure> localClasses = testClass.require(HypoHydration.LOCAL_CLASSES);
+        assertEquals(1, localClasses.size());
+        final LocalClassClosure localClass = localClasses.get(0);
+
+        assertArrayEquals(new int[] { 2, 3 }, localClass.getParamLvtIndices());
     }
 }

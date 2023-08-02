@@ -28,6 +28,7 @@ import dev.denwav.hypo.hydrate.generic.LambdaClosure;
 import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.types.JvmType;
@@ -188,26 +189,22 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
 
     private int @Nullable [] handleNestedConst(final MethodInsnNode insn, final AsmClassData nestedClass) {
         final ArrayList<JvmType> capturedVariables = new ArrayList<>();
-        for (final FieldNode field : nestedClass.getNode().fields) {
-            if (field.name.startsWith("this")) {
+        for (final FieldData field : nestedClass.fields()) {
+            if (!field.isSynthetic()) {
                 continue;
             }
-
-            if ((field.access & Opcodes.ACC_SYNTHETIC) == 0) {
-                break;
+            if (field.name().startsWith("this")) {
+                continue;
             }
-            if (!field.name.startsWith("val$")) {
-                break;
+            if (field.name().startsWith("val$")) {
+                capturedVariables.add(field.fieldType());
             }
-
-            capturedVariables.add(toJvmType(getType(field.desc)));
         }
 
-        final int varSize = capturedVariables.size();
-        final int[] closureIndices = new int[varSize];
+        final int[] closureIndices = new int[capturedVariables.size()];
 
         AbstractInsnNode prevInsn = insn;
-        for (int i = varSize - 1; i >= 0; i--) {
+        for (int i = closureIndices.length - 1; i >= 0; i--) {
             prevInsn = prevInsn.getPrevious();
 
             if (prevInsn.getType() != AbstractInsnNode.VAR_INSN) {
