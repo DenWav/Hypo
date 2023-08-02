@@ -60,7 +60,17 @@ public final class ChangeRegistry {
     private final @NotNull ConcurrentHashMap<MemberReference, List<MappingsChange>> changes = new ConcurrentHashMap<>();
     private final @NotNull ConcurrentHashMap<String, List<ClassMappingsChange>> classChanges = new ConcurrentHashMap<>();
 
+    private final @NotNull MappingSet mappings;
+
     private @Nullable String currentContributorName = null;
+
+    /**
+     * Create a new {@link ChangeRegistry} for the given {@link MappingSet}.
+     * @param mappings The {@link MappingSet} to use for this registery.
+     */
+    public ChangeRegistry(final @NotNull MappingSet mappings) {
+        this.mappings = mappings;
+    }
 
     /**
      * Submit a planned change to a {@link MappingSet} targeting the {@link MemberReference} referred to by the
@@ -107,6 +117,14 @@ public final class ChangeRegistry {
      */
     public @NotNull ConcurrentHashMap<String, List<ClassMappingsChange>> getClassChanges() {
         return this.classChanges;
+    }
+
+    /**
+     * Returns the {@link MappingSet} which is currently the basis for mapping change contribution.
+     * @return The {@link MappingSet} which is currently the basis for mapping change contribution.
+     */
+    public @NotNull MappingSet getMappings() {
+        return this.mappings;
     }
 
     /**

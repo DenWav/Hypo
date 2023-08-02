@@ -95,7 +95,7 @@ public class MappingsCompletionManager {
         final @NotNull List<@NotNull ChangeContributor> contributors
     ) throws HypoException {
         final ChangeContributor contrib = ChangeContributorSet.wrap(contributors);
-        final ChangeRegistry registry = new ChangeRegistry();
+        final ChangeRegistry registry = new ChangeRegistry(mappings);
 
         final HashSet<String> visitedClasses = new HashSet<>();
 

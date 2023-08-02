@@ -193,6 +193,25 @@ public final class LorenzUtil {
     }
 
     /**
+     * {@link Nullable} form of {@link ClassMapping#getMethodMapping(String, String)}, which takes a {@link MethodData}
+     * as shorthand for the name and descriptor of the method.
+     *
+     * @param mapping The class mapping to call.
+     * @param method The method to search for.
+     * @return The {@link MethodMapping}, or {@code null} if not found.
+     * @see #unwrap(Optional)
+     */
+    public static @Nullable MethodMapping getMethodMapping(
+        final @Nullable ClassMapping<?, ?> mapping,
+        final @NotNull MethodData method
+    ) {
+        if (mapping == null) {
+            return null;
+        }
+        return unwrap(mapping.getMethodMapping(method.name(), method.descriptorText()));
+    }
+
+    /**
      * {@link Nullable} form of {@link ClassMapping#getFieldMapping(String)}.
      *
      * @param mapping The class mapping to call.
