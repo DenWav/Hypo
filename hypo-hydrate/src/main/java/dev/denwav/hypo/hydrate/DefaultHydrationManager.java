@@ -120,7 +120,7 @@ public class DefaultHydrationManager implements HydrationManager {
                         if (!stage.contains(provider)) {
                             continue;
                         }
-                        if (classData.getClass().isAssignableFrom(provider.target())) {
+                        if (provider.target().isInstance(classData)) {
                             provider.hydrate(HypoModelUtil.cast(classData), context);
                         }
                     }
@@ -132,7 +132,7 @@ public class DefaultHydrationManager implements HydrationManager {
                             if (!stage.contains(provider)) {
                                 continue;
                             }
-                            if (method.getClass().isAssignableFrom(provider.target())) {
+                            if (provider.target().isInstance(method)) {
                                 provider.hydrate(HypoModelUtil.cast(method), context);
                             }
                         }
@@ -145,7 +145,7 @@ public class DefaultHydrationManager implements HydrationManager {
                             if (!stage.contains(provider)) {
                                 continue;
                             }
-                            if (field.getClass().isAssignableFrom(provider.target())) {
+                            if (provider.target().isInstance(field)) {
                                 provider.hydrate(HypoModelUtil.cast(field), context);
                             }
                         }

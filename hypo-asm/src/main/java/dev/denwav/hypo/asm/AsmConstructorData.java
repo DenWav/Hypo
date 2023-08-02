@@ -34,7 +34,7 @@ import org.objectweb.asm.tree.MethodNode;
  */
 public class AsmConstructorData extends LazyConstructorData implements ConstructorData {
 
-    private final @NotNull ClassData parentClass;
+    private final @NotNull AsmClassData parentClass;
     private final @NotNull MethodNode node;
 
     /**
@@ -45,7 +45,7 @@ public class AsmConstructorData extends LazyConstructorData implements Construct
      * @param parentClass The {@link ClassData} which declares this constructor.
      * @param node The {@link MethodNode} to use for this {@link AsmConstructorData}.
      */
-    public AsmConstructorData(final @NotNull ClassData parentClass, final @NotNull MethodNode node) {
+    public AsmConstructorData(final @NotNull AsmClassData parentClass, final @NotNull MethodNode node) {
         this.parentClass = parentClass;
         this.node = node;
     }
@@ -69,7 +69,7 @@ public class AsmConstructorData extends LazyConstructorData implements Construct
     }
 
     @Override
-    public @NotNull ClassData parentClass() {
+    public @NotNull AsmClassData parentClass() {
         return this.parentClass;
     }
 
