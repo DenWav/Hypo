@@ -40,32 +40,32 @@ import static dev.denwav.hypo.mappings.LorenzUtil.getMethodMapping;
  * Implementation of {@link ChangeContributor} which copies {@link MethodMapping method mappings} from a lambda interface
  * method to any synthetic lambdas in the source.
  */
-public class CopyLambdaParametersDownAlt implements ChangeContributor {
+public class CopyLambdaParametersDown implements ChangeContributor {
 
     private final boolean overrideLambdaMappings;
 
-    private CopyLambdaParametersDownAlt(final boolean overrideLambdaMappings) {
+    private CopyLambdaParametersDown(final boolean overrideLambdaMappings) {
         this.overrideLambdaMappings = overrideLambdaMappings;
     }
 
     /**
-     * Create a new instance of {@link CopyLambdaParametersDownAlt}. This instance <b>will</b> overwrite any mappings that
+     * Create a new instance of {@link CopyLambdaParametersDown}. This instance <b>will</b> overwrite any mappings that
      * are set on the synthetic lambda method.
-     * @return A new instance of {@link CopyLambdaParametersDownAlt}.
+     * @return A new instance of {@link CopyLambdaParametersDown}.
      */
     @Contract(value = "-> new", pure = true)
-    public static @NotNull CopyLambdaParametersDownAlt create() {
-        return new CopyLambdaParametersDownAlt(true);
+    public static @NotNull CopyLambdaParametersDown create() {
+        return new CopyLambdaParametersDown(true);
     }
 
     /**
-     * Create a new instance of {@link CopyLambdaParametersDownAlt}. This instance <b>will not</b> overwrite any mappings that
+     * Create a new instance of {@link CopyLambdaParametersDown}. This instance <b>will not</b> overwrite any mappings that
      * are set on the synthetic lambda method.
-     * @return A new instance of {@link CopyLambdaParametersDownAlt}.
+     * @return A new instance of {@link CopyLambdaParametersDown}.
      */
     @Contract(value = "-> new", pure = true)
-    public static @NotNull CopyLambdaParametersDownAlt createWithoutOverwrite() {
-        return new CopyLambdaParametersDownAlt(false);
+    public static @NotNull CopyLambdaParametersDown createWithoutOverwrite() {
+        return new CopyLambdaParametersDown(false);
     }
 
     @Override
