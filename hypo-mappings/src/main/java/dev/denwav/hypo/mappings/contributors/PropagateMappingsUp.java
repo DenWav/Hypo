@@ -26,6 +26,7 @@ import dev.denwav.hypo.mappings.changes.MemberReference;
 import dev.denwav.hypo.mappings.changes.RemoveMappingChange;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.MethodData;
+import java.util.List;
 import org.cadixdev.lorenz.model.ClassMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
 import org.jetbrains.annotations.Contract;
@@ -96,7 +97,8 @@ public class PropagateMappingsUp implements ChangeContributor {
         }
 
         final MethodData superMethod = method.superMethod();
-        final MethodData syntheticSource = method.get(HypoHydration.SYNTHETIC_SOURCE);
+        final List<MethodData> syntheticSources = method.get(HypoHydration.SYNTHETIC_SOURCE);
+        final MethodData syntheticSource = syntheticSources != null && !syntheticSources.isEmpty() ? syntheticSources.get(0) : null;
 
         if (superMethod != null && !superMethod.parentClass().isContextClass() && walkSuper) {
             walkUp(superMethod, baseMapping, registry);

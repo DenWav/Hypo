@@ -37,7 +37,7 @@ public final class HypoHydration {
     /**
      * The synthetic {@link MethodData method} which calls the method this {@link HypoKey} is set on.
      */
-    public static final HypoKey<MethodData> SYNTHETIC_SOURCE = HypoKey.create("Synthetic Source");
+    public static final HypoKey<List<MethodData>> SYNTHETIC_SOURCE = HypoKey.create("Synthetic Source");
 
     /**
      * The list of {@link SuperCall super calls} which calls the constructor this {@link HypoKey} is set on.
