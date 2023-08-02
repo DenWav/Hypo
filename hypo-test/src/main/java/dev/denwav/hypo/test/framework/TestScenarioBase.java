@@ -30,6 +30,7 @@ import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.model.ClassProviderRoot;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.model.data.MethodData;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,6 +53,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -146,6 +148,12 @@ public abstract class TestScenarioBase {
         } catch (final IOException e) {
             throw HypoModelUtil.rethrow(e);
         }
+    }
+
+    public static @NotNull MethodData findMethod(final ClassData data, final String name) {
+        final List<@NotNull MethodData> methods = data.methods(name);
+        assertEquals(1, methods.size());
+        return methods.get(0);
     }
 
     /**

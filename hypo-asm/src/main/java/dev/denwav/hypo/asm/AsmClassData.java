@@ -20,11 +20,13 @@ package dev.denwav.hypo.asm;
 
 import dev.denwav.hypo.core.HypoException;
 import dev.denwav.hypo.model.ClassDataProvider;
+import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ClassKind;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.LazyClassData;
 import dev.denwav.hypo.model.data.MethodData;
+import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.model.data.Visibility;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,6 +45,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.RecordComponentNode;
 
 import static dev.denwav.hypo.asm.HypoAsmUtil.toJvmType;
+import static dev.denwav.hypo.model.data.MethodDescriptor.parseDescriptor;
 import static org.objectweb.asm.Type.getType;
 
 /**
@@ -101,13 +104,32 @@ public class AsmClassData extends LazyClassData {
     @Override
     public boolean computeStaticInnerClass() {
         if (this.node.outerClass != null) {
-            return (this.node.access & Opcodes.ACC_STATIC) != 0;
+            if ((this.node.access & (Opcodes.ACC_STATIC | Opcodes.ACC_ENUM | Opcodes.ACC_RECORD)) != 0) {
+                return true;
+            }
+            if (this.node.outerMethod != null) {
+                final ClassData outerClass;
+                try {
+                    outerClass = this.outerClass();
+                } catch (final IOException e) {
+                    throw HypoModelUtil.rethrow(e);
+                }
+                if (outerClass != null) {
+                    final MethodData outerMethod = outerClass.method(this.node.outerMethod, parseDescriptor(this.node.outerMethodDesc));
+                    if (outerMethod != null) {
+                        return outerMethod.isStatic();
+                    }
+                }
+            }
+            // All we know is it's a class inside a method, which is usually not static. We can't find the method though,
+            // so we have to guess.
+            return false;
         }
         final String thisName = this.name();
         for (int i = 0; i < this.node.innerClasses.size(); i++) {
             final InnerClassNode innerClassNode = this.node.innerClasses.get(i);
             if (Objects.equals(thisName, innerClassNode.name) && innerClassNode.outerName != null) {
-                return (innerClassNode.access & Opcodes.ACC_STATIC) != 0;
+                return (innerClassNode.access & (Opcodes.ACC_STATIC | Opcodes.ACC_ENUM | Opcodes.ACC_RECORD)) != 0;
             }
         }
         return false;
