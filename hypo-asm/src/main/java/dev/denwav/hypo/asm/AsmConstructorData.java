@@ -20,11 +20,11 @@ package dev.denwav.hypo.asm;
 
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ConstructorData;
-import dev.denwav.hypo.model.data.LazyConstructorData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
-import dev.denwav.hypo.model.data.Visibility;
+import dev.denwav.hypo.model.data.MethodData;
+import java.util.Collections;
+import java.util.Set;
 import org.jetbrains.annotations.NotNull;
-import org.objectweb.asm.Opcodes;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
@@ -32,10 +32,7 @@ import org.objectweb.asm.tree.MethodNode;
  *
  * @see AsmMethodData
  */
-public class AsmConstructorData extends LazyConstructorData implements ConstructorData {
-
-    private final @NotNull AsmClassData parentClass;
-    private final @NotNull MethodNode node;
+public class AsmConstructorData extends AsmMethodData implements ConstructorData {
 
     /**
      * Construct a new instance of {@link AsmConstructorData} using the given {@link MethodNode}. The given {@code node}
@@ -46,35 +43,54 @@ public class AsmConstructorData extends LazyConstructorData implements Construct
      * @param node The {@link MethodNode} to use for this {@link AsmConstructorData}.
      */
     public AsmConstructorData(final @NotNull AsmClassData parentClass, final @NotNull MethodNode node) {
-        this.parentClass = parentClass;
-        this.node = node;
-    }
-
-    /**
-     * Returns the {@link MethodNode} which backs this {@link AsmConstructorData}.
-     * @return The {@link MethodNode} which backs this {@link AsmConstructorData}.
-     */
-    public @NotNull MethodNode getNode() {
-        return this.node;
+        super(parentClass, node);
     }
 
     @Override
-    public @NotNull Visibility visibility() {
-        return HypoAsmUtil.accessToVisibility(this.node.access);
+    public @NotNull String name() {
+        return "<init>";
     }
 
     @Override
-    public boolean isSynthetic() {
-        return (this.node.access & Opcodes.ACC_SYNTHETIC) != 0;
+    public boolean isConstructor() {
+        return true;
     }
 
     @Override
-    public @NotNull AsmClassData parentClass() {
-        return this.parentClass;
+    public boolean isStatic() {
+        return false;
     }
 
     @Override
-    public @NotNull MethodDescriptor computeDescriptor() {
-        return MethodDescriptor.parseDescriptor(this.node.desc);
+    public boolean isAbstract() {
+        return false;
+    }
+
+    @Override
+    public boolean isFinal() {
+        return false;
+    }
+
+    @Override
+    public boolean isBridge() {
+        return false;
+    }
+
+    @Override
+    public boolean isNative() {
+        return false;
+    }
+
+    @Override
+    public @Nullable MethodData superMethod() {
+        return null;
+    }
+
+    @Override
+    public void setSuperMethod(final @Nullable MethodData superMethod) {}
+
+    @Override
+    public @NotNull Set<MethodData> childMethods() {
+        return Collections.emptySet();
     }
 }

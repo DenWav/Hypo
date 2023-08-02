@@ -18,10 +18,7 @@
 
 package dev.denwav.hypo.model.data;
 
-import java.util.Collections;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Java constructor model. This is a specialization of {@link MethodData} for constructors, as constructors all share
@@ -64,17 +61,5 @@ public interface ConstructorData extends MethodData {
     @Override
     default boolean isNative() {
         return false;
-    }
-
-    @Override
-    default void setSuperMethod(final @Nullable MethodData superMethod) {}
-
-    @Override
-    default @Nullable MethodData superMethod() {
-        return null;
-    }
-    @Override
-    default @NotNull Set<MethodData> childMethods() {
-        return Collections.emptySet();
     }
 }

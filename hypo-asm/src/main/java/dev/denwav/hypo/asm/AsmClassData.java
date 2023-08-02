@@ -26,7 +26,6 @@ import dev.denwav.hypo.model.data.ClassKind;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.LazyClassData;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.model.data.Visibility;
 import java.io.IOException;
 import java.util.ArrayList;

@@ -18,8 +18,6 @@
 
 package dev.denwav.hypo.asm.scenarios;
 
-import dev.denwav.hypo.model.data.ClassData;
-import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
