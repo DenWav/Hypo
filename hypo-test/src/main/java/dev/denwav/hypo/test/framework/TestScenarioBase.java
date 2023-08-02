@@ -33,6 +33,7 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
+import dev.denwav.hypo.model.data.MethodDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -156,6 +157,12 @@ public abstract class TestScenarioBase {
         final List<@NotNull MethodData> methods = data.methods(name);
         assertEquals(1, methods.size());
         return methods.get(0);
+    }
+
+    public static @NotNull MethodData findMethod(final ClassData data, final String name, final String desc) {
+        final MethodData method = data.method(name, MethodDescriptor.parseDescriptor(desc));
+        assertNotNull(method);
+        return method;
     }
 
     /**

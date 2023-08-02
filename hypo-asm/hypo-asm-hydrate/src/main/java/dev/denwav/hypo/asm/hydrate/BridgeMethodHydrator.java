@@ -18,16 +18,20 @@
 
 package dev.denwav.hypo.asm.hydrate;
 
+import dev.denwav.hypo.asm.AsmClassData;
 import dev.denwav.hypo.asm.AsmMethodData;
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.model.HypoModelUtil;
+import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.MethodDescriptor;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,7 +47,7 @@ import org.objectweb.asm.tree.VarInsnNode;
  * {@link HydrationProvider} for determining synthetic bridge method targets and sources on {@link AsmMethodData}
  * objects.
  *
- * <p>This class fills in {@link HypoHydration#SYNTHETIC_SOURCE} and {@link HypoHydration#SYNTHETIC_TARGET} keys on
+ * <p>This class fills in {@link HypoHydration#SYNTHETIC_SOURCES} and {@link HypoHydration#SYNTHETIC_TARGET} keys on
  * {@link AsmMethodData} objects.
  */
 public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
@@ -66,7 +70,7 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
 
     @Override
     public List<HypoKey<?>> provides() {
-        return HypoModelUtil.immutableListOf(HypoHydration.SYNTHETIC_SOURCE, HypoHydration.SYNTHETIC_TARGET);
+        return HypoModelUtil.immutableListOf(HypoHydration.SYNTHETIC_SOURCES, HypoHydration.SYNTHETIC_TARGET);
     }
 
     @Override
@@ -81,7 +85,7 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
         @Nullable MethodInsnNode invokeInsn = null;
 
         for (final AbstractInsnNode insn : data.getNode().instructions) {
-            if ((insn instanceof LabelNode) || (insn instanceof LineNumberNode) || (insn instanceof TypeInsnNode)) {
+            if (insn instanceof LabelNode || insn instanceof LineNumberNode || insn instanceof TypeInsnNode) {
                 continue;
             }
 
@@ -100,11 +104,12 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
                     }
                     break;
                 case INVOKE:
-                    // Must be a virtual or interface invoke instruction
-                    if ((opcode != Opcodes.INVOKEVIRTUAL && opcode != Opcodes.INVOKEINTERFACE) || !(insn instanceof MethodInsnNode)) {
+                    // Must be a virtual or interface or special invoke instruction
+                    if (opcode != Opcodes.INVOKEVIRTUAL && opcode != Opcodes.INVOKEINTERFACE && opcode != Opcodes.INVOKESPECIAL) {
                         return;
                     }
 
+                    //noinspection DataFlowIssue
                     invokeInsn = (MethodInsnNode) insn;
                     state = State.RETURN;
                     break;
@@ -132,8 +137,18 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
             return;
         }
 
-        // Must be a method in the same class with a different signature
-        if (!data.parentClass().getNode().name.equals(invoke.owner) || (data.name().equals(invoke.name) && data.getNode().desc.equals(invoke.desc))) {
+        // Must be a method in the same class or a super class with a different signature
+        final AsmClassData parent = data.parentClass();
+        final ClassData grandParent = parent.superClass();
+        final ClassData owner;
+        if (parent.name().equals(invoke.owner)) {
+            owner = parent;
+        } else if (grandParent != null && grandParent.name().equals(invoke.owner)) {
+            owner = grandParent;
+        } else {
+            return;
+        }
+        if (data.name().equals(invoke.name) && data.getNode().desc.equals(invoke.desc)) {
             return;
         }
 
@@ -143,13 +158,18 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
             return;
         }
 
-        final MethodData targetMethod = data.parentClass().method(invoke.name, invokeDesc);
+        final MethodData targetMethod = owner.method(invoke.name, invokeDesc);
         if (targetMethod == null) {
             return;
         }
 
         data.store(HypoHydration.SYNTHETIC_TARGET, targetMethod);
+        //noinspection deprecation
         targetMethod.store(HypoHydration.SYNTHETIC_SOURCE, data);
+        final Set<MethodData> sources = targetMethod.compute(HypoHydration.SYNTHETIC_SOURCES, HashSet::new);
+        synchronized (sources) {
+            sources.add(data);
+        }
     }
 
     /**

@@ -22,6 +22,7 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Core common data keys for hydration. Hydrators for these keys are implemented in the {@code hypo-asm} module.
@@ -34,10 +35,19 @@ public final class HypoHydration {
      * The {@link MethodData method} the synthetic method this {@link HypoKey} is set on targets.
      */
     public static final HypoKey<MethodData> SYNTHETIC_TARGET = HypoKey.create("Synthetic Target");
+
     /**
      * The synthetic {@link MethodData method} which calls the method this {@link HypoKey} is set on.
+     * @deprecated There can be multiple synthetic sources for a single method, use {@link #SYNTHETIC_SOURCES} instead.
      */
+    @SuppressWarnings("DeprecatedIsStillUsed")
+    @Deprecated
     public static final HypoKey<MethodData> SYNTHETIC_SOURCE = HypoKey.create("Synthetic Source");
+
+    /**
+     * All synthetic {@link MethodData methods} which calls the method this {@link HypoKey} is set on.
+     */
+    public static final HypoKey<Set<MethodData>> SYNTHETIC_SOURCES = HypoKey.create("Synthetic Sources");
 
     /**
      * The list of {@link SuperCall super calls} which calls the constructor this {@link HypoKey} is set on.

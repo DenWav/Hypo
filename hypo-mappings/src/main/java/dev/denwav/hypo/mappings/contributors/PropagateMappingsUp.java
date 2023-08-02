@@ -26,6 +26,7 @@ import dev.denwav.hypo.mappings.changes.MemberReference;
 import dev.denwav.hypo.mappings.changes.RemoveMappingChange;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.MethodData;
+import java.util.Set;
 import org.cadixdev.lorenz.model.ClassMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
 import org.jetbrains.annotations.Contract;
@@ -39,7 +40,7 @@ import static dev.denwav.hypo.mappings.LorenzUtil.getMethodMapping;
 /**
  * Removes duplicate mappings for child methods and ensures that each method at the top of the method hierarchy is the
  * only method with mappings. This takes synthetic methods into account as well with
- * {@link HypoHydration#SYNTHETIC_SOURCE}.
+ * {@link HypoHydration#SYNTHETIC_SOURCES}.
  */
 public class PropagateMappingsUp implements ChangeContributor {
 
@@ -96,23 +97,25 @@ public class PropagateMappingsUp implements ChangeContributor {
         }
 
         final MethodData superMethod = method.superMethod();
-        final MethodData syntheticSource = method.get(HypoHydration.SYNTHETIC_SOURCE);
+        final Set<MethodData> syntheticSources = method.get(HypoHydration.SYNTHETIC_SOURCES);
 
         if (superMethod != null && !superMethod.parentClass().isContextClass() && walkSuper) {
             walkUp(superMethod, baseMapping, registry);
-        } else if (methodMapping == null && syntheticSource == null) {
+        } else if (methodMapping == null && syntheticSources == null) {
             // This method is the highest in the chain
             // It does not have an associated mapping, so we should add it
             registry.submitChange(CopyMethodMappingChange.of(MemberReference.of(method), baseMapping));
             remove(registry, baseMapping);
-        } else if (superMethod != null && superMethod.parentClass().isContextClass() && syntheticSource == null) {
+        } else if (superMethod != null && superMethod.parentClass().isContextClass() && syntheticSources == null) {
             // This is the highest we can go without dropping into the context provider
             // But this method already has a mapping, so we just need to remove the base
             remove(registry, baseMapping);
         }
 
-        if (syntheticSource != null) {
-            walkUp(syntheticSource, baseMapping, registry);
+        if (syntheticSources != null) {
+            for (final MethodData source : syntheticSources) {
+                walkUp(source, baseMapping, registry);
+            }
         }
     }
 
