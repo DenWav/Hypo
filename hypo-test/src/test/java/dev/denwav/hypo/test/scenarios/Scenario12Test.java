@@ -22,6 +22,7 @@ import dev.denwav.hypo.asm.hydrate.SuperConstructorHydrator;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.mappings.contributors.CopyMappingsDown;
+import dev.denwav.hypo.mappings.contributors.PropagateMappingsUp;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
 import java.util.List;
 import org.cadixdev.lorenz.MappingSet;
@@ -29,15 +30,15 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("[integration] Scenario 09 - Mixture Constructor Calls")
-public class Scenario09 extends TestScenarioBase {
+@DisplayName("[integration] Scenario 12 - Super Constructs from Inner Classes")
+public class Scenario12Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
         return new Env() {
             @Override
             public @NotNull String forContext() {
-                return "scenario-09";
+                return "scenario-12";
             }
 
             @Override
@@ -48,41 +49,43 @@ public class Scenario09 extends TestScenarioBase {
     }
 
     @Test
-    @DisplayName("Test mixing this() & super() calls")
-    void testMixingConstructorCalls() throws Exception {
+    @DisplayName("Test super constructor param mappings from inner class")
+    void testSuperConstructorFromInnerClass() throws Exception {
         this.runTest(new TestCase() {
             @Override
             public @NotNull Iterable<ChangeContributor> changeContributors() {
-                return List.of(CopyMappingsDown.create());
+                return List.of(PropagateMappingsUp.create(), CopyMappingsDown.create());
             }
 
             @Override
             public @NotNull MappingSet startMappings() {
                 return parseTiny("""
-                    c    scenario09/ParentClass    scenario09/ParentClass
-                        m    (II)V    <init>    <init>
+                    c    scenario12/BaseClass    scenario12/BaseClass
+                        m    (III)V    <init>    <init>
                             p    1        i
                             p    2        j
+                            p    3        k
                     """);
             }
 
             @Override
             public @NotNull MappingSet finishMappings() {
                 return parseTiny("""
-                    c    scenario09/ParentClass    scenario09/ParentClass
-                        m    (II)V    <init>    <init>
+                    c    scenario12/BaseClass    scenario12/BaseClass
+                        m    (III)V    <init>    <init>
                             p    1        i
                             p    2        j
-                        m    (JJ)V    <init>    <init>
+                            p    3        k
+                    c    scenario12/TestClass$InnerClass    scenario12/TestClass$InnerClass
+                        m    (III)V    <init>    <init>
                             p    1        i
-                            p    3        j
-                    c    scenario09/ChildClass    scenario09/ChildClass
-                        m    (JJ)V    <init>    <init>
+                            p    2        j
+                            p    3        k
+                    c    scenario12/ChildClass    scenario12/ChildClass
+                        m    (III)V    <init>    <init>
                             p    1        i
-                            p    3        j
-                        m    (DD)V    <init>    <init>
-                            p    1        i
-                            p    3        j
+                            p    2        j
+                            p    3        k
                     """);
             }
         });

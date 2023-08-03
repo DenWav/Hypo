@@ -30,7 +30,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("[integration] Scenario 07 - Complex Constructors")
-public class Scenario07 extends TestScenarioBase {
+public class Scenario07Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {

@@ -18,6 +18,8 @@
 
 package dev.denwav.hypo.test.scenarios;
 
+import dev.denwav.hypo.asm.hydrate.BridgeMethodHydrator;
+import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.mappings.contributors.CopyMappingsDown;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
@@ -27,17 +29,27 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("[integration] Scenario 02 - Extended Hierarchy")
-public class Scenario02 extends TestScenarioBase {
+@DisplayName("[integration] Scenario 11 - Complex Generics")
+public class Scenario11Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
-        return () -> "scenario-02";
+        return new Env() {
+            @Override
+            public @NotNull String forContext() {
+                return "scenario-11";
+            }
+
+            @Override
+            public @NotNull Iterable<HydrationProvider<?>> hydration() {
+                return List.of(BridgeMethodHydrator.create());
+            }
+        };
     }
 
     @Test
-    @DisplayName("Test copying mappings down extended hierarchy")
-    void testTopDown() throws Exception {
+    @DisplayName("Test multiple levels of complex generic classes")
+    void testComplexGenerics() throws Exception {
         this.runTest(new TestCase() {
             @Override
             public @NotNull Iterable<ChangeContributor> changeContributors() {
@@ -47,49 +59,23 @@ public class Scenario02 extends TestScenarioBase {
             @Override
             public @NotNull MappingSet startMappings() {
                 return parseTsrg("""
-                    scenario02/ParentClass scenario02/ParentClass
-                        method ()V methodNew
+                    scenario11/ParentClass scenario11/ParentClass
+                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
                     """);
             }
 
             @Override
             public @NotNull MappingSet finishMappings() {
                 return parseTsrg("""
-                    scenario02/ParentClass scenario02/ParentClass
-                        method ()V methodNew
-                    scenario02/ChildClass scenario02/ChildClass
-                        method ()V methodNew
-                    scenario02/GrandChildClass scenario02/GrandChildClass
-                        method ()V methodNew
-                    """);
-            }
-        });
-    }
-
-    @Test
-    @DisplayName("Test copying mappings mid-hierarchy")
-    void testMidDown() throws Exception {
-        this.runTest(new TestCase() {
-            @Override
-            public @NotNull Iterable<ChangeContributor> changeContributors() {
-                return List.of(CopyMappingsDown.create());
-            }
-
-            @Override
-            public @NotNull MappingSet startMappings() {
-                return parseTsrg("""
-                    scenario02/ChildClass scenario02/ChildClass
-                        method ()V methodNew
-                    """);
-            }
-
-            @Override
-            public @NotNull MappingSet finishMappings() {
-                return parseTsrg("""
-                    scenario02/ChildClass scenario02/ChildClass
-                        method ()V methodNew
-                    scenario02/GrandChildClass scenario02/GrandChildClass
-                        method ()V methodNew
+                    scenario11/ParentClass scenario11/ParentClass
+                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
+                    scenario11/ChildClass scenario11/ChildClass
+                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
+                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String; getObjectWith
+                    scenario11/GrandChildClass scenario11/GrandChildClass
+                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
+                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String; getObjectWith
+                        getWith (Ljava/lang/Integer;Ljava/lang/Object;)Ljava/lang/String; getObjectWith
                     """);
             }
         });

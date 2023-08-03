@@ -29,15 +29,15 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("[integration] Scenario 08 - Same-class Constructor Calls")
-public class Scenario08 extends TestScenarioBase {
+@DisplayName("[integration] Scenario 09 - Mixture Constructor Calls")
+public class Scenario09Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
         return new Env() {
             @Override
             public @NotNull String forContext() {
-                return "scenario-08";
+                return "scenario-09";
             }
 
             @Override
@@ -48,8 +48,8 @@ public class Scenario08 extends TestScenarioBase {
     }
 
     @Test
-    @DisplayName("Test this() call parameter propagation")
-    void testThisPropagation() throws Exception {
+    @DisplayName("Test mixing this() & super() calls")
+    void testMixingConstructorCalls() throws Exception {
         this.runTest(new TestCase() {
             @Override
             public @NotNull Iterable<ChangeContributor> changeContributors() {
@@ -59,33 +59,30 @@ public class Scenario08 extends TestScenarioBase {
             @Override
             public @NotNull MappingSet startMappings() {
                 return parseTiny("""
-                    c    scenario08/TestClass    scenario08/TestClass
+                    c    scenario09/ParentClass    scenario09/ParentClass
                         m    (II)V    <init>    <init>
                             p    1        i
                             p    2        j
-                        m    (Ljava/lang/String;IJ)V    <init>    <init>
-                            p    1        someText
-                            p    2        i
-                            p    3        j
                     """);
             }
 
             @Override
             public @NotNull MappingSet finishMappings() {
                 return parseTiny("""
-                    c    scenario08/TestClass    scenario08/TestClass
+                    c    scenario09/ParentClass    scenario09/ParentClass
                         m    (II)V    <init>    <init>
                             p    1        i
                             p    2        j
                         m    (JJ)V    <init>    <init>
                             p    1        i
                             p    3        j
-                        m    (Ljava/lang/String;IJ)V    <init>    <init>
-                            p    1        someText
-                            p    2        i
+                    c    scenario09/ChildClass    scenario09/ChildClass
+                        m    (JJ)V    <init>    <init>
+                            p    1        i
                             p    3        j
-                        m    (Ljava/lang/String;Ljava/lang/String;)V    <init>    <init>
-                            p    1        someText
+                        m    (DD)V    <init>    <init>
+                            p    1        i
+                            p    3        j
                     """);
             }
         });

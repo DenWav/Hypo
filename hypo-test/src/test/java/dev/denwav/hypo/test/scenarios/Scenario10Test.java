@@ -29,15 +29,15 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("[integration] Scenario 11 - Complex Generics")
-public class Scenario11 extends TestScenarioBase {
+@DisplayName("[integration] Scenario 10 - Generics")
+public class Scenario10Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
         return new Env() {
             @Override
             public @NotNull String forContext() {
-                return "scenario-11";
+                return "scenario-10";
             }
 
             @Override
@@ -48,8 +48,8 @@ public class Scenario11 extends TestScenarioBase {
     }
 
     @Test
-    @DisplayName("Test multiple levels of complex generic classes")
-    void testComplexGenerics() throws Exception {
+    @DisplayName("Test covariant return via generics")
+    void testGenericMethod() throws Exception {
         this.runTest(new TestCase() {
             @Override
             public @NotNull Iterable<ChangeContributor> changeContributors() {
@@ -59,23 +59,19 @@ public class Scenario11 extends TestScenarioBase {
             @Override
             public @NotNull MappingSet startMappings() {
                 return parseTsrg("""
-                    scenario11/ParentClass scenario11/ParentClass
-                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
+                    scenario10/ParentClass scenario10/ParentClass
+                        get ()Ljava/lang/Object; getObject
                     """);
             }
 
             @Override
             public @NotNull MappingSet finishMappings() {
                 return parseTsrg("""
-                    scenario11/ParentClass scenario11/ParentClass
-                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
-                    scenario11/ChildClass scenario11/ChildClass
-                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
-                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String; getObjectWith
-                    scenario11/GrandChildClass scenario11/GrandChildClass
-                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object; getObjectWith
-                        getWith (Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String; getObjectWith
-                        getWith (Ljava/lang/Integer;Ljava/lang/Object;)Ljava/lang/String; getObjectWith
+                    scenario10/ParentClass scenario10/ParentClass
+                        get ()Ljava/lang/Object; getObject
+                    scenario10/ChildClass scenario10/ChildClass
+                        get ()Ljava/lang/Object; getObject
+                        get ()Ljava/lang/String; getObject
                     """);
             }
         });

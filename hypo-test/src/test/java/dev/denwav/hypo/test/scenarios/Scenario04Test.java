@@ -31,15 +31,15 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("[integration] Scenario 05 - Duplicate Name Synthetics")
-public class Scenario05 extends TestScenarioBase {
+@DisplayName("[integration] Scenario 04 - Conflicting Name Synthetics")
+public class Scenario04Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
         return new Env() {
             @Override
             public @NotNull String forContext() {
-                return "scenario-05";
+                return "scenario-04";
             }
 
             @Override
@@ -50,17 +50,17 @@ public class Scenario05 extends TestScenarioBase {
             @Override
             public @NotNull Map<String, Map<String, String>> renames() {
                 return Map.of(
-                    "scenario05/ParentClass", Map.of("b()Ljava/lang/Object;", "a"),
-                    "scenario05/ChildClassString", Map.of("b()Ljava/lang/Object;", "a"),
-                    "scenario05/ChildClassByte", Map.of("b()Ljava/lang/Object;", "a")
+                    "scenario04/ParentClass", Map.of("a()Ljava/lang/Object;", "b"),
+                    "scenario04/ChildClassString", Map.of("a()Ljava/lang/Object;", "b"),
+                    "scenario04/ChildClassByte", Map.of("a()Ljava/lang/Object;", "b")
                 );
             }
         };
     }
 
     @Test
-    @DisplayName("Test synthetic methods with conflicting names")
-    void testSynthConflictingNames() throws Exception {
+    @DisplayName("Test synthetic methods with different names")
+    void testSynthRenames() throws Exception {
         this.runTest(new TestCase() {
             @Override
             public @NotNull Iterable<ChangeContributor> changeContributors() {
@@ -70,36 +70,30 @@ public class Scenario05 extends TestScenarioBase {
             @Override
             public @NotNull MappingSet startMappings() {
                 return parseTsrg("""
-                    scenario05/ParentClass scenario05/ParentClass
-                        a ()Ljava/lang/Object; getObject
-                    scenario05/Str scenario05/Str
-                        a ()Ljava/lang/String; getString
+                    scenario04/ParentClass scenario04/ParentClass
+                        b ()Ljava/lang/Object; getObject
                     """);
             }
 
             @Override
             public @NotNull MappingSet finishMappings() {
                 return parseTsrg("""
-                    scenario05/ParentClass scenario05/ParentClass
-                        a ()Ljava/lang/Object; getObject
-                    scenario05/ChildClassString scenario05/ChildClassString
-                        a ()Ljava/lang/Object; getObject
-                        b ()Ljava/lang/String; getObject
-                        a ()Ljava/lang/String; getString
-                    scenario05/ChildClassByte scenario05/ChildClassByte
-                        a ()Ljava/lang/Object; getObject
-                        b ()Ljava/lang/Byte; getObject
-                        a ()Ljava/lang/String; getString
-                    scenario05/Str scenario05/Str
-                        a ()Ljava/lang/String; getString
+                    scenario04/ParentClass scenario04/ParentClass
+                        b ()Ljava/lang/Object; getObject
+                    scenario04/ChildClassString scenario04/ChildClassString
+                        b ()Ljava/lang/Object; getObject
+                        a ()Ljava/lang/String; getObject
+                    scenario04/ChildClassByte scenario04/ChildClassByte
+                        b ()Ljava/lang/Object; getObject
+                        a ()Ljava/lang/Byte; getObject
                     """);
             }
         });
     }
 
     @Test
-    @DisplayName("Test synthetic methods with conflicting names & bad starting mappings")
-    void badStartingMappingWithSynthConflictingNames() throws Exception {
+    @DisplayName("Test synthetic methods with different names & bad starting mappings")
+    void messySynthRenamesTest() throws Exception {
         this.runTest(new TestCase() {
             @Override
             public @NotNull Iterable<ChangeContributor> changeContributors() {
@@ -109,30 +103,24 @@ public class Scenario05 extends TestScenarioBase {
             @Override
             public @NotNull MappingSet startMappings() {
                 return parseTsrg("""
-                    scenario05/ParentClass scenario05/ParentClass
-                        a ()Ljava/lang/Object; getObject
-                    scenario05/Str scenario05/Str
-                        a ()Ljava/lang/String; getString
-                    scenario05/ChildClassString scenario05/ChildClassString
-                        b ()Ljava/lang/String; getString # incorrect mapping
+                    scenario04/ParentClass scenario04/ParentClass
+                        b ()Ljava/lang/Object; getObject
+                    scenario04/ChildClassString scenario04/ChildClassString
+                        a ()Ljava/lang/String; getString # incorrect mapping
                     """);
             }
 
             @Override
             public @NotNull MappingSet finishMappings() {
                 return parseTsrg("""
-                    scenario05/ParentClass scenario05/ParentClass
-                        a ()Ljava/lang/Object; getObject
-                    scenario05/ChildClassString scenario05/ChildClassString
-                        a ()Ljava/lang/Object; getObject
-                        b ()Ljava/lang/String; getObject
-                        a ()Ljava/lang/String; getString
-                    scenario05/ChildClassByte scenario05/ChildClassByte
-                        a ()Ljava/lang/Object; getObject
-                        b ()Ljava/lang/Byte; getObject
-                        a ()Ljava/lang/String; getString
-                    scenario05/Str scenario05/Str
-                        a ()Ljava/lang/String; getString
+                    scenario04/ParentClass scenario04/ParentClass
+                        b ()Ljava/lang/Object; getObject
+                    scenario04/ChildClassString scenario04/ChildClassString
+                        b ()Ljava/lang/Object; getObject
+                        a ()Ljava/lang/String; getObject
+                    scenario04/ChildClassByte scenario04/ChildClassByte
+                        b ()Ljava/lang/Object; getObject
+                        a ()Ljava/lang/Byte; getObject
                     """);
             }
         });

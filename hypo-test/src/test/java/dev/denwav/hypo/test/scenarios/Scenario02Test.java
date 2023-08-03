@@ -18,8 +18,6 @@
 
 package dev.denwav.hypo.test.scenarios;
 
-import dev.denwav.hypo.asm.hydrate.BridgeMethodHydrator;
-import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.mappings.contributors.ChangeContributor;
 import dev.denwav.hypo.mappings.contributors.CopyMappingsDown;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
@@ -29,27 +27,17 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("[integration] Scenario 10 - Generics")
-public class Scenario10 extends TestScenarioBase {
+@DisplayName("[integration] Scenario 02 - Extended Hierarchy")
+public class Scenario02Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
-        return new Env() {
-            @Override
-            public @NotNull String forContext() {
-                return "scenario-10";
-            }
-
-            @Override
-            public @NotNull Iterable<HydrationProvider<?>> hydration() {
-                return List.of(BridgeMethodHydrator.create());
-            }
-        };
+        return () -> "scenario-02";
     }
 
     @Test
-    @DisplayName("Test covariant return via generics")
-    void testGenericMethod() throws Exception {
+    @DisplayName("Test copying mappings down extended hierarchy")
+    void testTopDown() throws Exception {
         this.runTest(new TestCase() {
             @Override
             public @NotNull Iterable<ChangeContributor> changeContributors() {
@@ -59,19 +47,49 @@ public class Scenario10 extends TestScenarioBase {
             @Override
             public @NotNull MappingSet startMappings() {
                 return parseTsrg("""
-                    scenario10/ParentClass scenario10/ParentClass
-                        get ()Ljava/lang/Object; getObject
+                    scenario02/ParentClass scenario02/ParentClass
+                        method ()V methodNew
                     """);
             }
 
             @Override
             public @NotNull MappingSet finishMappings() {
                 return parseTsrg("""
-                    scenario10/ParentClass scenario10/ParentClass
-                        get ()Ljava/lang/Object; getObject
-                    scenario10/ChildClass scenario10/ChildClass
-                        get ()Ljava/lang/Object; getObject
-                        get ()Ljava/lang/String; getObject
+                    scenario02/ParentClass scenario02/ParentClass
+                        method ()V methodNew
+                    scenario02/ChildClass scenario02/ChildClass
+                        method ()V methodNew
+                    scenario02/GrandChildClass scenario02/GrandChildClass
+                        method ()V methodNew
+                    """);
+            }
+        });
+    }
+
+    @Test
+    @DisplayName("Test copying mappings mid-hierarchy")
+    void testMidDown() throws Exception {
+        this.runTest(new TestCase() {
+            @Override
+            public @NotNull Iterable<ChangeContributor> changeContributors() {
+                return List.of(CopyMappingsDown.create());
+            }
+
+            @Override
+            public @NotNull MappingSet startMappings() {
+                return parseTsrg("""
+                    scenario02/ChildClass scenario02/ChildClass
+                        method ()V methodNew
+                    """);
+            }
+
+            @Override
+            public @NotNull MappingSet finishMappings() {
+                return parseTsrg("""
+                    scenario02/ChildClass scenario02/ChildClass
+                        method ()V methodNew
+                    scenario02/GrandChildClass scenario02/GrandChildClass
+                        method ()V methodNew
                     """);
             }
         });

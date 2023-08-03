@@ -32,7 +32,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("[integration] Scenario 03 - Simple Synthetic Methods")
-public class Scenario03 extends TestScenarioBase {
+public class Scenario03Test extends TestScenarioBase {
     @Override
     public @NotNull Env env() {
         return new Env() {

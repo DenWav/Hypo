@@ -31,7 +31,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 @DisplayName("[integration] Scenario 01 - Simple Hierarchy")
-public class Scenario01 extends TestScenarioBase {
+public class Scenario01Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {
