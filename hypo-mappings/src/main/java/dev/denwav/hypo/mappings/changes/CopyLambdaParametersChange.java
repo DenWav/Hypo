@@ -18,8 +18,6 @@
 
 package dev.denwav.hypo.mappings.changes;
 
-import dev.denwav.hypo.mappings.MergeResult;
-import dev.denwav.hypo.mappings.MergeableMappingsChange;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.model.ClassMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
@@ -31,9 +29,7 @@ import org.jetbrains.annotations.NotNull;
  * {@link dev.denwav.hypo.mappings.MappingsChange MappingsChange} which copies functional interface method parameter
  * mappings to lambda methods that implement it.
  */
-public class CopyLambdaParametersChange
-    extends AbstractMappingsChange
-    implements MergeableMappingsChange<CopyLambdaParametersChange> {
+public class CopyLambdaParametersChange extends AbstractMappingsChange {
 
     private final @NotNull MethodMapping mapping;
     private final int paramOffset;
@@ -73,15 +69,6 @@ public class CopyLambdaParametersChange
         for (final MethodParameterMapping paramMapping : this.mapping.getParameterMappings()) {
             newMapping.getOrCreateParameterMapping(paramMapping.getIndex() + this.paramOffset)
                 .setDeobfuscatedName(paramMapping.getDeobfuscatedName());
-        }
-    }
-
-    @Override
-    public @NotNull MergeResult<CopyLambdaParametersChange> mergeWith(final @NotNull CopyLambdaParametersChange that) {
-        if (this.mapping.getParameterMappings().size() > that.mapping.getParameterMappings().size()) {
-            return MergeResult.success(this);
-        } else {
-            return MergeResult.success(that);
         }
     }
 
