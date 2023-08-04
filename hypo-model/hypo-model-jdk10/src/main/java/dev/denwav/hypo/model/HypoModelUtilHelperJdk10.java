@@ -33,8 +33,9 @@ class HypoModelUtilHelperJdk10 extends HypoModelUtilHelper {
         return List.copyOf(list);
     }
 
-    @SafeVarargs
     @Override
+    @SafeVarargs
+    @SuppressWarnings("varargs")
     final @NotNull <T> List<T> immutableListOf(@NotNull final T @NotNull ... array) {
         return List.of(array);
     }

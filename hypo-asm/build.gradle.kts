@@ -7,7 +7,7 @@ plugins {
 }
 
 hypoTest {
-    testDataProject.set(projects.hypoAsm.hypoAsmTestData)
+    testDataProject = projects.hypoAsm.hypoAsmTestData
 }
 
 repositories {
@@ -23,7 +23,7 @@ dependencies {
 }
 
 tasks.compileTestJava {
-    options.release.set(17)
+    options.release = 17
 }
 
 tasks.jar {
@@ -42,5 +42,5 @@ hypoJava {
 }
 
 hypoPublish {
-    component.set(components.named("java"))
+    component = components.named("java")
 }

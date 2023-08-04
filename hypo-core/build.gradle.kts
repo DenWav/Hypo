@@ -24,5 +24,5 @@ hypoJava {
 }
 
 hypoPublish {
-    component.set(components.named("java"))
+    component = components.named("java")
 }

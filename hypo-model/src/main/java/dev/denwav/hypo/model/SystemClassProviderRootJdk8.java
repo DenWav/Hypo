@@ -81,7 +81,7 @@ class SystemClassProviderRootJdk8 implements ClassProviderRoot {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         this.delegate.close();
     }
 }

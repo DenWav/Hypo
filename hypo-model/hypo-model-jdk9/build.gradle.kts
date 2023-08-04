@@ -9,9 +9,9 @@ dependencies {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(9)
+    options.release = 9
 }
 
 hypoModule {
-    enableJavadoc.set(false)
+    enableJavadoc = false
 }

@@ -4,7 +4,7 @@ plugins {
 }
 
 hypoPublish {
-    component.set(components.named("javaPlatform"))
+    component = components.named("javaPlatform")
 }
 
 dependencies {

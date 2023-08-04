@@ -109,7 +109,7 @@ public class DefaultHydrationManager implements HydrationManager {
     private void executeProviderStage(
         final @NotNull HypoContext context,
         final @NotNull HashSet<HydrationProvider<?>> stage
-    )throws ExecutionException, InterruptedException {
+    ) throws ExecutionException, InterruptedException {
         final ExecutorService executor = context.getExecutor();
         ArrayList<Future<?>> futures = new ArrayList<>();
 

@@ -1,3 +1,4 @@
+import net.ltgt.gradle.errorprone.errorprone
 import org.cadixdev.gradle.licenser.LicenseExtension
 
 plugins {
@@ -7,6 +8,13 @@ plugins {
 }
 
 val hypoModule = extensions.create("hypoModule", HypoModuleExtension::class)
+
+tasks.withType<JavaCompile>().configureEach {
+    options.compilerArgs = listOf("-Xlint:all,-serial,-fallthrough", "-Werror")
+    options.errorprone {
+        disable("NonApiType", "LabelledBreakTarget")
+    }
+}
 
 afterEvaluate {
     if (hypoModule.enableJavadoc.get()) {

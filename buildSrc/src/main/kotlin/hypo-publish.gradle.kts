@@ -23,37 +23,37 @@ publishing {
             pom {
                 val repoUrl = "https://github.com/DenWav/Hypo"
 
-                name.set("Hypo")
-                description.set("An extensible and pluggable Java bytecode analytical model")
-                url.set(repoUrl)
-                inceptionYear.set("2021")
+                name = "Hypo"
+                description = "An extensible and pluggable Java bytecode analytical model"
+                url = repoUrl
+                inceptionYear = "2021"
 
                 licenses {
                     license {
-                        name.set("LGPL-3.0-only")
-                        url.set("$repoUrl/blob/main/COPYING.lesser")
-                        distribution.set("repo")
+                        name = "LGPL-3.0-only"
+                        url = "$repoUrl/blob/main/COPYING.lesser"
+                        distribution = "repo"
                     }
                 }
 
                 issueManagement {
-                    system.set("GitHub")
-                    url.set("$repoUrl/issues")
+                    system = "GitHub"
+                    url = "$repoUrl/issues"
                 }
 
                 developers {
                     developer {
-                        id.set("DenWav")
-                        name.set("Kyle Wood")
-                        email.set("kyle@denwav.dev")
-                        url.set("https://github.com/DenWav")
+                        id = "DenWav"
+                        name = "Kyle Wood"
+                        email = "kyle@denwav.dev"
+                        url = "https://github.com/DenWav"
                     }
                 }
 
                 scm {
-                    url.set(repoUrl)
-                    connection.set("scm:git:$repoUrl.git")
-                    developerConnection.set(connection)
+                    url = repoUrl
+                    connection = "scm:git:$repoUrl.git"
+                    developerConnection = connection
                 }
             }
         }

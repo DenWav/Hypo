@@ -212,12 +212,12 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
     }
 
     @Override
-    public void close() throws Exception {
-        Exception thrown = null;
+    public void close() throws IOException {
+        IOException thrown = null;
         for (final ClassProviderRoot rootProvider : this.rootProviders) {
             try {
                 rootProvider.close();
-            } catch (final Exception e) {
+            } catch (final IOException e) {
                 if (thrown == null) {
                     thrown = e;
                 } else {

@@ -2,13 +2,12 @@ plugins {
     alias(libs.plugins.nexusPublish)
 }
 
-nexusPublishing {
-    this.repositories {
-        sonatype {
-            nexusUrl.set(uri("https://s01.oss.sonatype.org/service/local/"))
-            snapshotRepositoryUrl.set(uri("https://s01.oss.sonatype.org/content/repositories/snapshots/"))
-        }
+nexusPublishing.repositories {
+    sonatype {
+        nexusUrl = uri("https://s01.oss.sonatype.org/service/local/")
+        snapshotRepositoryUrl = uri("https://s01.oss.sonatype.org/content/repositories/snapshots/")
     }
+
 }
 
 tasks.register("printVersion") {

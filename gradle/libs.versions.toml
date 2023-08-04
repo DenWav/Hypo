@@ -1,6 +1,6 @@
 [versions]
-junit = "5.9.3"
-errorprone = "2.19.1"
+junit = "5.10.0"
+errorprone = "2.21.0"
 asm = "9.5"
 slf4j = "2.0.7"
 log4j = "2.20.0"

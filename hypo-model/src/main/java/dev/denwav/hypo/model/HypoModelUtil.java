@@ -214,6 +214,7 @@ public final class HypoModelUtil {
      * @return The new immutable list.
      */
     @SafeVarargs
+    @SuppressWarnings("varargs")
     public static <T> @NotNull List<T> immutableListOf(final @NotNull T @NotNull ... array) {
         return HypoModelUtilHelper.INSTANCE.immutableListOf(array);
     }

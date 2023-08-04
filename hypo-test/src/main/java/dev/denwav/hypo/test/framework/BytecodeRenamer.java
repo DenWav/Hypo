@@ -36,7 +36,6 @@ import org.objectweb.asm.commons.Remapper;
  * @param map The map of renames to run over any class retrieved from the {@link #delegate}.
  * @param delegate The {@link ClassProviderRoot} to use as the source for class data.
  */
-@SuppressWarnings("InvalidParam") // errorprone doesn't know about record javadoc yet
 public record BytecodeRenamer(
     @NotNull Map<String, Map<String, String>> map,
     @NotNull ClassProviderRoot delegate
@@ -75,7 +74,7 @@ public record BytecodeRenamer(
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         this.delegate.close();
     }
 

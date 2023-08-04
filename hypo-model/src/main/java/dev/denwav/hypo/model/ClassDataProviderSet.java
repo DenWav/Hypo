@@ -112,12 +112,12 @@ public class ClassDataProviderSet implements ClassDataProvider {
     }
 
     @Override
-    public void close() throws Exception {
-        Exception thrown = null;
+    public void close() throws IOException {
+        IOException thrown = null;
         for (final ClassDataProvider provider : this.delegateProviders) {
             try {
                 provider.close();
-            } catch (final Exception e) {
+            } catch (final IOException e) {
                 thrown = HypoModelUtil.addSuppressed(thrown, e);
             }
         }

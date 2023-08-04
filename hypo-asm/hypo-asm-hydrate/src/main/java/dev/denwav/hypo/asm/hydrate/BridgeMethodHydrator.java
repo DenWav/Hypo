@@ -164,12 +164,16 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
         }
 
         data.store(HypoHydration.SYNTHETIC_TARGET, targetMethod);
-        //noinspection deprecation
-        targetMethod.store(HypoHydration.SYNTHETIC_SOURCE, data);
+        setSynthSource(targetMethod, data);
         final Set<MethodData> sources = targetMethod.compute(HypoHydration.SYNTHETIC_SOURCES, HashSet::new);
         synchronized (sources) {
             sources.add(data);
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void setSynthSource(final MethodData targetMethod, final MethodData data) {
+        targetMethod.store(HypoHydration.SYNTHETIC_SOURCE, data);
     }
 
     /**

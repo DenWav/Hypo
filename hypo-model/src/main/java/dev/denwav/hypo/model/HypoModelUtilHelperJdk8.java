@@ -36,8 +36,9 @@ class HypoModelUtilHelperJdk8 extends HypoModelUtilHelper {
         return Collections.unmodifiableList(new ArrayList<>(list));
     }
 
-    @SafeVarargs
     @Override
+    @SafeVarargs
+    @SuppressWarnings("varargs")
     final @NotNull <T> List<T> immutableListOf(final @NotNull T @NotNull ... array) {
         if (array.length == 0) {
             return Collections.emptyList();

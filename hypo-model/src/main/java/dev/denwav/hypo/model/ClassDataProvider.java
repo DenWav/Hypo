@@ -210,4 +210,7 @@ public interface ClassDataProvider extends AutoCloseable {
      * @return The collection of {@link ClassProviderRoot roots} used by this provider.
      */
     @NotNull Collection<ClassProviderRoot> roots();
+
+    @Override
+    void close() throws IOException;
 }

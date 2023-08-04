@@ -5,9 +5,9 @@ plugins {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(17)
+    options.release = 17
 }
 
 tasks.compileScenario01Java {
-    options.release.set(8)
+    options.release = 8
 }

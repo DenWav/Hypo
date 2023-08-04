@@ -65,7 +65,7 @@ public final class LorenzUtil {
      * @param <T> The type of the optional.
      * @return The value the optional contains, or {@code null} if it is {@link Optional#empty() empty}.
      */
-    @SuppressWarnings({"OptionalAssignedToNull", "OptionalUsedAsFieldOrParameterType"})
+    @SuppressWarnings({"OptionalAssignedToNull", "OptionalUsedAsFieldOrParameterType", "NullableOptional"})
     public static <T> @Nullable T unwrap(final @Nullable Optional<T> opt) {
         if (opt == null) {
             return null;

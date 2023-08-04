@@ -19,7 +19,6 @@
 package dev.denwav.hypo.model;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -101,6 +100,9 @@ public interface ClassProviderRoot extends AutoCloseable {
     default @NotNull Stream<? extends FileDataReference> walkAllFiles() throws IOException {
         return Stream.of();
     }
+
+    @Override
+    void close() throws IOException;
 
     /**
      * Return the system root, which allows reading class data for the currently running JVM. This method will return
@@ -197,37 +199,3 @@ public interface ClassProviderRoot extends AutoCloseable {
         byte @Nullable [] readData() throws IOException;
     }
 }
-
-/**
- * Generic implementation of {@link ClassProviderRoot.FileDataReference} for {@link Path} objects.
- */
-final class PathFileDataReference implements ClassProviderRoot.FileDataReference {
-
-    private final @NotNull String name;
-    private final @NotNull Path path;
-
-    /**
-     * Constructor for {@link PathFileDataReference}.
-     *
-     * @param name The name of the class this is a reference to.
-     * @param path The {@link Path} object referring to the class file.
-     */
-    PathFileDataReference(final @NotNull String name, final @NotNull Path path) {
-        this.name = name;
-        this.path = path;
-    }
-
-    @Override
-    public @NotNull String name() {
-        return this.name;
-    }
-
-    @Override
-    public byte @Nullable [] readData() throws IOException {
-        if (Files.notExists(this.path)) {
-            return null;
-        }
-        return Files.readAllBytes(this.path);
-    }
-}
-

@@ -24,6 +24,7 @@ import dev.denwav.hypo.model.ClassDataDecorator;
 import dev.denwav.hypo.model.ClassDataProvider;
 import dev.denwav.hypo.model.ClassDataProviderSet;
 import dev.denwav.hypo.model.HypoModelUtil;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -137,7 +138,7 @@ public final class HypoContext implements AutoCloseable {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         final ExecutorService exec = this.executor;
         if (exec != null) {
             // close() should never be called while there are still tasks processing
@@ -145,15 +146,15 @@ public final class HypoContext implements AutoCloseable {
             this.executor = null;
         }
 
-        Exception thrown = null;
+        IOException thrown = null;
         try {
             this.provider.close();
-        } catch (final Exception e) {
+        } catch (final IOException e) {
             thrown = e;
         }
         try {
             this.contextProvider.close();
-        } catch (final Exception e) {
+        } catch (final IOException e) {
             thrown = HypoModelUtil.addSuppressed(thrown, e);
         }
 

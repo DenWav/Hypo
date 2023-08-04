@@ -4,7 +4,7 @@ plugins {
 }
 
 hypoPublish {
-    component.set(components.named("versionCatalog"))
+    component = components.named("versionCatalog")
 }
 
 catalog {

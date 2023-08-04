@@ -14,7 +14,7 @@ dependencies {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release.set(null as Int?)
+    options.release = null
     // Can't use release for this module due to Unsafe usage
     // JDK 11 doesn't allow access to sun.misc when using --release below 9
     // https://bugs.openjdk.java.net/browse/JDK-8206937
@@ -41,5 +41,5 @@ hypoJava {
 }
 
 hypoPublish {
-    component.set(components.named("java"))
+    component = components.named("java")
 }

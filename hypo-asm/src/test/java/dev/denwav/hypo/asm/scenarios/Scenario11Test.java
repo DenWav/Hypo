@@ -53,6 +53,7 @@ public class Scenario11Test extends TestScenarioBase {
 
     @Test
     @DisplayName("Test bridge method hydration on generic abstract enums")
+    @SuppressWarnings("deprecation")
     public void testBridgeMethod() {
         final ClassData enumData = this.findClass("scenario11/TestEnum");
         final ClassData oneImpl = this.findClass("scenario11/TestEnum$1");
@@ -64,7 +65,6 @@ public class Scenario11Test extends TestScenarioBase {
         final MethodData oneTest = findMethod(oneImpl, "test");
         final MethodData twoTest = findMethod(twoImpl, "test");
 
-        //noinspection deprecation
         assertNotNull(baseTest.require(HypoHydration.SYNTHETIC_SOURCE));
 
         final Set<MethodData> sources = baseTest.require(HypoHydration.SYNTHETIC_SOURCES);

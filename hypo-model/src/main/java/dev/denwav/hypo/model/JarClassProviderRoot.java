@@ -109,7 +109,7 @@ public final class JarClassProviderRoot implements ClassProviderRoot {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         this.fileSystem.close();
     }
 }

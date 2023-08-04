@@ -6,7 +6,7 @@ plugins {
 }
 
 hypoTest {
-    testDataProject.set(projects.hypoTest.hypoTestData)
+    testDataProject = projects.hypoTest.hypoTestData
 }
 
 repositories {
@@ -32,7 +32,7 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     // For tests, lets use the better APIs
-    options.release.set(17)
+    options.release = 17
 }
 
 hypoJava {

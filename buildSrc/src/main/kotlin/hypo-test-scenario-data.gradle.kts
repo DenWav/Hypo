@@ -13,7 +13,7 @@ fun createSourceSet(name: String) {
 
     val jarTask = tasks.register(newSourceSet.jarTaskName, Jar::class) {
         from(newSourceSet.output)
-        archiveClassifier.set(name)
+        archiveClassifier = name
     }
 
     configurations {
