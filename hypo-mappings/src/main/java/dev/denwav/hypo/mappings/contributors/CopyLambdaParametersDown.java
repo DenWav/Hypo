@@ -97,7 +97,7 @@ public class CopyLambdaParametersDown implements ChangeContributor {
                 }
             }
             if (closure == null || closure.getInterfaceMethod() == null) {
-                return;
+                continue;
             }
 
             final MethodMapping lambdaMapping = getMethodMapping(classMapping, method);
