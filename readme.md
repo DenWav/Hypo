@@ -1,7 +1,7 @@
 Hypo
 ====
 
-[![Maven Central Version 2.2.1](https://img.shields.io/badge/Maven_Central-2.2.1-blue?logo=apache-maven&style=flat)](https://search.maven.org/search?q=g:dev.denwav.hypo)
+[![Maven Central Version 2.3.0](https://img.shields.io/badge/Maven_Central-2.3.0-blue?logo=apache-maven&style=flat)](https://search.maven.org/search?q=g:dev.denwav.hypo)
 [![Test](https://github.com/DenWav/Hypo/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/DenWav/Hypo/actions/workflows/test.yml)
 
 Hypo is a model for Java bytecode inspection. The main idea behind Hypo is to separate the process of determining
@@ -51,7 +51,7 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > }
 > 
 > dependencies {
->     implementation(platform("dev.denwav.hypo:hypo-platform:2.2.1"))
+>     implementation(platform("dev.denwav.hypo:hypo-platform:2.3.0"))
 >     // Whichever modules you need:
 >     implementation("dev.denwav.hypo:hypo-model")
 >     implementation("dev.denwav.hypo:hypo-core")
@@ -74,7 +74,7 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 > }
 > 
 > dependencies {
->     implementation platform('dev.denwav.hypo:hypo-platform:2.2.1')
+>     implementation platform('dev.denwav.hypo:hypo-platform:2.3.0')
 >     // Whichever modules you need:
 >     implementation 'dev.denwav.hypo:hypo-model'
 >     implementation 'dev.denwav.hypo:hypo-core'
@@ -98,7 +98,7 @@ If you're using Gradle 7.0+ you can also use `hypo-catalog` if you like.
 >             <dependency>
 >                 <groupId>dev.denwav.hypo</groupId>
 >                 <artifactId>hypo-platform</artifactId>
->                 <version>2.2.1</version>
+>                 <version>2.3.0</version>
 >             </dependency>
 >         </dependencies>
 >     </dependencyManagement>
