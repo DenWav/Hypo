@@ -1,6 +1,6 @@
 package scenario01;
 
-// Compiled with JDK 8
+// Compiled with JDK 11
 public class TestClass {
 
     public void test() {

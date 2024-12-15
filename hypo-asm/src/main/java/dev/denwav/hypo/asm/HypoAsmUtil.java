@@ -33,6 +33,8 @@ import org.objectweb.asm.Type;
  */
 public final class HypoAsmUtil {
 
+    private HypoAsmUtil() {}
+
     /**
      * For convenience, an empty {@code int[]} array.
      */

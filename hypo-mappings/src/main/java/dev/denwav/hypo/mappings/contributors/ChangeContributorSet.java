@@ -20,7 +20,6 @@ package dev.denwav.hypo.mappings.contributors;
 
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.mappings.ChangeRegistry;
-import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import java.util.Collection;
 import java.util.List;
@@ -51,7 +50,7 @@ public class ChangeContributorSet implements ChangeContributor {
      */
     @Contract(value = "_ -> new", pure = true)
     public static @NotNull ChangeContributor wrap(final @NotNull Collection<@NotNull ChangeContributor> delegates) {
-        return new ChangeContributorSet(HypoModelUtil.asImmutableList(delegates));
+        return new ChangeContributorSet(List.copyOf(delegates));
     }
 
     @Override

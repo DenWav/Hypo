@@ -13,15 +13,6 @@ dependencies {
     api(libs.bombe)
 }
 
-tasks.withType<JavaCompile>().configureEach {
-    options.release = null
-    // Can't use release for this module due to Unsafe usage
-    // JDK 11 doesn't allow access to sun.misc when using --release below 9
-    // https://bugs.openjdk.java.net/browse/JDK-8206937
-    sourceCompatibility = "1.8"
-    targetCompatibility = "1.8"
-}
-
 tasks.jar {
     manifest {
         attributes(
@@ -31,8 +22,6 @@ tasks.jar {
 }
 
 hypoJava {
-    jdkVersionProjects.add(projects.hypoMappings.hypoMappingsJdk9)
-
     javadocLibs.add(libs.annotations)
     javadocLibs.add(libs.errorprone.annotations)
     javadocLibs.add(libs.lorenz)

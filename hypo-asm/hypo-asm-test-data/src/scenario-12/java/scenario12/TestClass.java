@@ -1,4 +1,4 @@
-package scenario03;
+package scenario12;
 
 import java.util.function.IntSupplier;
 

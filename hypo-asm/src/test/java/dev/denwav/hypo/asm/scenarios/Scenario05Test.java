@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 05 - Lambda scopes (Java 17)")
+@DisplayName("[asm] Scenario 05 - Lambda scopes (Java 21)")
 public class Scenario05Test extends TestScenarioBase {
 
     @Override

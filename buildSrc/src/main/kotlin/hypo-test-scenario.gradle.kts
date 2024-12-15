@@ -8,7 +8,7 @@ afterEvaluate {
     val testConfigs = mutableListOf<Configuration>()
 
     extension.testDataProject.orNull?.let { proj ->
-        proj.dependencyProject.projectDir.resolve("src").listFiles()?.forEach { dir ->
+        project(proj.path).projectDir.resolve("src").listFiles()?.forEach { dir ->
             if (dir.name.startsWith("scenario")) {
                 testConfigs += configurations.create(dir.name)
             }

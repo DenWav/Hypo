@@ -42,6 +42,11 @@ import org.jetbrains.annotations.Nullable;
 public abstract class LazyClassData extends AbstractClassData {
 
     /**
+     * Default constructor.
+     */
+    public LazyClassData() {}
+
+    /**
      * {@code compute} variant of {@link #name()}.
      *
      * @return The name of the class.
@@ -154,84 +159,98 @@ public abstract class LazyClassData extends AbstractClassData {
      */
     public abstract @NotNull List<MethodData> computeMethods();
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<String, ?> name = LazyValue.of(this::computeName);
     @Override
     public @NotNull String name() {
         return this.name.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<ClassData, IOException> outerClass = LazyValue.of(this::computeOuterClass);
     @Override
     public @Nullable ClassData outerClass() throws IOException {
         return this.outerClass.getOrThrow();
     }
 
+    @SuppressWarnings("this-escape")
     private final LazyValue<Boolean, ?> staticInnerClass = LazyValue.of(this::computeStaticInnerClass);
     @Override
     public boolean isStaticInnerClass() {
         return this.staticInnerClass.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final LazyValue<Boolean, ?> isFinal = LazyValue.of(this::computeIsFinal);
     @Override
     public boolean isFinal() {
         return this.isFinal.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final LazyValue<Boolean, ?> isSynthetic = LazyValue.of(this::computeIsSynthetic);
     @Override
     public boolean isSynthetic() {
         return this.isSynthetic.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final LazyValue<Boolean, ?> isSealed = LazyValue.of(this::computeIsSealed);
     @Override
     public boolean isSealed() {
         return this.isSealed.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final LazyValue<List<ClassData>, IOException> permittedClasses = LazyValue.of(this::computePermittedClasses);
     @Override
     public @Nullable List<ClassData> permittedClasses() throws IOException {
         return this.permittedClasses.getOrThrow();
     }
 
+    @SuppressWarnings("this-escape")
     private final LazyValue<List<FieldData>, ?> recordComponents = LazyValue.of(this::computeRecordComponents);
     @Override
     public @Nullable List<@NotNull FieldData> recordComponents() {
         return this.recordComponents.get();
     }
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<EnumSet<ClassKind>, ?> kinds = LazyValue.of(this::computeClassKinds);
     @Override
     public @NotNull EnumSet<ClassKind> kinds() {
         return this.kinds.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<@NotNull Visibility, ?> visibility = LazyValue.of(this::computeVisibility);
     @Override
     public @NotNull Visibility visibility() {
         return this.visibility.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<ClassData, IOException> superClass = LazyValue.of(this::computeSuperClass);
     @Override
     public @Nullable ClassData superClass() throws IOException {
         return this.superClass.getOrThrow();
     }
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<List<ClassData>, IOException> interfaces = LazyValue.of(this::computeInterfaces);
     @Override
     public @NotNull List<ClassData> interfaces() throws IOException {
         return this.interfaces.getOrThrowNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<List<FieldData>, ?> fields = LazyValue.of(this::computeFields);
     @Override
     public @NotNull List<FieldData> fields() {
         return this.fields.getNotNull();
     }
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<List<MethodData>, ?> methods = LazyValue.of(this::computeMethods);
     @Override
     public @NotNull List<MethodData> methods() {

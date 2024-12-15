@@ -1,6 +1,6 @@
 package scenario09;
 
-// Compiled with JDK 17
+// Compiled with JDK 21
 public enum TestClass {
     ONE {
         @Override

@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 09 - Abstract enums test (Java 17)")
+@DisplayName("[asm] Scenario 09 - Abstract enums test (Java 21)")
 public class Scenario09Test extends TestScenarioBase {
 
     @Override

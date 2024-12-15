@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@DisplayName("[asm] Scenario 07 - Local class scopes inside lambda scopes (Java 17)")
+@DisplayName("[asm] Scenario 07 - Local class scopes inside lambda scopes (Java 21)")
 public class Scenario07Test extends TestScenarioBase {
 
     @Override

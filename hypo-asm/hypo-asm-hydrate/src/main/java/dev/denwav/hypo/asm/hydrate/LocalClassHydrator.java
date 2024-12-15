@@ -26,7 +26,6 @@ import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.LambdaClosure;
 import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
-import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoKey;
@@ -43,13 +42,9 @@ import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
-
-import static dev.denwav.hypo.asm.HypoAsmUtil.toJvmType;
-import static org.objectweb.asm.Type.getType;
 
 /**
  * This is a {@link HydrationProvider} for determining local and anonymous classes present in methods, and the
@@ -71,12 +66,12 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
 
     @Override
     public List<HypoKey<?>> provides() {
-        return HypoModelUtil.immutableListOf(HypoHydration.LOCAL_CLASSES);
+        return List.of(HypoHydration.LOCAL_CLASSES);
     }
 
     @Override
     public List<HypoKey<?>> dependsOn() {
-        return HypoModelUtil.immutableListOf(HypoHydration.LAMBDA_CALLS);
+        return List.of(HypoHydration.LAMBDA_CALLS);
     }
 
     @Override

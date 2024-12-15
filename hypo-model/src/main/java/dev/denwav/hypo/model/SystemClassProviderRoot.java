@@ -19,61 +19,129 @@
 package dev.denwav.hypo.model;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ModuleReader;
+import java.lang.module.ModuleReference;
+import java.nio.ByteBuffer;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
- * Proxy class for creating system {@link ClassProviderRoot class provider roots}. System roots provide system JDK
- * classes. {@link #newInstance()} returns an instance of {@link ClassProviderRoot} compatible with the currently
- * running JDK.
+ * {@link ClassProviderRoot} implementation for system classes for Java 9+. Tested on JDKs up to Java 23.
  */
-final class SystemClassProviderRoot {
+/* package */ final class SystemClassProviderRoot implements ClassProviderRoot {
 
-    private static final @NotNull Constructor<? extends ClassProviderRoot> constructor;
+    private final @NotNull List<ModuleReader> readers;
 
-    static {
-        Constructor<? extends ClassProviderRoot> c;
-        try {
-            // Try to load the JDK9+ version
-            // If it succeeds then we know we're running at least on Java 9
-            // If it fails, fall back to Java 8
-            c = Class.forName(SystemClassProviderRoot.class.getName() + "Jdk9")
-                .asSubclass(ClassProviderRoot.class).getDeclaredConstructor();
-        } catch (final Throwable t) {
+    /**
+     * Constructor for {@link SystemClassProviderRoot}. Use {@link ClassProviderRoot#ofJdk()} instead.
+     *
+     * @throws IOException If an IO error occurs while opening JDK modules.
+     */
+    SystemClassProviderRoot() throws IOException {
+        final Set<ModuleReference> refs = ModuleFinder.ofSystem().findAll();
+        final ModuleReader[] readers = new ModuleReader[refs.size()];
+        int index = 0;
+        for (final ModuleReference ref : refs) {
+            readers[index++] = ref.open();
+        }
+        this.readers = Arrays.asList(readers);
+    }
+
+    @Override
+    public byte @Nullable [] getClassData(@NotNull String fileName) throws IOException {
+        for (final ModuleReader reader : this.readers) {
+            final ByteBuffer resource = reader.read(fileName).orElse(null);
+            if (resource == null) {
+                continue;
+            }
             try {
-                c = Class.forName(SystemClassProviderRoot.class.getName() + "Jdk8")
-                    .asSubclass(ClassProviderRoot.class).getDeclaredConstructor();
-            } catch (final Throwable t2) {
-                throw new AssertionError(HypoModelUtil.addSuppressed(t, t2));
+                final byte[] data = new byte[resource.remaining()];
+                resource.get(data);
+                return data;
+            } finally {
+                reader.release(resource);
             }
         }
+        return null;
+    }
 
-        constructor = c;
+    @Override
+    public @NotNull List<? extends ClassProviderRoot.FileDataReference> getAllClasses() throws IOException {
+        List<ClassProviderRoot.FileDataReference> refs = null;
+
+        for (final ModuleReader reader : this.readers) {
+            final List<ClassProviderRoot.FileDataReference> list = reader.list()
+                .filter(n -> n.endsWith(".class"))
+                .map(n -> new SystemFileDataReference(n, reader))
+                .collect(Collectors.toList());
+
+            if (refs == null) {
+                refs = list;
+            } else {
+                refs.addAll(list);
+            }
+        }
+        return refs == null ? Collections.emptyList() : refs;
+    }
+
+    @Override
+    public void close() throws IOException {
+        IOException thrown = null;
+        for (final ModuleReader reader : this.readers) {
+            try {
+                reader.close();
+            } catch (final IOException e) {
+                thrown = HypoModelUtil.addSuppressed(thrown, e);
+            }
+        }
+        if (thrown != null) {
+            throw thrown;
+        }
     }
 
     /**
-     * Returns a new instance of the system class provider root compatible with the currently running JVM.
-     *
-     * @return A new instance of the system class provider root compatible with the currently running JVM.
-     * @throws IOException If an IO error occurs while creating the system class provider root.
+     * Implementation of {@link ClassProviderRoot.FileDataReference} for {@link SystemClassProviderRoot}.
      */
-    static @NotNull ClassProviderRoot newInstance() throws IOException {
-        try {
-            return constructor.newInstance();
-        } catch (final InvocationTargetException e) {
-            final Throwable cause = e.getCause();
-            // Satisfy this method's `throws` clause to make the compiler happy
-            if (cause instanceof IOException) {
-                throw (IOException) cause;
+    static final class SystemFileDataReference implements ClassProviderRoot.FileDataReference {
+
+        private final @NotNull String name;
+        private final @NotNull ModuleReader reader;
+
+        /**
+         * Construct a new instance of {@link SystemFileDataReference}.
+         *
+         * @param name The file name.
+         * @param reader The {@link ModuleReader} to read the class from.
+         */
+        SystemFileDataReference(final @NotNull String name, final @NotNull ModuleReader reader) {
+            this.name = name;
+            this.reader = reader;
+        }
+
+        @Override
+        public @NotNull String name() {
+            return this.name;
+        }
+
+        @Override
+        public byte @Nullable [] readData() throws IOException {
+            final ByteBuffer resource = this.reader.read(this.name).orElse(null);
+            if (resource == null) {
+                return null;
             }
-            throw HypoModelUtil.rethrow(e.getCause());
-        } catch (final InstantiationException | IllegalAccessException e) {
-            // impossible
-            throw new LinkageError("Failed to load " + SystemClassProviderRoot.class.getName() + " implementation " +
-                "for the current Java version", e);
+            try {
+                final byte[] data = new byte[resource.remaining()];
+                resource.get(data);
+                return data;
+            } finally {
+                this.reader.release(resource);
+            }
         }
     }
-
-    private SystemClassProviderRoot() {}
 }

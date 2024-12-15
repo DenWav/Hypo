@@ -38,6 +38,11 @@ public abstract class AbstractHypoData implements HypoData {
      */
     private final @NotNull Map<HypoKey<?>, ?> hypoData = Collections.synchronizedMap(new IdentityHashMap<>());
 
+    /**
+     * Default constructor.
+     */
+    public AbstractHypoData() {}
+
     @Override
     public <T> @Nullable T store(final @NotNull HypoKey<T> key, final @Nullable T t) {
         if (t == null) {

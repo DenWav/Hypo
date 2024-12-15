@@ -33,7 +33,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@DisplayName("[asm] - Abstract enum bridge method detection (Java 17)")
+@DisplayName("[asm] Scenario 11 - Abstract enum bridge method detection (Java 21)")
 public class Scenario11Test extends TestScenarioBase {
 
     @Override

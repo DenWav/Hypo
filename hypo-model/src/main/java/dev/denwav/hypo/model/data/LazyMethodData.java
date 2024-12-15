@@ -26,12 +26,18 @@ import org.jetbrains.annotations.NotNull;
 public abstract class LazyMethodData extends AbstractMethodData {
 
     /**
+     * Default constructor.
+     */
+    public LazyMethodData() {}
+
+    /**
      * {@code compute} variant of {@link #descriptor()}.
      *
      * @return This method's descriptor.
      */
     public abstract @NotNull MethodDescriptor computeDescriptor();
 
+    @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<MethodDescriptor, ?> descriptor = LazyValue.of(this::computeDescriptor);
 
     @Override

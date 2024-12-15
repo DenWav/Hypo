@@ -33,8 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 03 - Synthetic classes and members (Java 17)")
-public class Scenario03Test extends TestScenarioBase {
+@DisplayName("[asm] Scenario 12 - Synthetic classes and members (Java 21)")
+public class Scenario12Test extends TestScenarioBase {
 
     @Override
     public @NotNull Env env() {

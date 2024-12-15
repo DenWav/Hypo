@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 08 - Java records tests (Java 17)")
+@DisplayName("[asm] Scenario 08 - Java records tests (Java 21)")
 public class Scenario08Test extends TestScenarioBase {
 
     @Override

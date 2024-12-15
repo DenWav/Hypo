@@ -52,7 +52,7 @@ public class ClassDataProviderSet implements ClassDataProvider {
     public static ClassDataProviderSet wrap(
         final @NotNull Collection<? extends @NotNull ClassDataProvider> providers
     ) {
-        return new ClassDataProviderSet(HypoModelUtil.asImmutableList(providers));
+        return new ClassDataProviderSet(List.copyOf(providers));
     }
 
     @Override

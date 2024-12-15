@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 04 - Sealed classes (Java 17)")
+@DisplayName("[asm] Scenario 04 - Sealed classes (Java 21)")
 public class Scenario04Test extends TestScenarioBase {
 
     @Override

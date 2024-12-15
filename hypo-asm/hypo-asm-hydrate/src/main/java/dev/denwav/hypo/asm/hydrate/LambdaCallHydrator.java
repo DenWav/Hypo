@@ -24,7 +24,6 @@ import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.LambdaClosure;
-import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
@@ -83,7 +82,7 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
 
     @Override
     public List<HypoKey<?>> provides() {
-        return HypoModelUtil.immutableListOf(HypoHydration.LAMBDA_CALLS);
+        return List.of(HypoHydration.LAMBDA_CALLS);
     }
 
     @Override

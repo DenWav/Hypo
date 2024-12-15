@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("[asm] Scenario 01 - Inner classes (Java 8)")
+@DisplayName("[asm] Scenario 01 - Inner classes (Java 11)")
 public class Scenario01Test extends TestScenarioBase {
 
     @Override

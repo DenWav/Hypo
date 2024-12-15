@@ -32,7 +32,7 @@ dependencies {
 
 tasks.withType<JavaCompile>().configureEach {
     // For tests, lets use the better APIs
-    options.release = 17
+    options.release = 21
 }
 
 hypoJava {

@@ -26,6 +26,8 @@ import dev.denwav.hypo.model.data.types.ArrayType;
 import dev.denwav.hypo.model.data.types.ClassType;
 import dev.denwav.hypo.model.data.types.JvmType;
 import dev.denwav.hypo.model.data.types.PrimitiveType;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -48,12 +50,46 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static dev.denwav.hypo.model.HypoModelUtil.cast;
+
 /**
  * General utility for interacting with the Lorenz API. This utility class helps with easing the interactions with
  * {@link Optional} and it provides utilities to help with modifying {@link MappingSet} models outside of what the
  * standard Lorenz API allows.
  */
 public final class LorenzUtil {
+
+    private static final VarHandle topLevelClassesHandle;
+    private static final VarHandle innerClassesHandle;
+    private static final VarHandle fieldsHandle;
+    private static final VarHandle fieldsByNameHandle;
+    private static final VarHandle methodsHandle;
+    private static final VarHandle paramsHandle;
+
+    static {
+        try {
+            topLevelClassesHandle = MethodHandles
+                .privateLookupIn(MappingSetImpl.class, MethodHandles.lookup())
+                .findVarHandle(MappingSetImpl.class, "topLevelClasses", Map.class);
+            innerClassesHandle = MethodHandles
+                .privateLookupIn(AbstractClassMappingImpl.class, MethodHandles.lookup())
+                .findVarHandle(AbstractClassMappingImpl.class, "innerClasses", Map.class);
+            fieldsHandle = MethodHandles
+                .privateLookupIn(AbstractClassMappingImpl.class, MethodHandles.lookup())
+                .findVarHandle(AbstractClassMappingImpl.class, "fields", Map.class);
+            fieldsByNameHandle = MethodHandles
+                .privateLookupIn(AbstractClassMappingImpl.class, MethodHandles.lookup())
+                .findVarHandle(AbstractClassMappingImpl.class, "fieldsByName", Map.class);
+            methodsHandle = MethodHandles
+                .privateLookupIn(AbstractClassMappingImpl.class, MethodHandles.lookup())
+                .findVarHandle(AbstractClassMappingImpl.class, "methods", Map.class);
+            paramsHandle = MethodHandles
+                .privateLookupIn(MethodMappingImpl.class, MethodHandles.lookup())
+                .findVarHandle(MethodMappingImpl.class, "parameters", Map.class);
+        } catch (final Throwable t) {
+            throw new AssertionError(t);
+        }
+    }
 
     private LorenzUtil() {}
 
@@ -398,7 +434,10 @@ public final class LorenzUtil {
      */
     @Contract(pure = true)
     public static @NotNull Map<String, TopLevelClassMapping> getTopLevelClassesMap(final @NotNull MappingSet mappingSet) {
-        return LorenzUtilHelper.INSTANCE.getTopLevelClassesMap(mappingSet);
+        final MappingSetImpl castMap = checkType(mappingSet);
+        final Object handleResult = topLevelClassesHandle.get(castMap);
+        final Map<String, TopLevelClassMapping> result = cast(handleResult);
+        return notNull(result, "topLevelClasses");
     }
 
     /**
@@ -409,7 +448,10 @@ public final class LorenzUtil {
      */
     @Contract(pure = true)
     public static @NotNull Map<String, InnerClassMapping> getInnerClassesMap(final @NotNull ClassMapping<?, ?> mapping) {
-        return LorenzUtilHelper.INSTANCE.getInnerClassesMap(mapping);
+        final AbstractClassMappingImpl<?, ?> castMap = checkType(mapping);
+        final Object handleResult = innerClassesHandle.get(castMap);
+        final Map<String, InnerClassMapping> result = cast(handleResult);
+        return notNull(result, "innerClasses");
     }
 
     /**
@@ -420,7 +462,10 @@ public final class LorenzUtil {
      */
     @Contract(pure = true)
     public static @NotNull Map<FieldSignature, FieldMapping> getFieldsMap(final @NotNull ClassMapping<?, ?> mapping) {
-        return LorenzUtilHelper.INSTANCE.getFieldsMap(mapping);
+        final AbstractClassMappingImpl<?, ?> castMap = checkType(mapping);
+        final Object handleResult = fieldsHandle.get(castMap);
+        final Map<FieldSignature, FieldMapping> result = cast(handleResult);
+        return notNull(result, "fields");
     }
 
     /**
@@ -431,7 +476,10 @@ public final class LorenzUtil {
      */
     @Contract(pure = true)
     public static @NotNull Map<String, FieldMapping> getFieldsByNameMap(final @NotNull ClassMapping<?, ?> mapping) {
-        return LorenzUtilHelper.INSTANCE.getFieldsByNameMap(mapping);
+        final AbstractClassMappingImpl<?, ?> castMap = checkType(mapping);
+        final Object handleResult = fieldsByNameHandle.get(castMap);
+        final Map<String, FieldMapping> result = cast(handleResult);
+        return notNull(result, "fieldsByName");
     }
 
     /**
@@ -442,7 +490,10 @@ public final class LorenzUtil {
      */
     @Contract(pure = true)
     public static @NotNull Map<MethodSignature, MethodMapping> getMethodsMap(final @NotNull ClassMapping<?, ?> mapping) {
-        return LorenzUtilHelper.INSTANCE.getMethodsMap(mapping);
+        final AbstractClassMappingImpl<?, ?> castMap = checkType(mapping);
+        final Object handleResult = methodsHandle.get(castMap);
+        final Map<MethodSignature, MethodMapping> result = cast(handleResult);
+        return notNull(result, "methods");
     }
 
     /**
@@ -453,7 +504,10 @@ public final class LorenzUtil {
      */
     @Contract(pure = true)
     public static @NotNull Map<Integer, MethodParameterMapping> getParamsMap(final @NotNull MethodMapping mapping) {
-        return LorenzUtilHelper.INSTANCE.getParamsMap(mapping);
+        final MethodMappingImpl castMap = checkType(mapping);
+        final Object handleResult = paramsHandle.get(castMap);
+        final Map<Integer, MethodParameterMapping> result = cast(handleResult);
+        return notNull(result, "parameters");
     }
 
     /**

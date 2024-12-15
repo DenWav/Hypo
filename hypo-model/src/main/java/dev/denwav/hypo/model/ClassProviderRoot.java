@@ -58,7 +58,7 @@ import org.jetbrains.annotations.Nullable;
  * </ol>
  *
  * <p>The system JDK root will use the currently running JVM to provide class file data for core JVM classes. Specific
- * implementations compatible with and tested against Java 8 through Java 17 will be returned based on the version of
+ * implementations compatible with and tested against Java 11 through Java 23 will be returned based on the version of
  * the currently running JVM. Later versions of Java may also be supported, but this cannot be guaranteed.
  *
  * <p>Roots are {@link AutoCloseable} as they operate over file system resources. Roots passed into an
@@ -105,16 +105,15 @@ public interface ClassProviderRoot extends AutoCloseable {
     void close() throws IOException;
 
     /**
-     * Return the system root, which allows reading class data for the currently running JVM. This method will return
-     * different implementations depending on the version of the JVM currently running, it is compatible with and has
-     * been tested against at least Java 8 through Java 17. Later version of Java may also be compatible as well, but
-     * that cannot be guaranteed.
+     * Return the system root, which allows reading class data for the currently running JVM. The implementation
+     * returned by this method is compatible with and has been tested against at least Java 11 through Java 23. Later
+     * version of Java may also be compatible as well, but that cannot be guaranteed.
      *
      * @return The root corresponding to the currently running JVM's system class files.
      * @throws IOException If an IO error occurs while reading system classes.
      */
     static @NotNull ClassProviderRoot ofJdk() throws IOException {
-        return SystemClassProviderRoot.newInstance();
+        return new SystemClassProviderRoot();
     }
 
     /**

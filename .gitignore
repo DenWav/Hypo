@@ -12,6 +12,7 @@ out/
 # Gradle
 .gradle/
 build/
+.kotlin/
 
 # Java
 *.class

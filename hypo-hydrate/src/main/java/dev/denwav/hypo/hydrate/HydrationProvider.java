@@ -19,7 +19,6 @@
 package dev.denwav.hypo.hydrate;
 
 import dev.denwav.hypo.core.HypoContext;
-import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoData;
@@ -67,7 +66,7 @@ public interface HydrationProvider<T extends HypoData> {
      * @return The {@link HypoKey HypoKeys} this hydration provider provides, if it reports this information.
      */
     default List<HypoKey<?>> provides() {
-        return HypoModelUtil.immutableListOf();
+        return List.of();
     }
 
     /**
@@ -76,6 +75,6 @@ public interface HydrationProvider<T extends HypoData> {
      * @return Which {@link HypoKey HypoKeys} this hydration provider would like to have available during hydration.
      */
     default List<HypoKey<?>> dependsOn() {
-        return HypoModelUtil.immutableListOf();
+        return List.of();
     }
 }

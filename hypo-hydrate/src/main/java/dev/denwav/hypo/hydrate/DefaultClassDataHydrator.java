@@ -43,6 +43,11 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
  */
 public class DefaultClassDataHydrator implements ClassDataHydrator {
 
+    /**
+     * Default constructor.
+     */
+    public DefaultClassDataHydrator() {}
+
     @Override
     public void hydrate(final @NotNull HypoContext context) throws IOException {
         final ExecutorService executor = context.getExecutor();

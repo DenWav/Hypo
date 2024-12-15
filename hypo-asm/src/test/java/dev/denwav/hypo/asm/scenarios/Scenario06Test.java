@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-@DisplayName("[asm] Scenario 06 - Local class scopes (Java 17)")
+@DisplayName("[asm] Scenario 06 - Local class scopes (Java 21)")
 public class Scenario06Test extends TestScenarioBase {
 
     @Override

@@ -79,7 +79,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
 
     @Override
     public List<HypoKey<?>> provides() {
-        return HypoModelUtil.immutableListOf(HypoHydration.SUPER_CALL_TARGET, HypoHydration.SUPER_CALLER_SOURCES);
+        return List.of(HypoHydration.SUPER_CALL_TARGET, HypoHydration.SUPER_CALLER_SOURCES);
     }
 
     @Override
@@ -559,6 +559,11 @@ final class Constant implements MethodCallArgument {
      * Model for {@link SuperConstructorHydrator}.
      */
     static final Constant INSTANCE = new Constant();
+
+    /**
+     * Default constructor.
+     */
+    Constant() {}
 }
 
 /**
@@ -592,6 +597,11 @@ final class NewArray implements MethodCallArgument {
      * Model for {@link SuperConstructorHydrator}.
      */
     static final NewArray INSTANCE = new NewArray();
+
+    /**
+     * Default constructor.
+     */
+    NewArray() {}
 }
 
 /**
@@ -627,6 +637,11 @@ final class MethodCall implements MethodCallArgument {
      * <p>The method descriptor.
      */
     @Nullable String desc;
+
+    /**
+     * Default constructor.
+     */
+    MethodCall() {}
 
     /**
      * Model for {@link SuperConstructorHydrator}.

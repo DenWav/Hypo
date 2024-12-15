@@ -46,6 +46,11 @@ public abstract class AbstractClassData extends AbstractHypoData implements Clas
     private final @NotNull Set<@NotNull ClassData> childClasses = new LinkedHashSet<>();
     private final @NotNull Set<@NotNull ClassData> innerClasses = new LinkedHashSet<>();
 
+    /**
+     * Default constructor.
+     */
+    public AbstractClassData() {}
+
     @Override
     public void setProvider(final @NotNull ClassDataProvider provider) {
         this.provider = provider;

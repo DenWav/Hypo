@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@DisplayName("[asm] Scenario 10 - Local class static detection (Java 17)")
+@DisplayName("[asm] Scenario 10 - Local class static detection (Java 21)")
 public class Scenario10Test extends TestScenarioBase {
 
     @Override

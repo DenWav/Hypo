@@ -27,6 +27,11 @@ import java.util.Objects;
  */
 public abstract class AbstractFieldData extends AbstractHypoData implements FieldData {
 
+    /**
+     * Default constructor.
+     */
+    public AbstractFieldData() {}
+
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;

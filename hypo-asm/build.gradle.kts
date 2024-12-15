@@ -23,7 +23,7 @@ dependencies {
 }
 
 tasks.compileTestJava {
-    options.release = 17
+    options.release = 21
 }
 
 tasks.jar {

@@ -3,7 +3,7 @@ package scenario05;
 import java.util.Random;
 import java.util.function.Function;
 
-// Compiled with JDK 17
+// Compiled with JDK 21
 public class TestClass {
 
     private long num = 0;

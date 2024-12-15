@@ -35,6 +35,11 @@ public abstract class AbstractMethodData extends AbstractHypoData implements Met
     private final @NotNull AtomicReference<@Nullable MethodData> superMethod = new AtomicReference<>(null);
     private final @NotNull Set<MethodData> childMethods = new LinkedHashSet<>();
 
+    /**
+     * Default constructor.
+     */
+    public AbstractMethodData() {}
+
     @Override
     public void setSuperMethod(final @Nullable MethodData superMethod) {
         this.superMethod.compareAndSet(null, superMethod);

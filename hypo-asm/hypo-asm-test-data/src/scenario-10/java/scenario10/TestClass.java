@@ -2,7 +2,7 @@ package scenario10;
 
 import java.util.Random;
 
-// Compiled with JDK 17
+// Compiled with JDK 21
 public class TestClass {
 
     public void test(Random random) {

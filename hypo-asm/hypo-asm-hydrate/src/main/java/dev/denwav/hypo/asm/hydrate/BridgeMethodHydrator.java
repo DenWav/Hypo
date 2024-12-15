@@ -23,7 +23,6 @@ import dev.denwav.hypo.asm.AsmMethodData;
 import dev.denwav.hypo.core.HypoContext;
 import dev.denwav.hypo.hydrate.HydrationProvider;
 import dev.denwav.hypo.hydrate.generic.HypoHydration;
-import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
@@ -70,7 +69,7 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
 
     @Override
     public List<HypoKey<?>> provides() {
-        return HypoModelUtil.immutableListOf(HypoHydration.SYNTHETIC_SOURCES, HypoHydration.SYNTHETIC_TARGET);
+        return List.of(HypoHydration.SYNTHETIC_SOURCES, HypoHydration.SYNTHETIC_TARGET);
     }
 
     @Override

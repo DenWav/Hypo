@@ -18,8 +18,6 @@
 
 package dev.denwav.hypo.model;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.Contract;
@@ -193,30 +191,6 @@ public final class HypoModelUtil {
 
         base.addSuppressed(thrown);
         return base;
-    }
-
-    /**
-     * Create a copy of the given collection and return it as an immutable list.
-     *
-     * @param collection The collection to copy as an immutable list.
-     * @param <T> The type param of the collection.
-     * @return The new immutable list.
-     */
-    public static <T> @NotNull List<T> asImmutableList(final @NotNull Collection<T> collection) {
-        return HypoModelUtilHelper.INSTANCE.asImmutableList(collection);
-    }
-
-    /**
-     * Create an immutable list from the given array.
-     *
-     * @param array The array to copy as an immutable list.
-     * @param <T> The type param of the collection.
-     * @return The new immutable list.
-     */
-    @SafeVarargs
-    @SuppressWarnings("varargs")
-    public static <T> @NotNull List<T> immutableListOf(final @NotNull T @NotNull ... array) {
-        return HypoModelUtilHelper.INSTANCE.immutableListOf(array);
     }
 
     /**

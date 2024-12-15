@@ -6,19 +6,19 @@ val hypoJava = extensions.create("hypoJava", HypoJavaExtension::class)
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
     withSourcesJar()
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 8
+    options.release = 11
 }
 
 afterEvaluate {
     tasks.jar {
         for (projDep in hypoJava.jdkVersionProjects.get()) {
-            val task = projDep.dependencyProject.sourceSets.main.map { it.output }
+            val task = project(projDep.path).sourceSets.main.map { it.output }
             dependsOn(task)
 
             from(task)
@@ -27,7 +27,7 @@ afterEvaluate {
 
     tasks.named("sourcesJar", Jar::class) {
         for (projDep in hypoJava.jdkVersionProjects.get()) {
-            val proj = projDep.dependencyProject
+            val proj = project(projDep.path)
 
             from(proj.sourceSets.main.map { it.allSource })
         }
@@ -35,7 +35,7 @@ afterEvaluate {
 
     tasks.javadoc {
         for (projDep in hypoJava.jdkVersionProjects.get()) {
-            val proj = projDep.dependencyProject
+            val proj = project(projDep.path)
 
             val sources = files(proj.sourceSets.main.map { it.allJava })
             source += sources.asFileTree
@@ -48,7 +48,7 @@ afterEvaluate {
             opt.links(url)
         }
         hypoJava.javadocProjects.get().forEach { p ->
-            val javadocTask = p.dependencyProject.tasks.javadoc
+            val javadocTask = project(p.path).tasks.javadoc
             dependsOn(javadocTask)
 
             val url = "$base/${p.group}/${p.name}/${p.version}"

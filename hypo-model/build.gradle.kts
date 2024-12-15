@@ -20,9 +20,6 @@ tasks.jar {
 }
 
 hypoJava {
-    jdkVersionProjects.add(projects.hypoModel.hypoModelJdk9)
-    jdkVersionProjects.add(projects.hypoModel.hypoModelJdk10)
-
     javadocLibs.add(libs.annotations)
     javadocLibs.add(libs.errorprone.annotations)
 }

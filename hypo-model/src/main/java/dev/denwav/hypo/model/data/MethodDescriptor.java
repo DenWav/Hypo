@@ -19,7 +19,6 @@
 package dev.denwav.hypo.model.data;
 
 import com.google.errorprone.annotations.Immutable;
-import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.types.ArrayType;
 import dev.denwav.hypo.model.data.types.ClassType;
 import dev.denwav.hypo.model.data.types.JvmType;
@@ -56,7 +55,7 @@ public final class MethodDescriptor {
      * @param returnType The method return type.
      */
     public MethodDescriptor(final @NotNull List<@NotNull JvmType> params, final @NotNull JvmType returnType) {
-        this.params = HypoModelUtil.asImmutableList(params);
+        this.params = List.copyOf(params);
         this.returnType = returnType;
     }
 
