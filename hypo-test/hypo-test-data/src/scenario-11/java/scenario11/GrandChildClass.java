@@ -1,5 +1,6 @@
 package scenario11;
 
+// Compiled with JDK 21
 public class GrandChildClass extends ChildClass<Integer> {
 
     @Override

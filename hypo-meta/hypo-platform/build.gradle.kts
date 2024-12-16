@@ -15,5 +15,6 @@ dependencies {
         api(projects.hypoHydrate)
         api(projects.hypoMappings)
         api(projects.hypoModel)
+        api(projects.hypoTypes)
     }
 }

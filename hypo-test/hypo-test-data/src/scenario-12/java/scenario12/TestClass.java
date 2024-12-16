@@ -1,5 +1,6 @@
 package scenario12;
 
+// Compiled with JDK 21
 public class TestClass {
 
     public static class InnerClass extends BaseClass {

@@ -16,29 +16,32 @@ repositories {
 }
 
 dependencies {
-    api(projects.hypoCore)
+    compileOnlyApi(libs.annotations)
     api(libs.bundles.asm)
+    api(libs.slf4j.api)
+
+    api(projects.hypoCore)
+    api(projects.hypoModel)
+    api(projects.hypoTypes)
 
     testImplementation(projects.hypoTest)
 }
 
-tasks.compileTestJava {
-    options.release = 21
-}
-
-tasks.jar {
-    manifest {
-        attributes(
-            "Automatic-Module-Name" to "dev.denwav.hypo.asm"
-        )
-    }
-}
-
 hypoJava {
     javadocLibs.add(libs.annotations)
-    javadocLibs.add(libs.errorprone.annotations)
     javadocLibs.addAll(libs.bundles.asm)
-    javadocProjects.addAll(projects.hypoCore, projects.hypoModel)
+    javadocLibs.add(libs.slf4j.api)
+    javadocProjects.addAll(projects.hypoCore, projects.hypoModel, projects.hypoTypes)
+
+    patchJavadocList.register("org.objectweb.asm") {
+        library.set(libs.asm.core)
+    }
+    patchJavadocList.register("org.objectweb.asm.tree") {
+        library.set(libs.asm.tree)
+    }
+    patchJavadocList.register("org.slf4j") {
+        library.set(libs.slf4j.api)
+    }
 }
 
 hypoPublish {

@@ -25,6 +25,7 @@ import dev.denwav.hypo.mappings.MergeableMappingsChange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.model.ClassMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
@@ -140,17 +141,61 @@ public class CopyConstructorMappingChange
         for (final MethodParameterMapping thatParamMapping : that.superMapping.getParameterMappings()) {
             final int index = thatParamMapping.getIndex();
             for (final SuperCall.SuperCallParameter thatParam : that.params) {
-                if (index == thatParam.getSuperIndex()) {
-                    final String existingMapping = mergedParams.get(thatParam.getThisIndex());
-                    if (existingMapping == null) {
+                if (index != thatParam.getSuperIndex()) {
+                    continue;
+                }
+                final String existingMapping = mergedParams.get(thatParam.getThisIndex());
+                if (existingMapping == null) {
+                    mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                } else {
+                    if (existingMapping.equals(thatParamMapping.getDeobfuscatedName())) {
+                        // nothing to do, they match
+                        break;
+                    }
+                    // We don't have a good solution here. They don't match and we don't really have a way of
+                    // determining which one may take precedence. Don't fail here, just take one of the names.
+                    //
+                    // The following logic to determine which name to take is effectively random, and shouldn't be
+                    // considered meaningful in any way. It's simply here as an attempt at keeping the result of this
+                    // method deterministic.
+
+                    // Keep the one with more param names present
+                    if (thisCount > thatCount) {
+                        break;
+                    } else if (thisCount < thatCount) {
                         mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
-                    } else {
-                        if (existingMapping.equals(thatParamMapping.getDeobfuscatedName())) {
-                            // nothing to do, they match
-                            break;
-                        }
-                        return MergeResult.failure("Cannot merge super calls from two constructors with " +
-                            "different parameter mapping results");
+                        break;
+                    }
+
+                    // Keep the one with the shorter class name
+                    final int thisClassNameLen = this.superMapping.getParent().getDeobfuscatedName().length();
+                    final int thatClassNameLen = that.superMapping.getParent().getDeobfuscatedName().length();
+                    if (thisClassNameLen < thatClassNameLen) {
+                        break;
+                    } else if (thisClassNameLen > thatClassNameLen) {
+                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                        break;
+                    }
+
+                    // Keep the shorter parameter name
+                    final int existingLen = existingMapping.length();
+                    final int otherLen = thatParamMapping.getDeobfuscatedName().length();
+                    if (existingLen < otherLen) {
+                        break;
+                    } else if (existingLen > otherLen) {
+                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                        break;
+                    }
+
+                    // Keep the parameter name with the smaller hashcode (remember, this is arbitrary and random)
+                    // This is our last attempt, if the hashcodes are equal, even though the strings are not, we will
+                    // just take the other one.
+                    final int existingHash = existingMapping.hashCode();
+                    final int otherHash = thatParamMapping.getDeobfuscatedName().hashCode();
+                    if (existingHash < otherHash) {
+                        break;
+                    } else if (existingHash > otherHash) {
+                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
                     }
                 }
             }

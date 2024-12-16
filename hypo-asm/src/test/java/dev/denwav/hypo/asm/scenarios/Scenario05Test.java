@@ -24,13 +24,13 @@ import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.LambdaClosure;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static dev.denwav.hypo.model.data.MethodDescriptor.parseDescriptor;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -66,9 +66,9 @@ public class Scenario05Test extends TestScenarioBase {
     @BeforeEach
     public void setupRunnable() {
         this.runnableRun = this.findClass("java/lang/Runnable")
-            .method("run", parseDescriptor("()V"));
+            .method("run", MethodDescriptor.parse("()V"));
         this.functionApply = this.findClass("java/util/function/Function")
-            .method("apply", parseDescriptor("(Ljava/lang/Object;)Ljava/lang/Object;"));
+            .method("apply", MethodDescriptor.parse("(Ljava/lang/Object;)Ljava/lang/Object;"));
     }
 
     @Test
@@ -77,14 +77,14 @@ public class Scenario05Test extends TestScenarioBase {
         final var testClass = this.findClass("scenario05/TestClass");
         assertNotNull(testClass);
 
-        final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));
+        final MethodData testMethod = testClass.method("test", MethodDescriptor.parse("()V"));
         assertNotNull(testMethod);
 
         final List<LambdaClosure> methodClosures = testMethod.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(methodClosures);
         assertEquals(1, methodClosures.size());
 
-        final LambdaClosure methodClosure = methodClosures.get(0);
+        final LambdaClosure methodClosure = methodClosures.getFirst();
         assertNotNull(methodClosure);
         assertEquals(this.runnableRun, methodClosure.getInterfaceMethod());
         final MethodData call = methodClosure.getLambda();
@@ -136,14 +136,14 @@ public class Scenario05Test extends TestScenarioBase {
         final var testClass = this.findClass("scenario05/TestClass");
         assertNotNull(testClass);
 
-        final MethodData testMethod = testClass.method("testStatic", parseDescriptor("()V"));
+        final MethodData testMethod = testClass.method("testStatic", MethodDescriptor.parse("()V"));
         assertNotNull(testMethod);
 
         final List<LambdaClosure> methodClosures = testMethod.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(methodClosures);
         assertEquals(1, methodClosures.size());
 
-        final LambdaClosure methodClosure = methodClosures.get(0);
+        final LambdaClosure methodClosure = methodClosures.getFirst();
         assertNotNull(methodClosure);
         final MethodData call = methodClosure.getLambda();
         assertNotNull(call);
@@ -160,13 +160,13 @@ public class Scenario05Test extends TestScenarioBase {
         final var testClass = this.findClass("scenario05/TestClass");
         assertNotNull(testClass);
 
-        final MethodData testMethod = testClass.method("testFunction", parseDescriptor("()V"));
+        final MethodData testMethod = testClass.method("testFunction", MethodDescriptor.parse("()V"));
         assertNotNull(testMethod);
 
         final List<LambdaClosure> lambdas = testMethod.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(lambdas);
 
-        final LambdaClosure lambda = lambdas.get(0);
+        final LambdaClosure lambda = lambdas.getFirst();
         assertNotNull(lambda);
 
         assertEquals(testMethod, lambda.getContainingMethod());

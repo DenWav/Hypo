@@ -24,12 +24,12 @@ import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static dev.denwav.hypo.model.data.MethodDescriptor.parseDescriptor;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -58,14 +58,14 @@ public class Scenario06Test extends TestScenarioBase {
         final var testClass = this.findClass("scenario06/TestClass");
         assertNotNull(testClass);
 
-        final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));
+        final MethodData testMethod = testClass.method("test", MethodDescriptor.parse("()V"));
         assertNotNull(testMethod);
 
         final List<LocalClassClosure> localClasses = testMethod.get(HypoHydration.LOCAL_CLASSES);
         assertNotNull(localClasses);
         assertEquals(3, localClasses.size());
 
-        final LocalClassClosure firstAnon = localClasses.get(0);
+        final LocalClassClosure firstAnon = localClasses.getFirst();
         assertNotNull(firstAnon);
         assertEquals(testMethod, firstAnon.getContainingMethod());
         assertEquals("scenario06/TestClass$1", firstAnon.getLocalClass().name());

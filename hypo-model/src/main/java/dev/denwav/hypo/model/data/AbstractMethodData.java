@@ -57,9 +57,12 @@ public abstract class AbstractMethodData extends AbstractHypoData implements Met
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof MethodData)) return false;
-        final MethodData that = (MethodData) o;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof final MethodData that)) {
+            return false;
+        }
         return this.parentClass().equals(that.parentClass()) &&
             this.name().equals(that.name()) &&
             this.descriptor().equals(that.descriptor());

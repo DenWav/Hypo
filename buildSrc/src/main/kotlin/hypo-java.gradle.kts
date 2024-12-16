@@ -1,3 +1,5 @@
+import kotlin.io.path.absolutePathString
+
 plugins {
     `java-library`
 }
@@ -12,7 +14,11 @@ java {
 }
 
 tasks.withType<JavaCompile>().configureEach {
-    options.release = 11
+    options.release = 21
+}
+
+hypoJava.patchJavadocList.register("org.jetbrains.annotations") {
+    library.set(lib("annotations"))
 }
 
 afterEvaluate {
@@ -33,7 +39,27 @@ afterEvaluate {
         }
     }
 
+    // javadoc doesn't like that static.javadoc.io redirects, so we'll manually copy the
+    // {element,package}-list for it so it doesn't complain
+    val javadocElementList by tasks.registering(DownloadJavadocListFiles::class) {
+        dependencies.set(hypoJava.javadocLibs)
+        output.set(layout.buildDirectory.dir("javadocElementLists"))
+    }
+
+    val elementLists = layout.buildDirectory.dir("javadocElementListsPatched")
+    val javadocElementListPatch by tasks.registering(PatchJavadocList::class) {
+        input.set(javadocElementList.flatMap { it.output })
+        patches.set(hypoJava.patchJavadocList)
+        output.set(elementLists)
+    }
+
     tasks.javadoc {
+        dependsOn(javadocElementListPatch)
+
+        javadocTool = javaToolchains.javadocToolFor {
+            languageVersion = JavaLanguageVersion.of(21)
+        }
+
         for (projDep in hypoJava.jdkVersionProjects.get()) {
             val proj = project(projDep.path)
 
@@ -42,22 +68,22 @@ afterEvaluate {
             classpath += sources
         }
 
-        val base = "https://javadoc.io/doc"
+        val packageListDir = elementLists.get().asFile.toPath()
         hypoJava.javadocLibs.get().forEach { m ->
-            val url = "$base/${m.module.group}/${m.module.name}/${m.versionConstraint}"
-            opt.links(url)
+            val base = "https://static.javadoc.io"
+            val artifact = "${m.module.group}/${m.module.name}/${m.versionConstraint}"
+            val packageDir = packageListDir.resolve(artifact)
+            val url = "$base/$artifact"
+
+            opt.linksOffline(url, packageDir.absolutePathString())
         }
+
         hypoJava.javadocProjects.get().forEach { p ->
             val javadocTask = project(p.path).tasks.javadoc
             dependsOn(javadocTask)
 
             val url = "$base/${p.group}/${p.name}/${p.version}"
             opt.linksOffline(url, javadocTask.get().destinationDir!!.absolutePath)
-        }
-
-        doLast {
-            // a lot of tools still require a package-list file instead of element-list
-            destinationDir!!.resolve("element-list").copyTo(destinationDir!!.resolve("package-list"))
         }
     }
 }

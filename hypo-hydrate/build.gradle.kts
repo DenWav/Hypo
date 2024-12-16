@@ -3,26 +3,36 @@ plugins {
     `hypo-java`
     `hypo-module`
     `hypo-publish`
+    `hypo-test-scenario`
+}
+
+hypoTest {
+    testDataProject = projects.hypoHydrate.hypoHydrateTestData
+}
+
+repositories {
+    // for tests
+    maven("https://maven.quiltmc.org/repository/release/")
 }
 
 dependencies {
-    implementation(projects.hypoCore)
-    implementation(libs.jgrapht)
-}
+    compileOnlyApi(libs.annotations)
+    compileOnlyApi(libs.errorprone.annotations)
 
-tasks.jar {
-    manifest {
-        attributes(
-            "Automatic-Module-Name" to "dev.denwav.hypo.hydrate"
-        )
-    }
+    implementation(libs.jgrapht)
+
+    implementation(projects.hypoCore)
+    implementation(projects.hypoModel)
+    implementation(projects.hypoTypes)
+
+    testImplementation(projects.hypoTest)
 }
 
 hypoJava {
     javadocLibs.add(libs.annotations)
     javadocLibs.add(libs.errorprone.annotations)
     javadocLibs.add(libs.jgrapht)
-    javadocProjects.addAll(projects.hypoCore, projects.hypoModel)
+    javadocProjects.addAll(projects.hypoCore, projects.hypoModel, projects.hypoTypes)
 }
 
 hypoPublish {

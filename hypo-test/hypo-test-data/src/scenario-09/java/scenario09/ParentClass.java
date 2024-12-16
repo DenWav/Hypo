@@ -1,5 +1,6 @@
 package scenario09;
 
+// Compiled with JDK 21
 public class ParentClass {
 
     public ParentClass(int i, int j) {}

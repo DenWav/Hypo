@@ -21,9 +21,11 @@ package dev.denwav.hypo.asm;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.LazyMethodData;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.model.data.Visibility;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.sig.MethodSignature;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -105,11 +107,26 @@ public class AsmMethodData extends LazyMethodData implements MethodData {
 
     @Override
     public @NotNull MethodDescriptor computeDescriptor() {
-        return MethodDescriptor.parseDescriptor(this.node.desc);
+        return MethodDescriptor.parse(this.node.desc);
+    }
+
+    @Override
+    public @Nullable MethodSignature computeSignature() {
+        final String sig = this.node.signature;
+        if (sig != null) {
+            return MethodSignature.parse(sig);
+        } else {
+            return null;
+        }
     }
 
     @Override
     public @NotNull String descriptorText() {
         return this.node.desc;
+    }
+
+    @Override
+    public @Nullable String signatureText() {
+        return this.node.signature;
     }
 }

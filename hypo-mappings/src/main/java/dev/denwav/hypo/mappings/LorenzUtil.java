@@ -21,11 +21,12 @@ package dev.denwav.hypo.mappings;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
-import dev.denwav.hypo.model.data.types.ArrayType;
-import dev.denwav.hypo.model.data.types.ClassType;
-import dev.denwav.hypo.model.data.types.JvmType;
-import dev.denwav.hypo.model.data.types.PrimitiveType;
+import dev.denwav.hypo.types.PrimitiveType;
+import dev.denwav.hypo.types.VoidType;
+import dev.denwav.hypo.types.desc.ArrayTypeDescriptor;
+import dev.denwav.hypo.types.desc.ClassTypeDescriptor;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.VarHandle;
 import java.util.ArrayList;
@@ -160,34 +161,40 @@ public final class LorenzUtil {
      * @return The same descriptor, but in the Hypo model.
      */
     public static @NotNull MethodDescriptor convertDesc(final @NotNull org.cadixdev.bombe.type.MethodDescriptor desc) {
-        final ArrayList<JvmType> params = new ArrayList<>(desc.getParamTypes().size());
+        final ArrayList<TypeDescriptor> params = new ArrayList<>(desc.getParamTypes().size());
         for (final org.cadixdev.bombe.type.FieldType paramType : desc.getParamTypes()) {
             params.add(convertType(paramType));
         }
-        return new MethodDescriptor(params, convertType(desc.getReturnType()));
+        return MethodDescriptor.of(params, convertType(desc.getReturnType()));
     }
 
     /**
-     * Convert a Bombe {@link org.cadixdev.bombe.type.Type Type} into a Hypo {@link JvmType}.
+     * Convert a Bombe {@link org.cadixdev.bombe.type.Type Type} into a Hypo {@link TypeDescriptor}.
      *
      * @param type The Bombe type to convert.
      * @return The same type, but in the Hypo model.
      */
-    public static @NotNull JvmType convertType(final @NotNull org.cadixdev.bombe.type.Type type) {
-        // ArrayType
-        if (type instanceof org.cadixdev.bombe.type.ArrayType) {
-            final org.cadixdev.bombe.type.ArrayType array = (org.cadixdev.bombe.type.ArrayType) type;
-            return new ArrayType(convertType(array.getComponent()), array.getDimCount());
+    public static @NotNull TypeDescriptor convertType(final @NotNull org.cadixdev.bombe.type.Type type) {
+        return switch (type) {
+            // ArrayType
+            case final org.cadixdev.bombe.type.ArrayType array ->
+                ArrayTypeDescriptor.of(array.getDimCount(), convertType(array.getComponent()));
             // Primitive (BaseType and VoidType)
-        } else if (type instanceof org.cadixdev.bombe.type.PrimitiveType) {
-            return PrimitiveType.fromChar(((org.cadixdev.bombe.type.PrimitiveType) type).getKey());
+            case org.cadixdev.bombe.type.VoidType ignored -> VoidType.INSTANCE;
+            case org.cadixdev.bombe.type.BaseType baseType -> switch (baseType) {
+                case CHAR -> PrimitiveType.CHAR;
+                case BYTE -> PrimitiveType.BYTE;
+                case SHORT -> PrimitiveType.SHORT;
+                case INT -> PrimitiveType.INT;
+                case LONG -> PrimitiveType.LONG;
+                case FLOAT -> PrimitiveType.FLOAT;
+                case DOUBLE -> PrimitiveType.DOUBLE;
+                case BOOLEAN -> PrimitiveType.BOOLEAN;
+            };
             // ObjectType is the only possibility left
-        } else if (type instanceof org.cadixdev.bombe.type.ObjectType) {
-            final org.cadixdev.bombe.type.ObjectType obj = (org.cadixdev.bombe.type.ObjectType) type;
-            return new ClassType(obj.getClassName());
-        } else {
-            throw new IllegalStateException("Unknown type: " + type);
-        }
+            case final org.cadixdev.bombe.type.ObjectType obj -> ClassTypeDescriptor.of(obj.getClassName());
+            default -> throw new IllegalStateException("Unknown type: " + type);
+        };
     }
 
     /**

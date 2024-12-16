@@ -20,10 +20,10 @@ package dev.denwav.hypo.asm.scenarios;
 
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
-import dev.denwav.hypo.model.data.types.ClassType;
-import dev.denwav.hypo.model.data.types.PrimitiveType;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
+import dev.denwav.hypo.types.PrimitiveType;
+import dev.denwav.hypo.types.desc.ClassTypeDescriptor;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
 import java.io.IOException;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -49,11 +49,11 @@ public class Scenario12Test extends TestScenarioBase {
         final var inner = this.findClass("scenario03/TestClass$Inner");
         assertNotNull(inner);
 
-        final MethodData intSupplierSynth = testClass.method("lambda$intSupplier$0", MethodDescriptor.parseDescriptor("(Lscenario03/TestClass$Inner;)I"));
+        final MethodData intSupplierSynth = testClass.method("lambda$intSupplier$0", MethodDescriptor.parse("(Lscenario03/TestClass$Inner;)I"));
         assertNotNull(intSupplierSynth, "Did not find expected lambda$intSupplier$0 synthetic member in TestClass");
         assertTrue(intSupplierSynth.isSynthetic());
 
-        final FieldData innerSyntheticOuterThisField = inner.field("this$0", new ClassType("scenario03.TestClass"));
+        final FieldData innerSyntheticOuterThisField = inner.field("this$0", ClassTypeDescriptor.of("scenario03.TestClass"));
         assertNotNull(innerSyntheticOuterThisField, "Did not find expected this$0 synthetic member in TestClass$Inner");
         assertTrue(innerSyntheticOuterThisField.isSynthetic());
     }
@@ -66,7 +66,7 @@ public class Scenario12Test extends TestScenarioBase {
         final var inner = this.findClass("scenario03/TestClass$Inner");
         assertNotNull(inner);
 
-        final MethodData intSupplier = testClass.method("intSupplier", MethodDescriptor.parseDescriptor("(Lscenario03/TestClass$Inner;)Ljava/util/function/IntSupplier;"));
+        final MethodData intSupplier = testClass.method("intSupplier", MethodDescriptor.parse("(Lscenario03/TestClass$Inner;)Ljava/util/function/IntSupplier;"));
         assertNotNull(intSupplier, "Did not find expected method intSupplier in TestClass");
         assertFalse(intSupplier.isSynthetic());
 

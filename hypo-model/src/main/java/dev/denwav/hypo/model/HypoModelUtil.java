@@ -18,6 +18,7 @@
 
 package dev.denwav.hypo.model;
 
+import dev.denwav.hypo.types.HypoTypesUtil;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.Contract;
@@ -45,8 +46,7 @@ public final class HypoModelUtil {
      * @return The normalized class name.
      */
     public static @NotNull String normalizedClassName(final @NotNull String className) {
-        final int index = className.endsWith(";") ? 1 : 0;
-        return className.substring(index, className.length() - index).replace('.', '/');
+        return HypoTypesUtil.normalizedClassName(className);
     }
 
     /**
@@ -62,8 +62,7 @@ public final class HypoModelUtil {
     @SuppressWarnings("TypeParameterUnusedInFormals")
     @Contract(value = "_ -> param1", pure = true)
     public static <T> @Nullable T cast(final @Nullable Object o) {
-        @SuppressWarnings("unchecked") final T t = (T) o;
-        return t;
+        return HypoTypesUtil.cast(o);
     }
 
     /**

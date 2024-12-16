@@ -34,21 +34,25 @@ public abstract class AbstractFieldData extends AbstractHypoData implements Fiel
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof FieldData)) return false;
-        final FieldData that = (FieldData) o;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof final FieldData that)) {
+            return false;
+        }
         return this.parentClass().equals(that.parentClass()) &&
             this.name().equals(that.name()) &&
-            this.fieldType().equals(that.fieldType());
+            this.descriptor().equals(that.descriptor()) &&
+            Objects.equals(this.signature(), that.signature());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.parentClass(), this.name(), this.fieldType());
+        return Objects.hash(this.parentClass(), this.name(), this.descriptor(), this.signature());
     }
 
     @Override
     public String toString() {
-        return this.parentClass().name() + "#" + this.name() + " " + this.fieldType();
+        return this.parentClass().name() + "#" + this.name() + " " + this.descriptor();
     }
 }

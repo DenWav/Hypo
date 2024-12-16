@@ -26,12 +26,12 @@ import dev.denwav.hypo.hydrate.generic.LambdaClosure;
 import dev.denwav.hypo.hydrate.generic.LocalClassClosure;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static dev.denwav.hypo.model.data.MethodDescriptor.parseDescriptor;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -60,13 +60,13 @@ public class Scenario07Test extends TestScenarioBase {
         final var testClass = this.findClass("scenario07/TestClass");
         assertNotNull(testClass);
 
-        final MethodData testMethod = testClass.method("test", parseDescriptor("()V"));
+        final MethodData testMethod = testClass.method("test", MethodDescriptor.parse("()V"));
         assertNotNull(testMethod);
 
         final List<LambdaClosure> firstLambdas = testMethod.get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(firstLambdas);
         assertEquals(1, firstLambdas.size());
-        final LambdaClosure firstLambda = firstLambdas.get(0);
+        final LambdaClosure firstLambda = firstLambdas.getFirst();
 
         final List<LambdaClosure> secondLambdas = firstLambda.getLambda().get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(secondLambdas);

@@ -18,12 +18,9 @@
 
 package dev.denwav.hypo.asm;
 
-import dev.denwav.hypo.model.data.MethodDescriptor;
 import dev.denwav.hypo.model.data.Visibility;
-import dev.denwav.hypo.model.data.types.ArrayType;
-import dev.denwav.hypo.model.data.types.ClassType;
-import dev.denwav.hypo.model.data.types.JvmType;
-import dev.denwav.hypo.model.data.types.PrimitiveType;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -59,43 +56,18 @@ public final class HypoAsmUtil {
     }
 
     /**
-     * Map an {@code asm} {@link Type} object into a Hypo {@link JvmType}.
+     * Map an {@code asm} {@link Type} object into a Hypo {@link TypeDescriptor}.
      *
-     * @param type The {@code asm} {@link Type} to convert to a Hypo {@link JvmType}.
-     * @return A {@link JvmType} which matches the given {@link Type}.
+     * @param type The {@code asm} {@link Type} to convert to a Hypo {@link TypeDescriptor}.
+     * @return A {@link TypeDescriptor} which matches the given {@link Type}.
      */
     @SuppressWarnings("ReferenceEquality")
-    public static @NotNull JvmType toJvmType(final @NotNull Type type) {
+    public static @NotNull TypeDescriptor toJvmType(final @NotNull Type type) {
         if (type.getSort() == Type.METHOD) {
             throw new IllegalArgumentException("Given type is a method descriptor: " + type);
         }
 
-        if (type == Type.CHAR_TYPE) {
-            return PrimitiveType.CHAR;
-        } else if (type == Type.BYTE_TYPE) {
-            return PrimitiveType.BYTE;
-        } else if (type == Type.SHORT_TYPE) {
-            return PrimitiveType.SHORT;
-        } else if (type == Type.INT_TYPE) {
-            return PrimitiveType.INT;
-        } else if (type == Type.LONG_TYPE) {
-            return PrimitiveType.LONG;
-        } else if (type == Type.FLOAT_TYPE) {
-            return PrimitiveType.FLOAT;
-        } else if (type == Type.DOUBLE_TYPE) {
-            return PrimitiveType.DOUBLE;
-        } else if (type == Type.BOOLEAN_TYPE) {
-            return PrimitiveType.BOOLEAN;
-        } else if (type == Type.VOID_TYPE) {
-            return PrimitiveType.VOID;
-        }
-
-        final String desc = type.getDescriptor();
-        if (desc.startsWith("[")) {
-            return new ArrayType(toJvmType(type.getElementType()), type.getDimensions());
-        } else {
-            return new ClassType(desc);
-        }
+        return TypeDescriptor.parse(type.getDescriptor());
     }
 
     /**
@@ -108,6 +80,6 @@ public final class HypoAsmUtil {
             throw new IllegalArgumentException("Given type is not a method descriptor: " + type);
         }
 
-        return MethodDescriptor.parseDescriptor(type.getDescriptor());
+        return MethodDescriptor.parse(type.getDescriptor());
     }
 }

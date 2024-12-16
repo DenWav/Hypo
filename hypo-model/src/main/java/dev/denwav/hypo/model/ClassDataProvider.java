@@ -19,8 +19,8 @@
 package dev.denwav.hypo.model;
 
 import dev.denwav.hypo.model.data.ClassData;
-import dev.denwav.hypo.model.data.types.ClassType;
-import dev.denwav.hypo.model.data.types.JvmType;
+import dev.denwav.hypo.types.desc.ClassTypeDescriptor;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -118,15 +118,15 @@ public interface ClassDataProvider extends AutoCloseable {
      * @return The parsed {@link ClassData} object corresponding with the given name, or {@code null} if the class name
      * cannot be found.
      * @throws IOException If an IO error occurs while attempting to read the class file.
-     * @see #findClass(JvmType)
+     * @see #findClass(TypeDescriptor)
      */
     @Contract("null -> null")
     @Nullable ClassData findClass(final @Nullable String className) throws IOException;
 
     /**
-     * This is a convenience method for resolving the {@link ClassData} object corresponding to a give {@link JvmType}.
-     * The {@link JvmType} passed to this method must be a {@link ClassType}, or this method will always return
-     * {@code null}.
+     * This is a convenience method for resolving the {@link ClassData} object corresponding to a give
+     * {@link TypeDescriptor}. The {@link TypeDescriptor} passed to this method must be a {@link ClassTypeDescriptor},
+     * or this method will always return {@code null}.
      *
      * <p>This method is implemented by default as:
      *
@@ -137,19 +137,19 @@ public interface ClassDataProvider extends AutoCloseable {
      * <p>and as such has identical semantics to {@link #findClass(String)}. Any implementations which override this
      * method must match these semantics to fully satisfy this method's contact.
      *
-     * @param type The {@link JvmType} of the class to find. Must be an instance of {@link ClassType} or this method
-     *             will always return {@code null}.
-     * @return The {@link ClassData} object corresponding with the given {@link JvmType}, or {@code null} if the type is
-     * not a {@link ClassType} or the class name cannot be found.
+     * @param type The {@link TypeDescriptor} of the class to find. Must be an instance of {@link ClassTypeDescriptor}
+     *             or this method will always return {@code null}.
+     * @return The {@link ClassData} object corresponding with the given {@link TypeDescriptor}, or {@code null} if the
+     *         type is not a {@link ClassTypeDescriptor} or the class name cannot be found.
      * @throws IOException If an IO error occurs while attempting to read the class file.
      * @see #findClass(String)
      */
     @Contract("null -> null")
-    default @Nullable ClassData findClass(final @Nullable JvmType type) throws IOException {
-        if (!(type instanceof ClassType)) {
+    default @Nullable ClassData findClass(final @Nullable TypeDescriptor type) throws IOException {
+        if (!(type instanceof ClassTypeDescriptor)) {
             return null;
         }
-        return this.findClass(type.asInternalName());
+        return this.findClass(type.asInternal());
     }
 
     /**

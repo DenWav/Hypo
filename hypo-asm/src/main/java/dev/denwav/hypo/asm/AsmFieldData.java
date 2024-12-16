@@ -18,20 +18,21 @@
 
 package dev.denwav.hypo.asm;
 
-import dev.denwav.hypo.model.data.AbstractFieldData;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
+import dev.denwav.hypo.model.data.LazyFieldData;
 import dev.denwav.hypo.model.data.Visibility;
-import dev.denwav.hypo.model.data.types.JvmType;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
+import dev.denwav.hypo.types.sig.TypeSignature;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldNode;
 
 /**
  * Implementation of {@link FieldData} based on {@code asm}'s {@link FieldNode}.
  */
-public class AsmFieldData extends AbstractFieldData implements FieldData {
+public class AsmFieldData extends LazyFieldData implements FieldData {
 
     private final @NotNull ClassData parentClass;
     private final @NotNull FieldNode node;
@@ -53,11 +54,6 @@ public class AsmFieldData extends AbstractFieldData implements FieldData {
      */
     public @NotNull FieldNode getNode() {
         return this.node;
-    }
-
-    @Override
-    public @NotNull JvmType fieldType() {
-        return HypoAsmUtil.toJvmType(Type.getType(this.node.desc));
     }
 
     @Override
@@ -88,5 +84,20 @@ public class AsmFieldData extends AbstractFieldData implements FieldData {
     @Override
     public @NotNull ClassData parentClass() {
         return this.parentClass;
+    }
+
+    @Override
+    public @NotNull TypeDescriptor computeDescriptor() {
+        return TypeDescriptor.parse(this.node.desc);
+    }
+
+    @Override
+    public @Nullable TypeSignature computeSignature() {
+        final String sig = this.node.signature;
+        if (sig != null) {
+            return TypeSignature.parse(sig);
+        } else {
+            return null;
+        }
     }
 }

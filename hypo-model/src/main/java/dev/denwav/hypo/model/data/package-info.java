@@ -27,6 +27,6 @@
  * up the first part.
  *
  * <p>The Hypo class data model is centered around {@link dev.denwav.hypo.model.data.ClassData ClassData}. Java types
- * are modeled in the {@link dev.denwav.hypo.model.data.types} package.
+ * are modeled in the {@link dev.denwav.hypo.types} package found in the {@code hypo-types} module.
  */
 package dev.denwav.hypo.model.data;

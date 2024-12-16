@@ -26,6 +26,8 @@ dependencies {
     api(libs.log4j.core)
     api(libs.slf4j.log4j2.impl)
 
+    compileOnly(libs.log4j.requirement)
+
     api(libs.junit.api)
     runtimeOnly(libs.junit.runtime)
 }
