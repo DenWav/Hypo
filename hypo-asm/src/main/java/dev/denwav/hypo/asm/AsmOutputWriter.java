@@ -30,6 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.ToIntFunction;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -43,22 +44,25 @@ import org.objectweb.asm.tree.ClassNode;
 public final class AsmOutputWriter implements HypoOutputWriter {
 
     private final @NotNull Path outputFile;
+    private final @NotNull ToIntFunction<ClassNode> writerFlags;
 
-    private AsmOutputWriter(final @NotNull Path outputFile) {
+    private AsmOutputWriter(final @NotNull Path outputFile, final @NotNull ToIntFunction<ClassNode> writerFlags) {
         this.outputFile = outputFile;
+        this.writerFlags = writerFlags;
     }
 
     /**
      * Create a new instance of a {@link AsmOutputWriter} which writes to the given file as a jar file.
      *
      * @param output The jar file to write to. Must not already exist.
+     * @param writerFlags Function which provides writer flags for a given {@link ClassNode}.
      * @return The new {@link AsmOutputWriter}.
      */
-    public static @NotNull AsmOutputWriter to(final @NotNull Path output) {
+    public static @NotNull AsmOutputWriter to(final @NotNull Path output, final @NotNull ToIntFunction<ClassNode> writerFlags) {
         if (Files.exists(output)) {
             throw new IllegalArgumentException("Cannot write to jar file, as it already exists: " + output);
         }
-        return new AsmOutputWriter(output);
+        return new AsmOutputWriter(output, writerFlags);
     }
 
     @Override
@@ -120,7 +124,7 @@ public final class AsmOutputWriter implements HypoOutputWriter {
         }
 
         final ClassNode node = ((AsmClassData) data).getNode();
-        final ClassWriter writer = new ClassWriter(0);
+        final ClassWriter writer = new ClassWriter(this.writerFlags.applyAsInt(node));
         node.accept(writer);
 
         final byte[] classBytes = writer.toByteArray();
