@@ -111,7 +111,7 @@ public final class MemberReference {
      * @return The new {@link MemberReference}.
      */
     public static @NotNull MemberReference of(final @NotNull FieldData field) {
-        return new MemberReference(field.parentClass().name(), field.name(), field.fieldType().asInternalName());
+        return new MemberReference(field.parentClass().name(), field.name(), field.descriptorText());
     }
 
     /**

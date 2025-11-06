@@ -8,20 +8,14 @@ plugins {
 
 dependencies {
     compileOnlyApi(libs.annotations)
-    api(libs.slf4j.api)
-}
 
-tasks.jar {
-    manifest {
-        attributes(
-            "Automatic-Module-Name" to "dev.denwav.hypo.model"
-        )
-    }
+    api(projects.hypoTypes)
 }
 
 hypoJava {
     javadocLibs.add(libs.annotations)
-    javadocLibs.add(libs.errorprone.annotations)
+
+    javadocProjects.add(projects.hypoTypes)
 }
 
 hypoPublish {

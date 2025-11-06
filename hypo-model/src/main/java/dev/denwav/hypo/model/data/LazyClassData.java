@@ -18,6 +18,7 @@
 
 package dev.denwav.hypo.model.data;
 
+import dev.denwav.hypo.types.sig.ClassSignature;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.List;
@@ -52,6 +53,13 @@ public abstract class LazyClassData extends AbstractClassData {
      * @return The name of the class.
      */
     public abstract @NotNull String computeName();
+
+    /**
+     * {@code compute} variant of {@link #signature()}.
+     *
+     * @return The generic signature of the class.
+     */
+    public abstract @Nullable ClassSignature computeSignature();
 
     /**
      * {@code compute} variant of {@link #outerClass()}.
@@ -164,6 +172,13 @@ public abstract class LazyClassData extends AbstractClassData {
     @Override
     public @NotNull String name() {
         return this.name.getNotNull();
+    }
+
+    @SuppressWarnings("this-escape")
+    private final @NotNull LazyValue<ClassSignature, ?> signature = LazyValue.of(this::computeSignature);
+    @Override
+    public @Nullable ClassSignature signature() {
+        return this.signature.get();
     }
 
     @SuppressWarnings("this-escape")

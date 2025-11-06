@@ -1,5 +1,6 @@
 package scenario08;
 
+// Compiled with JDK 21
 public class TestClass {
 
     public TestClass(int i, int j) {}

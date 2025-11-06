@@ -41,6 +41,7 @@ import org.objectweb.asm.tree.ClassNode;
 /**
  * Implementation of {@link HypoOutputWriter} for {@link AsmClassDataProvider ASM providers}.
  */
+@SuppressWarnings("ClassCanBeRecord")
 public final class AsmOutputWriter implements HypoOutputWriter {
 
     private final @NotNull Path outputFile;
@@ -75,8 +76,7 @@ public final class AsmOutputWriter implements HypoOutputWriter {
             final ZipOutputStream zos = new ZipOutputStream(bos)
         ) {
             for (final ClassProviderRoot root : context.getProvider().roots()) {
-                if (root instanceof JarClassProviderRoot) {
-                    final JarClassProviderRoot jarRoot = (JarClassProviderRoot) root;
+                if (root instanceof final JarClassProviderRoot jarRoot) {
                     final Path jarFile = jarRoot.getJarFile();
                     try (
                         final InputStream in = Files.newInputStream(jarFile);

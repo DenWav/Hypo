@@ -18,7 +18,10 @@
 
 package dev.denwav.hypo.model.data;
 
+import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.sig.MethodSignature;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Base implementation of {@link MethodData} which lazily retrieves and caches the method descriptor.
@@ -37,11 +40,26 @@ public abstract class LazyMethodData extends AbstractMethodData {
      */
     public abstract @NotNull MethodDescriptor computeDescriptor();
 
+    /**
+     * {@code compute} variant of {@link #signature()}.
+     *
+     * @return This method's generic type signature.
+     */
+    public abstract @Nullable MethodSignature computeSignature();
+
     @SuppressWarnings("this-escape")
     private final @NotNull LazyValue<MethodDescriptor, ?> descriptor = LazyValue.of(this::computeDescriptor);
 
     @Override
     public @NotNull MethodDescriptor descriptor() {
         return this.descriptor.getNotNull();
+    }
+
+    @SuppressWarnings("this-escape")
+    private final @NotNull LazyValue<MethodSignature, ?> signature = LazyValue.of(this::computeSignature);
+
+    @Override
+    public @Nullable MethodSignature signature() {
+        return this.signature.get();
     }
 }

@@ -20,7 +20,9 @@ package dev.denwav.hypo.model.data;
 
 import dev.denwav.hypo.model.ClassDataProvider;
 import dev.denwav.hypo.model.HypoModelUtil;
-import dev.denwav.hypo.model.data.types.JvmType;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
+import dev.denwav.hypo.types.sig.ClassSignature;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,6 +99,13 @@ public interface ClassData extends HypoData {
      * @return The name of the class represented by this object.
      */
     @NotNull String name();
+
+    /**
+     * The generic signature of this class.
+     *
+     * @return The generic signature of this class.
+     */
+    @Nullable ClassSignature signature();
 
     /**
      * This class data's outer class data, or {@code null} if this class data does not have an outer class.
@@ -463,9 +472,9 @@ public interface ClassData extends HypoData {
      * @param type The type of the field to find.
      * @return The field data this class declares with the given name and type, or {@code null} if it can't be found.
      */
-    default @Nullable FieldData field(final @NotNull String name, final @NotNull JvmType type) {
+    default @Nullable FieldData field(final @NotNull String name, final @NotNull TypeDescriptor type) {
         for (final FieldData field : this.fields()) {
-            if (field.name().equals(name) && field.fieldType().equals(type)) {
+            if (field.name().equals(name) && field.descriptor().equals(type)) {
                 return field;
             }
         }

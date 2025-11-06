@@ -20,9 +20,9 @@ package dev.denwav.hypo.asm.scenarios;
 
 import dev.denwav.hypo.model.data.ClassKind;
 import dev.denwav.hypo.model.data.FieldData;
-import dev.denwav.hypo.model.data.types.ClassType;
-import dev.denwav.hypo.model.data.types.PrimitiveType;
 import dev.denwav.hypo.test.framework.TestScenarioBase;
+import dev.denwav.hypo.types.PrimitiveType;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.DisplayName;
@@ -53,9 +53,9 @@ public class Scenario08Test extends TestScenarioBase {
 
         assertEquals(4, components.size());
 
-        assertEquals(testClass.field("first", new ClassType("Ljava/lang/String;")), components.get(0));
+        assertEquals(testClass.field("first", TypeDescriptor.parse("Ljava/lang/String;")), components.get(0));
         assertEquals(testClass.field("second", PrimitiveType.INT), components.get(1));
         assertEquals(testClass.field("third", PrimitiveType.LONG), components.get(2));
-        assertEquals(testClass.field("fourth", new ClassType("Ljava/lang/Object;")), components.get(3));
+        assertEquals(testClass.field("fourth", TypeDescriptor.parse("Ljava/lang/Object;")), components.get(3));
     }
 }

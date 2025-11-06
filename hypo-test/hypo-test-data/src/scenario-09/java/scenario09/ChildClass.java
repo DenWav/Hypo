@@ -1,5 +1,6 @@
 package scenario09;
 
+// Compiled with JDK 21
 public class ChildClass extends ParentClass {
 
     public ChildClass(long i, long j) {

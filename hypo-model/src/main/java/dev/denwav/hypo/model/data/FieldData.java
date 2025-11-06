@@ -18,8 +18,10 @@
 
 package dev.denwav.hypo.model.data;
 
-import dev.denwav.hypo.model.data.types.JvmType;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
+import dev.denwav.hypo.types.sig.TypeSignature;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Java field model.
@@ -35,6 +37,49 @@ public interface FieldData extends MemberData {
      * The type of this field data.
      *
      * @return The type of this field data.
+     * @deprecated Use {@link #descriptor()}.
      */
-    @NotNull JvmType fieldType();
+    @Deprecated(since = "3.0.0")
+    default @NotNull TypeDescriptor fieldType() {
+        return this.descriptor();
+    }
+
+    /**
+     * The type of this field data.
+     *
+     * @return The type of this field data.
+     */
+    @NotNull TypeDescriptor descriptor();
+
+    /**
+     * The descriptor text of this field data.
+     *
+     * @return The descriptor text of this field data.
+     * @see #descriptor()
+     */
+    default @NotNull String descriptorText() {
+        return this.descriptor().asInternal();
+    }
+
+    /**
+     * The generic type signature of this field data.
+     *
+     * @return The type signature of this field data.
+     */
+    @Nullable TypeSignature signature();
+
+    /**
+     * The internal JVM text representation of this field's generic type signature.
+     *
+     * @return The internal JVM text representation of this field's generic type signature.
+     * @see #signature()
+     */
+    default @Nullable String signatureText() {
+        final TypeSignature sig = this.signature();
+        if (sig != null) {
+            return sig.asInternal();
+        } else {
+            return null;
+        }
+    }
 }

@@ -48,7 +48,8 @@ import org.jetbrains.annotations.Nullable;
         final ModuleReader[] readers = new ModuleReader[refs.size()];
         int index = 0;
         for (final ModuleReference ref : refs) {
-            readers[index++] = ref.open();
+            @SuppressWarnings("resource") final ModuleReader openedReader = ref.open();
+            readers[index++] = openedReader;
         }
         this.readers = Arrays.asList(readers);
     }

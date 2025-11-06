@@ -10,7 +10,7 @@ plugins {
 val hypoModule = extensions.create("hypoModule", HypoModuleExtension::class)
 
 tasks.withType<JavaCompile>().configureEach {
-    options.compilerArgs = listOf("-Xlint:all,-serial,-fallthrough", "-Werror")
+    options.compilerArgs = listOf("-Xlint:all,-serial,-fallthrough,-options", "-Werror")
     options.errorprone {
         disable("NonApiType", "LabelledBreakTarget")
     }

@@ -30,7 +30,7 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.types.JvmType;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -183,7 +183,7 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
     }
 
     private int @Nullable [] handleNestedConst(final MethodInsnNode insn, final AsmClassData nestedClass) {
-        final ArrayList<JvmType> capturedVariables = new ArrayList<>();
+        final ArrayList<TypeDescriptor> capturedVariables = new ArrayList<>();
         for (final FieldData field : nestedClass.fields()) {
             if (!field.isSynthetic()) {
                 continue;
@@ -192,7 +192,7 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
                 continue;
             }
             if (field.name().startsWith("val$")) {
-                capturedVariables.add(field.fieldType());
+                capturedVariables.add(field.descriptor());
             }
         }
 

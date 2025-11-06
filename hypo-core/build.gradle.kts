@@ -6,20 +6,13 @@ plugins {
 }
 
 dependencies {
-    api(projects.hypoModel)
-}
+    compileOnlyApi(libs.annotations)
 
-tasks.jar {
-    manifest {
-        attributes(
-            "Automatic-Module-Name" to "dev.denwav.hypo.core"
-        )
-    }
+    api(projects.hypoModel)
 }
 
 hypoJava {
     javadocLibs.add(libs.annotations)
-    javadocLibs.add(libs.errorprone.annotations)
     javadocProjects.add(projects.hypoModel)
 }
 

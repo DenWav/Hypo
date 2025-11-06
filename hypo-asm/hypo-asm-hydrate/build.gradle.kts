@@ -6,6 +6,10 @@ plugins {
 }
 
 dependencies {
+    compileOnlyApi(libs.annotations)
+
+    api(projects.hypoTypes)
+    api(projects.hypoModel)
     api(projects.hypoCore)
     api(projects.hypoAsm)
     api(projects.hypoHydrate)
@@ -21,10 +25,7 @@ tasks.jar {
 
 hypoJava {
     javadocLibs.add(libs.annotations)
-    javadocLibs.add(libs.errorprone.annotations)
-    javadocLibs.add(libs.jgrapht)
-    javadocLibs.addAll(libs.bundles.asm)
-    javadocProjects.addAll(projects.hypoAsm, projects.hypoHydrate, projects.hypoCore, projects.hypoModel)
+    javadocProjects.addAll(projects.hypoAsm, projects.hypoHydrate, projects.hypoCore, projects.hypoModel, projects.hypoTypes)
 }
 
 hypoPublish {

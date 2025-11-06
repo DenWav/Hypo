@@ -1,5 +1,6 @@
 package scenario03;
 
+// Compiled with JDK 21
 public class ChildClassString extends ParentClass {
 
     @Override

@@ -3,6 +3,7 @@ package scenario13;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
 
+// Compiled with JDK 21
 public class TestClass {
 
     private String thisValue = Integer.toString(ThreadLocalRandom.current().nextInt());

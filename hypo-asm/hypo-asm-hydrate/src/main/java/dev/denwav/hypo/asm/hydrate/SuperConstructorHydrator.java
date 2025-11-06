@@ -28,9 +28,9 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ConstructorData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
-import dev.denwav.hypo.model.data.types.JvmType;
-import dev.denwav.hypo.model.data.types.PrimitiveType;
+import dev.denwav.hypo.types.PrimitiveType;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -125,11 +125,10 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
             throw new IllegalStateException("Could not determine owner of super method");
         }
 
-        final MethodData targetMethod = targetClass.method("<init>", MethodDescriptor.parseDescriptor(desc));
-        if (!(targetMethod instanceof ConstructorData)) {
+        final MethodData targetMethod = targetClass.method("<init>", MethodDescriptor.parse(desc));
+        if (!(targetMethod instanceof final ConstructorData targetConstructor)) {
             throw new IllegalStateException("Target constructor is not an instance of " + ConstructorData.class.getName());
         }
-        final ConstructorData targetConstructor = (ConstructorData) targetMethod;
 
         final ArrayList<SuperCall.SuperCallParameter> superCallParams = new ArrayList<>();
         final SuperCall superCallData = new SuperCall(data, targetConstructor, superCallParams);
@@ -156,7 +155,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
             if (arg instanceof Variable) {
                 varArgument = (Variable) arg;
                 simpleArg = true;
-            } else if (arg instanceof MethodCall) {
+            } else if (arg instanceof final MethodCall subCall) {
                 // We will still match the name if a constructor parameter is the only argument passed to a method
                 // This could be for example where the subclass calls a method to transform the input, but it's
                 // still the same input. For example maybe something like:
@@ -170,7 +169,6 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
                 //     public SomeClass(String s) {
                 //         super(s.toUppercase());
                 //     }
-                final MethodCall subCall = (MethodCall) arg;
                 if (subCall.args.size() != 1 && !(subCall.receiver instanceof Variable)) {
                     continue;
                 }
@@ -476,7 +474,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
     }
 
     private static int @NotNull [] buildParamIndexMapping(final @NotNull MethodData data) throws IOException {
-        final List<@NotNull JvmType> targetParams = data.params();
+        final List<? extends @NotNull TypeDescriptor> targetParams = data.params();
         final int[] outputParamIndices = new int[targetParams.size()];
         int currentIndex = 0;
         int currentTargetIndex = 1; // `this` is 0
@@ -485,7 +483,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
             currentTargetIndex++; // index 1 is the outer class
         }
 
-        for (final JvmType paramType : targetParams) {
+        for (final TypeDescriptor paramType : targetParams) {
             outputParamIndices[currentIndex] = currentTargetIndex;
             currentIndex++;
             currentTargetIndex++;
@@ -514,6 +512,7 @@ interface MethodCallArgument {}
  * <p>This is mainly what we're looking to keep track of in {@link MethodCall}. This will tell us the LVT index
  * corresponding to the method call index.
  */
+@SuppressWarnings("ClassCanBeRecord")
 final class Variable implements MethodCallArgument {
     /**
      * Model for {@link SuperConstructorHydrator}.
@@ -533,6 +532,7 @@ final class Variable implements MethodCallArgument {
 /**
  * Model for {@link SuperConstructorHydrator}.
  */
+@SuppressWarnings("ClassCanBeRecord")
 final class FieldAccess implements MethodCallArgument {
     /**
      * Model for {@link SuperConstructorHydrator}.
@@ -571,6 +571,7 @@ final class Constant implements MethodCallArgument {
  *
  * <p>{@code new} expressions.
  */
+@SuppressWarnings("ClassCanBeRecord")
 final class NewCall implements MethodCallArgument {
     /**
      * Model for {@link SuperConstructorHydrator}.

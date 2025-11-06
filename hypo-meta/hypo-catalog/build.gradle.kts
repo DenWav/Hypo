@@ -16,8 +16,9 @@ catalog {
         library("hypo-hydrate", projects.hypoHydrate)
         library("hypo-mappings", projects.hypoMappings)
         library("hypo-model", projects.hypoModel)
+        library("hypo-types", projects.hypoTypes)
 
-        bundle("hypo-base", listOf("hypo-model", "hypo-core", "hypo-hydrate"))
+        bundle("hypo-base", listOf("hypo-types", "hypo-model", "hypo-core", "hypo-hydrate"))
         bundle("hypo-asm", listOf("hypo-asm-base", "hypo-asm-hydrate"))
     }
 }

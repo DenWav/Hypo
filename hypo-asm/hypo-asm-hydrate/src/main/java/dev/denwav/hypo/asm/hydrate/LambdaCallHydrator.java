@@ -27,8 +27,8 @@ import dev.denwav.hypo.hydrate.generic.LambdaClosure;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
-import dev.denwav.hypo.model.data.types.JvmType;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +44,6 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import static dev.denwav.hypo.asm.HypoAsmUtil.toDescriptor;
-import static dev.denwav.hypo.model.data.MethodDescriptor.parseDescriptor;
 
 /**
  * This is a {@link HydrationProvider} for determining lambda expressions present in methods, and the
@@ -135,8 +134,8 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 continue;
             }
 
-            final MethodDescriptor desc = parseDescriptor(dyn.desc);
-            final List<@NotNull JvmType> params = desc.getParams();
+            final MethodDescriptor desc = MethodDescriptor.parse(dyn.desc);
+            final List<? extends @NotNull TypeDescriptor> params = desc.getParameters();
             final int paramsSize = params.size();
             final int[] closureIndices = new int[paramsSize];
 
@@ -157,7 +156,7 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 }
             }
 
-            final MethodData targetMethod = owner.method(handle.getName(), parseDescriptor(handle.getDesc()));
+            final MethodData targetMethod = owner.method(handle.getName(), MethodDescriptor.parse(handle.getDesc()));
             if (targetMethod == null) {
                 continue;
             }

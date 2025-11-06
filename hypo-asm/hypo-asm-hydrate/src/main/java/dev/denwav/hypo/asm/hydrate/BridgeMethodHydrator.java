@@ -26,7 +26,7 @@ import dev.denwav.hypo.hydrate.generic.HypoHydration;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
@@ -152,8 +152,8 @@ public class BridgeMethodHydrator implements HydrationProvider<AsmMethodData> {
         }
 
         // The descriptors need to be the same size
-        final MethodDescriptor invokeDesc = MethodDescriptor.parseDescriptor(invoke.desc);
-        if (data.params().size() != invokeDesc.getParams().size()) {
+        final MethodDescriptor invokeDesc = MethodDescriptor.parse(invoke.desc);
+        if (data.params().size() != invokeDesc.getParameters().size()) {
             return;
         }
 

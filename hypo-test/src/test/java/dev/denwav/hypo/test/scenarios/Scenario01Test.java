@@ -122,6 +122,7 @@ public class Scenario01Test extends TestScenarioBase {
             }
 
             @Override
+            @SuppressWarnings("MultipleNullnessAnnotations")
             public @NotNull MappingSet @Nullable [] stageMappings() {
                 return new MappingSet[] {
                     // First stage, propagate up

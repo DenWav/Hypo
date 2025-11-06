@@ -110,9 +110,12 @@ public abstract class AbstractClassData extends AbstractHypoData implements Clas
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof ClassData)) return false;
-        final ClassData that = (ClassData) o;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof final ClassData that)) {
+            return false;
+        }
         return this.name().equals(that.name());
     }
 

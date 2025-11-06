@@ -26,8 +26,8 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.ClassKind;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.types.JvmType;
-import dev.denwav.hypo.model.data.types.PrimitiveType;
+import dev.denwav.hypo.types.PrimitiveType;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.util.ArrayList;
 import java.util.List;
 import org.cadixdev.lorenz.model.ClassMapping;
@@ -99,7 +99,7 @@ public final class CopyRecordParameters implements ChangeContributor {
 
             // must have the same types
             for (int i = 0; i < len; i++) {
-                if (!method.param(i).equals(components.get(i).fieldType())) {
+                if (!method.param(i).equals(components.get(i).descriptor())) {
                     continue outer;
                 }
             }
@@ -122,7 +122,7 @@ public final class CopyRecordParameters implements ChangeContributor {
                 registry.submitChange(AddNewParameterMappingsChange.of(ref, newName));
 
                 lvtIndex++;
-                final JvmType paramType = method.param(i);
+                final TypeDescriptor paramType = method.param(i);
                 if (paramType == PrimitiveType.LONG || paramType == PrimitiveType.DOUBLE) {
                     lvtIndex++;
                 }

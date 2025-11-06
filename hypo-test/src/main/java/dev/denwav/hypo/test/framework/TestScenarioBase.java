@@ -31,7 +31,7 @@ import dev.denwav.hypo.model.ClassProviderRoot;
 import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.MethodData;
-import dev.denwav.hypo.model.data.MethodDescriptor;
+import dev.denwav.hypo.types.desc.MethodDescriptor;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import net.fabricmc.lorenztiny.TinyMappingFormat;
 import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.io.MappingFormats;
@@ -154,11 +155,11 @@ public abstract class TestScenarioBase {
     public static @NotNull MethodData findMethod(final ClassData data, final String name) {
         final List<@NotNull MethodData> methods = data.methods(name);
         assertEquals(1, methods.size());
-        return methods.get(0);
+        return methods.getFirst();
     }
 
     public static @NotNull MethodData findMethod(final ClassData data, final String name, final String desc) {
-        final MethodData method = data.method(name, MethodDescriptor.parseDescriptor(desc));
+        final MethodData method = data.method(name, MethodDescriptor.parse(desc));
         assertNotNull(method);
         return method;
     }
@@ -420,6 +421,7 @@ public abstract class TestScenarioBase {
          * @return An array of mappings expected to be the result of each step of the change contributors process.
          * @see #finishMappings()
          */
+        @SuppressWarnings("MultipleNullnessAnnotations")
         default @NotNull MappingSet @Nullable [] stageMappings() {
             return null;
         }
