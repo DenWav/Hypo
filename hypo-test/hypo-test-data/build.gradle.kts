@@ -11,3 +11,10 @@ tasks.withType<JavaCompile>().configureEach {
     }
     options.release = 21
 }
+
+tasks.compileScenario14Java {
+    javaCompiler = javaToolchains.compilerFor {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+    options.release = 25
+}

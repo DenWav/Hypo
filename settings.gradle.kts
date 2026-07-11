@@ -1,3 +1,16 @@
+import org.gradle.kotlin.dsl.mavenCentral
+
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        maven("https://maven.neoforged.net/releases/") {
+            content {
+                includeGroupAndSubgroups("net.neoforged")
+            }
+        }
+    }
+}
+
 rootProject.name = "hypo"
 
 include(

@@ -27,6 +27,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 
@@ -114,6 +115,7 @@ public record BytecodeRenamer(
          * @param map The set of renames to apply.
          */
         public SimpleRemapper(final @NotNull Map<String, Map<String, String>> map) {
+            super(Opcodes.ASM9);
             this.map = map;
         }
 

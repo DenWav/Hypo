@@ -41,13 +41,13 @@ afterEvaluate {
 
     // javadoc doesn't like that static.javadoc.io redirects, so we'll manually copy the
     // {element,package}-list for it so it doesn't complain
-    val javadocElementList by tasks.registering(DownloadJavadocListFiles::class) {
+    val javadocElementList = tasks.register("javadocElementList", DownloadJavadocListFiles::class) {
         dependencies.set(hypoJava.javadocLibs)
         output.set(layout.buildDirectory.dir("javadocElementLists"))
     }
 
     val elementLists = layout.buildDirectory.dir("javadocElementListsPatched")
-    val javadocElementListPatch by tasks.registering(PatchJavadocList::class) {
+    val javadocElementListPatch = tasks.register("javadocElementListPatch", PatchJavadocList::class) {
         input.set(javadocElementList.flatMap { it.output })
         patches.set(hypoJava.patchJavadocList)
         output.set(elementLists)

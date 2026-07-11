@@ -4,7 +4,7 @@ import org.cadixdev.gradle.licenser.LicenseExtension
 plugins {
     `java-library`
     id("net.ltgt.errorprone")
-    id("org.cadixdev.licenser")
+    id("net.neoforged.licenser")
 }
 
 val hypoModule = extensions.create("hypoModule", HypoModuleExtension::class)

@@ -32,8 +32,8 @@ import dev.denwav.hypo.types.PrimitiveType;
 import dev.denwav.hypo.types.desc.MethodDescriptor;
 import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.io.IOException;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.Contract;
@@ -42,14 +42,14 @@ import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.FrameNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.analysis.Analyzer;
+import org.objectweb.asm.tree.analysis.AnalyzerException;
+import org.objectweb.asm.tree.analysis.BasicInterpreter;
+import org.objectweb.asm.tree.analysis.BasicValue;
+import org.objectweb.asm.tree.analysis.Interpreter;
+import org.objectweb.asm.tree.analysis.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +71,6 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
      * Create a new instance of {@link SuperConstructorHydrator}.
      * @return A new instance of {@link SuperConstructorHydrator}.
      */
-
     @Contract(value = "-> new", pure = true)
     public static @NotNull SuperConstructorHydrator create() {
         return new SuperConstructorHydrator();
@@ -100,17 +99,14 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
     }
 
     private void hydrate0(final @NotNull AsmConstructorData data) throws IOException {
-        final MethodCall superCall = buildSuperCall(data);
-        if (superCall == null) {
+        final SuperCallSite superCallSite = findSuperCall(data);
+        if (superCallSite == null) {
             return;
         }
 
         final ClassData thisClass = data.parentClass();
-        final String owner = superCall.owner;
-        final String desc = superCall.desc;
-        if (owner == null || desc == null) {
-            throw new IllegalStateException("Could not determine owner or desc of super method");
-        }
+        final String owner = superCallSite.owner();
+        final String desc = superCallSite.desc();
         final String normalizedOwner = HypoModelUtil.normalizedClassName(owner);
 
         final ClassData targetClass;
@@ -122,12 +118,14 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
         } else if (superClass == null) {
             throw new IllegalStateException("Could not find owner of super method");
         } else {
-            throw new IllegalStateException("Could not determine owner of super method");
+            throw new IllegalStateException("Owner of super method for " + data + " is invalid: "
+                + normalizedOwner + ". ");
         }
 
         final MethodData targetMethod = targetClass.method("<init>", MethodDescriptor.parse(desc));
         if (!(targetMethod instanceof final ConstructorData targetConstructor)) {
-            throw new IllegalStateException("Target constructor is not an instance of " + ConstructorData.class.getName());
+            throw new IllegalStateException("Target constructor is not an instance of "
+                + ConstructorData.class.getName());
         }
 
         final ArrayList<SuperCall.SuperCallParameter> superCallParams = new ArrayList<>();
@@ -135,7 +133,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
 
         // Store our value
         data.store(HypoHydration.SUPER_CALL_TARGET, superCallData);
-        final List<SuperCall> superCallers = targetConstructor.compute(HypoHydration.SUPER_CALLER_SOURCES, ArrayList::new);
+        final var superCallers = targetConstructor.compute(HypoHydration.SUPER_CALLER_SOURCES, ArrayList::new);
         synchronized (superCallers) {
             superCallers.add(superCallData);
         }
@@ -144,64 +142,42 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
         final int[] thisParamIndices = buildParamIndexMapping(data);
         final int[] targetParamIndices = buildParamIndexMapping(targetConstructor);
 
-        // Do what we can to match parameters
+        // Match each traced argument back to one of this constructor's own parameters
         int index = -1;
-        for (final MethodCallArgument arg : superCall.args) {
+        for (final TraceValue arg : superCallSite.args()) {
             index++;
-            // We only match simple cases
-            final Variable varArgument;
 
-            boolean simpleArg = false;
-            if (arg instanceof Variable) {
-                varArgument = (Variable) arg;
-                simpleArg = true;
-            } else if (arg instanceof final MethodCall subCall) {
-                // We will still match the name if a constructor parameter is the only argument passed to a method
-                // This could be for example where the subclass calls a method to transform the input, but it's
-                // still the same input. For example maybe something like:
-                //
-                //     public SomeClass(String s) {
-                //         super(toUppercase(s));
-                //     }
-                //
-                // or
-                //
-                //     public SomeClass(String s) {
-                //         super(s.toUppercase());
-                //     }
-                if (subCall.args.size() != 1 && !(subCall.receiver instanceof Variable)) {
+            final int lvtIndex;
+            final boolean directMatch;
+            switch (arg.kind) {
+                case PARAM:
+                    lvtIndex = arg.lvtIndex;
+                    directMatch = true;
+                    break;
+                case WRAPPED:
+                    lvtIndex = arg.lvtIndex;
+                    directMatch = false;
+                    break;
+                case NONE:
+                case UNINITIALIZED_THIS:
+                default:
                     continue;
-                }
+            }
 
-                if (subCall.receiver instanceof Variable) {
-                    // This is potentially an instance method on a method argument, keep it
-                    varArgument = (Variable) subCall.receiver;
-                } else {
-                    final MethodCallArgument first = subCall.args.getFirst();
-                    if (!(first instanceof Variable)) {
-                        continue;
-                    }
-                    // This is potentially a method which only takes in a variable as input
-                    varArgument = (Variable) first;
-                }
-            } else {
+            if (lvtIndex > thisParamIndices[thisParamIndices.length - 1]) {
+                // Defensive: PARAM/WRAPPED are only ever seeded from this constructor's own declared
+                // parameter locals (SuperCallInterpreter#newParameterValue), so this is unreachable.
                 continue;
             }
 
-            final int varIndex = varArgument.index;
-            if (varIndex > thisParamIndices[thisParamIndices.length - 1]) {
-                // This isn't a parameter
-                continue;
-            }
-
-            if (simpleArg) {
+            if (directMatch) {
                 // arguments which are directly passed through take priority
-                superCallParams.removeIf(s -> s.getThisIndex() == varIndex);
+                superCallParams.removeIf(s -> s.getThisIndex() == lvtIndex);
             } else {
                 // we only take method calls if they aren't overwriting anything else
                 boolean anyExist = false;
                 for (final SuperCall.SuperCallParameter superCallParam : superCallParams) {
-                    if (superCallParam.getThisIndex() == varIndex) {
+                    if (superCallParam.getThisIndex() == lvtIndex) {
                         anyExist = true;
                         break;
                     }
@@ -211,266 +187,63 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
                 }
             }
 
-            superCallParams.add(new SuperCall.SuperCallParameter(varIndex, targetParamIndices[index]));
+            superCallParams.add(new SuperCall.SuperCallParameter(lvtIndex, targetParamIndices[index]));
         }
     }
 
     /**
-     * This method handles most typical constructor {@code super()} and {@code this()} calls. It walks the method
-     * instructions and records how each instruction affects the stack. Once the {@code super()} or {@code this()} call
-     * is found (and verifying the call comes from an {@code INVOKESPECIAL} instruction) the built {@link MethodCall} is
-     * returned.
+     * Locate this constructor's real {@code super()}/{@code this()} call by running ASM's {@link Analyzer} with a
+     * {@link SuperCallInterpreter} over the whole method. The JVM spec guarantees exactly one {@code INVOKESPECIAL
+     * <init>} instruction consumes the incoming uninitialized {@code this} (local {@code 0}), and that instruction
+     * is this constructor's real {@code super()}/{@code this()} call.
      *
-     * <p>This method does not handle invalid bytecode or weird bytecode. It is intended solely to  process bytecode
-     * generated by standard {@code javac} which requires {@code super()} calls to be the first statement in a
-     * constructor. Any constructor which may have bytecode different from this pattern, or more complex constructors,
-     * will not be supported by this method.
-     *
-     * @param data The constructor to build the super call data from.
-     * @return The build {@link MethodCall} corresponding to this constructor's {@code super()} call, if it's possible
-     *         to build.
+     * @param data The constructor to search.
+     * @return The located call's owner, descriptor, and traced arguments, or {@code null} if this constructor's
+     *         instructions never make such a call.
      */
-    private static @Nullable MethodCall buildSuperCall(final @NotNull AsmConstructorData data) {
-        final MethodCall superCall = new MethodCall();
-
-        loop: for (AbstractInsnNode insn = data.getNode().instructions.getFirst(); insn != null; insn = insn.getNext()) {
-            if ((insn instanceof LabelNode) || (insn instanceof LineNumberNode) || (insn instanceof FrameNode)) {
-                continue;
-            }
-
-            final int opcode = insn.getOpcode();
-            switch (opcode) {
-                case Opcodes.INVOKEDYNAMIC:
-                    final InvokeDynamicInsnNode dynNode = (InvokeDynamicInsnNode) insn;
-                    final int dynArgCount = Type.getArgumentTypes(dynNode.desc).length;
-                    superCall.collapseInvoke(dynArgCount, true, null, dynNode.desc);
-                    continue;
-                case Opcodes.INVOKESPECIAL:
-                case Opcodes.INVOKESTATIC:
-                case Opcodes.INVOKEVIRTUAL:
-                case Opcodes.INVOKEINTERFACE:
-                    final MethodInsnNode methodNode = (MethodInsnNode) insn;
-                    final int argCount = Type.getArgumentTypes(methodNode.desc).length;
-                    final boolean isStatic = opcode == Opcodes.INVOKESTATIC;
-                    superCall.collapseInvoke(argCount, isStatic, methodNode.owner, methodNode.desc);
-                    if (superCall.receiver != null) {
-                        if (opcode != Opcodes.INVOKESPECIAL) {
-                            throw new IllegalStateException("Super call collapsed on non-INVOKESPECIAL instruction: " + opcode);
-                        }
-                        break loop;
-                    }
-                    continue;
-                case Opcodes.NEW:
-                    superCall.args.add(new NewCall(((TypeInsnNode) insn).desc));
-                    continue;
-                case Opcodes.NEWARRAY:
-                case Opcodes.ANEWARRAY:
-                    superCall.args.removeLast();
-                    superCall.args.addLast(NewArray.INSTANCE);
-                    continue;
-                case Opcodes.DUP:
-                    final MethodCallArgument dupStack = superCall.args.peekLast();
-                    if (dupStack != null) {
-                        superCall.args.addLast(dupStack);
-                    }
-                    continue;
-                case Opcodes.POP2:
-                    superCall.args.removeLast();
-                    // fallthrough
-                case Opcodes.POP:
-                    superCall.args.removeLast();
-                    continue;
-                case Opcodes.SWAP:
-                    final MethodCallArgument swap1 = superCall.args.removeLast();
-                    final MethodCallArgument swap2 = superCall.args.removeLast();
-                    superCall.args.addLast(swap1);
-                    superCall.args.addLast(swap2);
-                    continue;
-                case Opcodes.ILOAD:
-                case Opcodes.LLOAD:
-                case Opcodes.FLOAD:
-                case Opcodes.DLOAD:
-                case Opcodes.ALOAD:
-                    superCall.args.add(new Variable(((VarInsnNode) insn).var));
-                    continue;
-                case Opcodes.IASTORE:
-                case Opcodes.LASTORE:
-                case Opcodes.FASTORE:
-                case Opcodes.DASTORE:
-                case Opcodes.AASTORE:
-                case Opcodes.BASTORE:
-                case Opcodes.CASTORE:
-                case Opcodes.SASTORE:
-                    superCall.args.removeLast();
-                    superCall.args.removeLast();
-                    // fallthrough
-                case Opcodes.ISTORE:
-                case Opcodes.LSTORE:
-                case Opcodes.FSTORE:
-                case Opcodes.DSTORE:
-                case Opcodes.ASTORE:
-                    superCall.args.removeLast();
-                    continue;
-                case Opcodes.GETSTATIC:
-                case Opcodes.LDC:
-                case Opcodes.ICONST_M1:
-                case Opcodes.ICONST_0:
-                case Opcodes.ICONST_1:
-                case Opcodes.ICONST_2:
-                case Opcodes.ICONST_3:
-                case Opcodes.ICONST_4:
-                case Opcodes.ICONST_5:
-                case Opcodes.LCONST_0:
-                case Opcodes.LCONST_1:
-                case Opcodes.FCONST_0:
-                case Opcodes.FCONST_1:
-                case Opcodes.FCONST_2:
-                case Opcodes.DCONST_0:
-                case Opcodes.DCONST_1:
-                case Opcodes.ACONST_NULL:
-                case Opcodes.BIPUSH:
-                case Opcodes.SIPUSH:
-                    superCall.args.add(Constant.INSTANCE);
-                    continue;
-                // operators
-                case Opcodes.IADD:
-                case Opcodes.LADD:
-                case Opcodes.FADD:
-                case Opcodes.DADD:
-                case Opcodes.ISUB:
-                case Opcodes.LSUB:
-                case Opcodes.FSUB:
-                case Opcodes.DSUB:
-                case Opcodes.IMUL:
-                case Opcodes.LMUL:
-                case Opcodes.FMUL:
-                case Opcodes.DMUL:
-                case Opcodes.IDIV:
-                case Opcodes.LDIV:
-                case Opcodes.FDIV:
-                case Opcodes.DDIV:
-                case Opcodes.IREM:
-                case Opcodes.LREM:
-                case Opcodes.FREM:
-                case Opcodes.DREM:
-                case Opcodes.INEG:
-                case Opcodes.LNEG:
-                case Opcodes.FNEG:
-                case Opcodes.DNEG:
-                case Opcodes.ISHL:
-                case Opcodes.LSHL:
-                case Opcodes.ISHR:
-                case Opcodes.LSHR:
-                case Opcodes.IUSHR:
-                case Opcodes.LUSHR:
-                case Opcodes.IAND:
-                case Opcodes.LAND:
-                case Opcodes.IOR:
-                case Opcodes.LOR:
-                case Opcodes.IXOR:
-                case Opcodes.LXOR:
-                case Opcodes.LCMP:
-                case Opcodes.FCMPL:
-                case Opcodes.FCMPG:
-                case Opcodes.DCMPL:
-                case Opcodes.DCMPG:
-                // array access
-                case Opcodes.IALOAD:
-                case Opcodes.LALOAD:
-                case Opcodes.FALOAD:
-                case Opcodes.DALOAD:
-                case Opcodes.AALOAD:
-                case Opcodes.BALOAD:
-                case Opcodes.CALOAD:
-                case Opcodes.SALOAD:
-                    superCall.args.removeLast();
-                    superCall.args.removeLast();
-                    superCall.args.addLast(Constant.INSTANCE);
-                    continue;
-                case Opcodes.I2L:
-                case Opcodes.I2F:
-                case Opcodes.I2D:
-                case Opcodes.L2I:
-                case Opcodes.L2F:
-                case Opcodes.L2D:
-                case Opcodes.F2I:
-                case Opcodes.F2L:
-                case Opcodes.F2D:
-                case Opcodes.D2I:
-                case Opcodes.D2L:
-                case Opcodes.D2F:
-                case Opcodes.I2B:
-                case Opcodes.I2C:
-                case Opcodes.I2S:
-                case Opcodes.CHECKCAST:
-                case Opcodes.INSTANCEOF:
-                    //  Doesn't affect the stack in any way that matters to us
-                    continue;
-                case Opcodes.PUTFIELD:
-                    // inner class
-                    // This will consume the previous 2 var instructions
-                    superCall.args.removeLast();
-                    superCall.args.removeLast();
-                    continue;
-                case Opcodes.GETFIELD:
-                    final FieldAccess fieldAccess = new FieldAccess(superCall.args.removeLast());
-                    superCall.args.addLast(fieldAccess);
-                    continue;
-                case Opcodes.ARRAYLENGTH:
-                    superCall.args.removeLast();
-                    superCall.args.addLast(Constant.INSTANCE);
-                    continue;
-                case Opcodes.IF_ICMPEQ:
-                case Opcodes.IF_ICMPNE:
-                case Opcodes.IF_ICMPLT:
-                case Opcodes.IF_ICMPGE:
-                case Opcodes.IF_ICMPGT:
-                case Opcodes.IF_ICMPLE:
-                case Opcodes.IF_ACMPEQ:
-                case Opcodes.IF_ACMPNE:
-                    // Take the default path for jumps, which is to do nothing
-                    superCall.args.removeLast();
-                    // fallthrough
-                case Opcodes.IFEQ:
-                case Opcodes.IFNE:
-                case Opcodes.IFLT:
-                case Opcodes.IFGE:
-                case Opcodes.IFGT:
-                case Opcodes.IFLE:
-                case Opcodes.IFNULL:
-                case Opcodes.IFNONNULL:
-                    superCall.args.removeLast();
-                    continue;
-                case Opcodes.GOTO:
-                    // Default (only) path for GOTO is to jump
-                    insn = ((JumpInsnNode) insn).label;
-                    continue;
-                case Opcodes.JSR:
-                case Opcodes.RET:
-                case Opcodes.IRETURN:
-                case Opcodes.LRETURN:
-                case Opcodes.FRETURN:
-                case Opcodes.DRETURN:
-                case Opcodes.ARETURN:
-                case Opcodes.RETURN:
-                    // This shouldn't happen before a super call
-                    return null;
-                default:
-                    throw new IllegalStateException("Instruction not expected, probably a more complex case: " + insn.getOpcode());
-            }
+    private static @Nullable SuperCallSite findSuperCall(final @NotNull AsmConstructorData data) throws IOException {
+        final MethodNode methodNode = data.getNode();
+        final SuperCallInterpreter interpreter = new SuperCallInterpreter();
+        try {
+            new Analyzer<>(interpreter).analyze(data.parentClass().name(), methodNode);
+        } catch (final AnalyzerException e) {
+            throw new IllegalStateException("Failed to analyze constructor for super()/this() call", e);
         }
 
-        // Verify what we have is actually a valid super call before returning it
-        if (superCall.receiver == null) {
+        final MethodInsnNode callInsn = interpreter.superCallInsn;
+        final List<TraceValue> callArgs = interpreter.superCallArgs;
+        if (callInsn == null || callArgs == null) {
             return null;
         }
+        assertValidSuperCallOwner(data, callInsn.owner);
 
-        final MethodCallArgument receiver = superCall.receiver;
-        if (!(receiver instanceof Variable) || ((Variable) receiver).index != 0) {
-            throw new IllegalStateException("Receiver for super call is not `this`");
+        return new SuperCallSite(callInsn.owner, callInsn.desc, callArgs);
+    }
+
+    /**
+     * Assert the given call owner is either {@code data}'s own declaring class (a {@code this()} call) or its
+     * direct superclass (a {@code super()} call). This is the same validation {@link #hydrate0} performs later in
+     * the pipeline once the target constructor is resolved.
+     *
+     * @param data The constructor the call was found in.
+     * @param owner The owner of the located call, as found on the {@code INVOKESPECIAL} instruction.
+     */
+    private static void assertValidSuperCallOwner(
+        final @NotNull AsmConstructorData data,
+        final @NotNull String owner
+    ) throws IOException {
+        final ClassData thisClass = data.parentClass();
+        final String normalizedOwner = HypoModelUtil.normalizedClassName(owner);
+        if (thisClass.name().equals(normalizedOwner)) {
+            return;
         }
 
-        return superCall;
+        final ClassData superClass = thisClass.superClass();
+        if (superClass != null && superClass.name().equals(normalizedOwner)) {
+            return;
+        }
+
+        throw new IllegalStateException("super()/this() call owner is not this class or its superclass: " + owner);
     }
 
     private static int @NotNull [] buildParamIndexMapping(final @NotNull MethodData data) throws IOException {
@@ -496,202 +269,281 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
 }
 
 //
-// Below are the classes which make up the simplified view of the bytecode model of the super call.
+// Below are the classes which make up the Analyzer-based model for the super call.
 //
 
 /**
  * Model for {@link SuperConstructorHydrator}.
  *
- * <p>Represents something which affects the Java stack in some way.
+ * <p>A 4-state trace of what a value observed during analysis is, relative to the calling constructor's own
+ * parameters.
+ * <ul>
+ *     <li>{@link Kind#NONE}: not traceable to a parameter at all</li>
+ *     <li>{@link Kind#UNINITIALIZED_THIS}: the constructor's own not-yet-initialized {@code this}</li>
+ *     <li>{@link Kind#PARAM}: a direct untransformed reference to one of the constructor's own parameters</li>
+ *     <li>{@link Kind#WRAPPED}: the result of exactly one method call applied directly to a {@link Kind#PARAM} value</li>
+ * </ul>
  */
-interface MethodCallArgument {}
-
-/**
- * Model for {@link SuperConstructorHydrator}.
- *
- * <p>This is mainly what we're looking to keep track of in {@link MethodCall}. This will tell us the LVT index
- * corresponding to the method call index.
- */
-@SuppressWarnings("ClassCanBeRecord")
-final class Variable implements MethodCallArgument {
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     */
-    final int index;
+final class TraceValue implements Value {
 
     /**
      * Model for {@link SuperConstructorHydrator}.
-     *
-     * @param index LVT index.
      */
-    Variable(int index) {
-        this.index = index;
+    enum Kind {
+        NONE,
+        UNINITIALIZED_THIS,
+        PARAM,
+        WRAPPED,
     }
-}
 
-/**
- * Model for {@link SuperConstructorHydrator}.
- */
-@SuppressWarnings("ClassCanBeRecord")
-final class FieldAccess implements MethodCallArgument {
     /**
      * Model for {@link SuperConstructorHydrator}.
      */
-    final MethodCallArgument receiver;
-
+    final @NotNull Kind kind;
     /**
      * Model for {@link SuperConstructorHydrator}.
      *
-     * @param receiver Method receiver ({@code this}).
+     * <p>The calling constructor's LVT slot this value traces back to. Only meaningful for {@link Kind#PARAM} and
+     * {@link Kind#WRAPPED}; {@code -1} otherwise.
      */
-    FieldAccess(MethodCallArgument receiver) {
-        this.receiver = receiver;
+    final int lvtIndex;
+    private final int size;
+
+    private TraceValue(final @NotNull Kind kind, final int lvtIndex, final int size) {
+        this.kind = kind;
+        this.lvtIndex = lvtIndex;
+        this.size = size;
     }
-}
 
-/**
- * Model for {@link SuperConstructorHydrator}.
- *
- * <p>This applies to any load operation not referring to a local variable. We essentially just throw that data away.
- */
-final class Constant implements MethodCallArgument {
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     */
-    static final Constant INSTANCE = new Constant();
+    static @NotNull TraceValue none(final int size) {
+        return new TraceValue(Kind.NONE, -1, size);
+    }
 
-    /**
-     * Default constructor.
-     */
-    Constant() {}
-}
+    static @NotNull TraceValue uninitializedThis(final int size) {
+        return new TraceValue(Kind.UNINITIALIZED_THIS, -1, size);
+    }
 
-/**
- * Model for {@link SuperConstructorHydrator}.
- *
- * <p>{@code new} expressions.
- */
-@SuppressWarnings("ClassCanBeRecord")
-final class NewCall implements MethodCallArgument {
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     */
-    final String desc;
+    static @NotNull TraceValue param(final int lvtIndex, final int size) {
+        return new TraceValue(Kind.PARAM, lvtIndex, size);
+    }
 
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     *
-     * @param desc Method descriptor.
-     */
-    NewCall(String desc) {
-        this.desc = desc;
+    static @NotNull TraceValue wrapped(final int lvtIndex, final int size) {
+        return new TraceValue(Kind.WRAPPED, lvtIndex, size);
+    }
+
+    @Override
+    public int getSize() {
+        return this.size;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof final TraceValue that)) {
+            return false;
+        }
+        return this.kind == that.kind && this.lvtIndex == that.lvtIndex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.kind, this.lvtIndex);
     }
 }
 
 /**
  * Model for {@link SuperConstructorHydrator}.
  *
- * <p>{@code new} expressions for arrays.
- */
-final class NewArray implements MethodCallArgument {
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     */
-    static final NewArray INSTANCE = new NewArray();
-
-    /**
-     * Default constructor.
-     */
-    NewArray() {}
-}
-
-/**
- * Model for {@link SuperConstructorHydrator}.
+ * <p>An {@link Interpreter} which computes a {@link TraceValue} for each value in a constructor, and records the
+ * real {@code super()}/{@code this()} call (the sole {@code INVOKESPECIAL <init>} instruction whose receiver is the
+ * constructor's own not-yet-initialized {@code this}) as a side effect once {@link Analyzer#analyze} finds it.
  *
- * <p>This is the core stack model for the hydrator, it represents method calls and keeps track of which stack items
- * correspond with which method parameters.
+ * <p>{@link #newOperation}, {@link #binaryOperation}, {@link #ternaryOperation}, and {@link #naryOperation} only
+ * need the <i>size</i> of the value a real {@link BasicInterpreter} would compute for the same instruction, since
+ * (aside from the {@code Kind.WRAPPED} case {@link #naryOperation} computes itself) none of those operations can
+ * ever produce a value directly traceable back to a parameter. {@link #unaryOperation} can map to a value for numeric
+ * conversion or {@code checkcast} applied directly to a traced value.
  */
-final class MethodCall implements MethodCallArgument {
+final class SuperCallInterpreter extends Interpreter<TraceValue> {
 
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     *
-     * <p>The arguments for this method, made up of stack items.
-     */
-    final @NotNull ArrayDeque<MethodCallArgument> args = new ArrayDeque<>();
+    private static final BasicValue PLACEHOLDER = BasicValue.INT_VALUE;
 
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     *
-     * <p>If this method is not static, the stack item which is the {@code this} object for this method call.
-     */
-    @Nullable MethodCallArgument receiver;
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     *
-     * <p>The declaring class of the method.
-     */
-    @Nullable String owner;
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     *
-     * <p>The method descriptor.
-     */
-    @Nullable String desc;
+    private final @NotNull BasicInterpreter basic = new BasicInterpreter();
 
-    /**
-     * Default constructor.
-     */
-    MethodCall() {}
+    @Nullable MethodInsnNode superCallInsn;
+    @Nullable List<TraceValue> superCallArgs;
 
-    /**
-     * Model for {@link SuperConstructorHydrator}.
-     *
-     * <p>This will collapse the current stack in {@link #args} into a new {@link MethodCall} and replace the args which
-     * made up that method call with the method call itself. This effectively turns the arguments for the method call
-     * into the method call itself.
-     *
-     * @param argCount Number of arguments to consume.
-     * @param isStatic Whether the method is static.
-     * @param owner The owning class of the method.
-     * @param desc The method descriptor.
-     */
-    void collapseInvoke(
-        final int argCount,
-        final boolean isStatic,
-        final @Nullable String owner,
-        final @NotNull String desc
+    SuperCallInterpreter() {
+        super(Opcodes.ASM9);
+    }
+
+    private static @Nullable TraceValue wrap(final @Nullable BasicValue basicValue) {
+        return basicValue == null ? null : TraceValue.none(basicValue.getSize());
+    }
+
+    @Override
+    public @Nullable TraceValue newValue(final @Nullable Type type) {
+        return wrap(this.basic.newValue(type));
+    }
+
+    @Override
+    public @NotNull TraceValue newParameterValue(
+        final boolean isInstanceMethod,
+        final int local,
+        final @NotNull Type type
     ) {
-        final int back = argCount + (isStatic ? 0 : 1);
-        final int count = this.args.size();
+        final BasicValue basicValue = this.basic.newParameterValue(isInstanceMethod, local, type);
+        final int size = basicValue != null ? basicValue.getSize() : 1;
+        if (isInstanceMethod && local == 0) {
+            return TraceValue.uninitializedThis(size);
+        }
+        return TraceValue.param(local, size);
+    }
 
-        if (back == count) {
-            // This is our invoke instruction
-            this.receiver = this.args.removeFirst();
-            this.owner = owner;
-            this.desc = desc;
-            return;
+    @Override
+    public @Nullable TraceValue newOperation(final @NotNull AbstractInsnNode insn) throws AnalyzerException {
+        return wrap(this.basic.newOperation(insn));
+    }
+
+    @Override
+    public @NotNull TraceValue copyOperation(final @NotNull AbstractInsnNode insn, final @NotNull TraceValue value) {
+        return value;
+    }
+
+    @Override
+    public @Nullable TraceValue unaryOperation(
+        final @NotNull AbstractInsnNode insn,
+        final @NotNull TraceValue value
+    ) throws AnalyzerException {
+        final BasicValue basicResult = this.basic.unaryOperation(insn, PLACEHOLDER);
+        if (basicResult == null) {
+            return null;
+        }
+        final int size = basicResult.getSize();
+
+        // Numeric conversions, checkcast, and instanceof are identity pass-throughs for tracing purposes, so
+        // `super((int) someLongParam)` still traces back to `someLongParam`.
+        //noinspection EnhancedSwitchMigration
+        switch (insn.getOpcode()) {
+            case Opcodes.I2L:
+            case Opcodes.I2F:
+            case Opcodes.I2D:
+            case Opcodes.L2I:
+            case Opcodes.L2F:
+            case Opcodes.L2D:
+            case Opcodes.F2I:
+            case Opcodes.F2L:
+            case Opcodes.F2D:
+            case Opcodes.D2I:
+            case Opcodes.D2L:
+            case Opcodes.D2F:
+            case Opcodes.I2B:
+            case Opcodes.I2C:
+            case Opcodes.I2S:
+            case Opcodes.CHECKCAST:
+                return switch (value.kind) {
+                    case PARAM -> TraceValue.param(value.lvtIndex, size);
+                    case WRAPPED -> TraceValue.wrapped(value.lvtIndex, size);
+                    case UNINITIALIZED_THIS -> TraceValue.uninitializedThis(size);
+                    case NONE -> TraceValue.none(size);
+                };
+            default:
+                return TraceValue.none(size);
+        }
+    }
+
+    @Override
+    public @Nullable TraceValue binaryOperation(
+        final @NotNull AbstractInsnNode insn,
+        final @NotNull TraceValue value1,
+        final @NotNull TraceValue value2
+    ) throws AnalyzerException {
+        return wrap(this.basic.binaryOperation(insn, PLACEHOLDER, PLACEHOLDER));
+    }
+
+    @Override
+    public @Nullable TraceValue ternaryOperation(
+        final @NotNull AbstractInsnNode insn,
+        final @NotNull TraceValue value1,
+        final @NotNull TraceValue value2,
+        final @NotNull TraceValue value3
+    ) throws AnalyzerException {
+        return wrap(this.basic.ternaryOperation(insn, PLACEHOLDER, PLACEHOLDER, PLACEHOLDER));
+    }
+
+    @Override
+    public @Nullable TraceValue naryOperation(
+        final @NotNull AbstractInsnNode insn,
+        final @NotNull List<? extends TraceValue> values
+    ) throws AnalyzerException {
+        final int opcode = insn.getOpcode();
+
+        if (opcode == Opcodes.INVOKESPECIAL) {
+            final MethodInsnNode methodInsn = (MethodInsnNode) insn;
+            // Re-recording args on every visit to the *same* instruction (rather than only the first)
+            // matters: Analyzer's worklist can execute this instruction once with a not-yet-merged
+            // input frame (e.g. before both sides of a preceding branch have reached it) and again
+            // later with the converged one. Only a genuinely different qualifying instruction is
+            // rejected once superCallInsn is locked onto something else.
+            if (methodInsn.name.equals("<init>")
+                && !values.isEmpty()
+                && values.getFirst().kind == TraceValue.Kind.UNINITIALIZED_THIS
+                && (this.superCallInsn == null || this.superCallInsn == methodInsn)) {
+                this.superCallInsn = methodInsn;
+                this.superCallArgs = List.copyOf(values.subList(1, values.size()));
+            }
         }
 
-        if (back > count) {
-            throw new IllegalStateException("Cannot collapse args - requested " + back + " args but only have " + count);
+        final BasicValue basicResult = this.basic.naryOperation(insn, Collections.nCopies(values.size(), PLACEHOLDER));
+        if (basicResult == null) {
+            // void return - Frame never pushes this result either way
+            return null;
         }
+        final int size = basicResult.getSize();
 
-        final MethodCall innerCall = new MethodCall();
-        for (int i = 0; i < argCount; i++) {
-            innerCall.args.addFirst(this.args.removeLast());
-        }
-        if (!isStatic) {
-            innerCall.receiver = this.args.removeLast();
-        }
-        if (Objects.equals(Type.getReturnType(desc), Type.VOID_TYPE)) {
-            // If this method returns void and this is part of the super() call, that means this
-            // was executed off of a DUP
-            this.args.removeLast();
-        }
-        this.args.addLast(innerCall);
+        final boolean hasReceiver = opcode != Opcodes.INVOKESTATIC
+            && opcode != Opcodes.INVOKEDYNAMIC
+            && opcode != Opcodes.MULTIANEWARRAY;
+        final TraceValue receiver = hasReceiver && !values.isEmpty() ? values.getFirst() : null;
+        final List<? extends TraceValue> args = hasReceiver && !values.isEmpty()
+            ? values.subList(1, values.size())
+            : values;
 
-        innerCall.owner = owner;
-        innerCall.desc = desc;
+        if (receiver != null && receiver.kind == TraceValue.Kind.PARAM) {
+            return TraceValue.wrapped(receiver.lvtIndex, size);
+        }
+        if (args.size() == 1 && args.getFirst().kind == TraceValue.Kind.PARAM) {
+            return TraceValue.wrapped(args.getFirst().lvtIndex, size);
+        }
+        return TraceValue.none(size);
+    }
+
+    @Override
+    public void returnOperation(
+        final @NotNull AbstractInsnNode insn,
+        final @NotNull TraceValue value,
+        final @NotNull TraceValue expected
+    ) {}
+
+    @Override
+    public @NotNull TraceValue merge(final @NotNull TraceValue value1, final @NotNull TraceValue value2) {
+        if (value1.equals(value2)) {
+            return value1;
+        }
+        return TraceValue.none(value1.getSize());
     }
 }
+
+/**
+ * Model for {@link SuperConstructorHydrator}.
+ *
+ * <p>The located {@code super()}/{@code this()} call: its owner and descriptor (as found on the
+ * {@code INVOKESPECIAL} instruction), and a {@link TraceValue} per call argument, in call-argument order.
+ *
+ * @param owner The declaring class of the called constructor.
+ * @param desc The descriptor of the called constructor.
+ * @param args A {@link TraceValue} per call argument, in call-argument order.
+ */
+record SuperCallSite(@NotNull String owner, @NotNull String desc, @NotNull List<TraceValue> args) {}

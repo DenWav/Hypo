@@ -13,6 +13,8 @@ dependencies {
     api(projects.hypoCore)
     api(projects.hypoAsm)
     api(projects.hypoHydrate)
+
+    implementation(libs.asm.analysis)
 }
 
 tasks.jar {

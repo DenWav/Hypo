@@ -30,6 +30,7 @@ dependencies {
 
     api(libs.junit.api)
     runtimeOnly(libs.junit.runtime)
+    runtimeOnly(libs.junit.launcher)
 }
 
 tasks.withType<JavaCompile>().configureEach {

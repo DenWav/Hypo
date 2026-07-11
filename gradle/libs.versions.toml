@@ -2,7 +2,7 @@
 junit = "5.11.3"
 junit-platform = "1.11.3"
 errorprone = "2.36.0"
-asm = "9.7.1"
+asm = "9.10.1"
 slf4j = "2.0.16"
 log4j = "2.24.3"
 
@@ -21,6 +21,7 @@ asm-core = { module = "org.ow2.asm:asm", version.ref = "asm" }
 asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
 asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
 asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
+asm-analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
 
 lorenz = "org.cadixdev:lorenz:0.5.8"
 bombe = "org.cadixdev:bombe:0.4.4"
@@ -42,7 +43,7 @@ errorprone-annotations = { module = "com.google.errorprone:error_prone_annotatio
 
 # Gradle
 gradle-errorprone = "net.ltgt.errorprone:net.ltgt.errorprone.gradle.plugin:4.1.0"
-gradle-licenser = "org.cadixdev.licenser:org.cadixdev.licenser.gradle.plugin:0.6.1"
+gradle-licenser = "net.neoforged.licenser:net.neoforged.licenser.gradle.plugin:0.7.5"
 
 [bundles]
-asm = [ "asm-core", "asm-tree", "asm-util" ]
+asm = [ "asm-core", "asm-tree", "asm-util", "asm-analysis" ]

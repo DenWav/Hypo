@@ -25,6 +25,7 @@ module dev.denwav.hypo.asm.hydrator {
 
     requires static transitive org.jetbrains.annotations;
 
+    requires org.objectweb.asm.tree.analysis;
     requires org.slf4j;
 
     exports dev.denwav.hypo.asm.hydrate;

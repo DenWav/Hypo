@@ -4,9 +4,9 @@ plugins {
     `hypo-module`
 }
 
-val spring: Configuration by configurations.creating
-val guava: Configuration by configurations.creating
-val eclipse: Configuration by configurations.creating
+val spring: Configuration = configurations.create("spring")
+val guava: Configuration = configurations.create("guava")
+val eclipse: Configuration = configurations.create("eclipse")
 
 dependencies {
     implementation(projects.hypoAsm)
@@ -35,7 +35,7 @@ tasks.withType<JavaCompile>().configureEach {
 
 val outputDir = layout.buildDirectory.dir("types-export")
 val xmlDir = outputDir.map { it.dir("xmls") }
-val runJvm by tasks.registering(JavaExec::class) {
+val runJvm = tasks.register("runJvm", JavaExec::class) {
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     }
@@ -46,7 +46,7 @@ val runJvm by tasks.registering(JavaExec::class) {
     outputs.file(xmlDir.map { it.file("jvm.xml") })
 }
 
-fun createTypeExportTask(configuration: Configuration) = tasks.registering(JavaExec::class) {
+fun createTypeExportTask(name: String, configuration: Configuration) = tasks.register(name, JavaExec::class) {
     javaLauncher = javaToolchains.launcherFor {
         languageVersion = JavaLanguageVersion.of(21)
     }
@@ -58,11 +58,11 @@ fun createTypeExportTask(configuration: Configuration) = tasks.registering(JavaE
     outputs.file(xmlDir.map { it.file("${configuration.name}.xml") })
 }
 
-val runSpring by createTypeExportTask(spring)
-val runGuava by createTypeExportTask(guava)
-val runEclipse by createTypeExportTask(eclipse)
+val runSpring = createTypeExportTask("runSpring", spring)
+val runGuava = createTypeExportTask("runGuava", guava)
+val runEclipse = createTypeExportTask("runEclipse", eclipse)
 
-val buildTypesExport by tasks.registering(Zip::class) {
+val buildTypesExport = tasks.register("buildTypesExport", Zip::class) {
     dependsOn(runJvm, runSpring, runGuava, runEclipse)
 
     from(xmlDir)
