@@ -59,7 +59,7 @@ public record BytecodeRenamer(
     }
 
     @Override
-    public byte @Nullable [] getClassData(@NotNull String fileName) throws IOException {
+    public byte @Nullable [] getClassData(final @NotNull String fileName) throws IOException {
         final byte[] data = this.delegate.getClassData(fileName);
         if (data == null) {
             return null;

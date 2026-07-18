@@ -87,7 +87,7 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
     }
 
     @Override
-    public void hydrate(@NotNull AsmConstructorData data, @NotNull HypoContext context) throws IOException {
+    public void hydrate(final @NotNull AsmConstructorData data, final @NotNull HypoContext context) throws IOException {
         try {
             this.hydrate0(data);
         } catch (final IllegalStateException e) {
@@ -172,12 +172,12 @@ public class SuperConstructorHydrator implements HydrationProvider<AsmConstructo
 
             if (directMatch) {
                 // arguments which are directly passed through take priority
-                superCallParams.removeIf(s -> s.getThisIndex() == lvtIndex);
+                superCallParams.removeIf(s -> s.thisIndex() == lvtIndex);
             } else {
                 // we only take method calls if they aren't overwriting anything else
                 boolean anyExist = false;
                 for (final SuperCall.SuperCallParameter superCallParam : superCallParams) {
-                    if (superCallParam.getThisIndex() == lvtIndex) {
+                    if (superCallParam.thisIndex() == lvtIndex) {
                         anyExist = true;
                         break;
                     }
@@ -288,11 +288,26 @@ final class TraceValue implements Value {
 
     /**
      * Model for {@link SuperConstructorHydrator}.
+     *
+     * <p>The kind of a {@link TraceValue}, indicating what a value observed during analysis traces back to,
+     * relative to the calling constructor's own parameters or uninitialized {@code this}.
      */
     enum Kind {
+        /**
+         * Not traceable to a parameter at all.
+         */
         NONE,
+        /**
+         * The constructor's own not-yet-initialized {@code this}.
+         */
         UNINITIALIZED_THIS,
+        /**
+         * A direct untransformed reference to one of the constructor's own parameters.
+         */
         PARAM,
+        /**
+         * The result of exactly one method call applied directly to a {@link #PARAM} value.
+         */
         WRAPPED,
     }
 
@@ -315,18 +330,40 @@ final class TraceValue implements Value {
         this.size = size;
     }
 
+    /**
+     * Create a {@link Kind#NONE} trace value.
+     * @param size The stack size.
+     * @return The new {@link TraceValue}
+     */
     static @NotNull TraceValue none(final int size) {
         return new TraceValue(Kind.NONE, -1, size);
     }
 
+    /**
+     * Create a {@link Kind#UNINITIALIZED_THIS} trace value.
+     * @param size The stack size.
+     * @return The new {@link TraceValue}
+     */
     static @NotNull TraceValue uninitializedThis(final int size) {
         return new TraceValue(Kind.UNINITIALIZED_THIS, -1, size);
     }
 
+    /**
+     * Create a {@link Kind#PARAM} trace value.
+     * @param lvtIndex The LVT index.
+     * @param size The stack size.
+     * @return The new {@link TraceValue}
+     */
     static @NotNull TraceValue param(final int lvtIndex, final int size) {
         return new TraceValue(Kind.PARAM, lvtIndex, size);
     }
 
+    /**
+     * Create a {@link Kind#WRAPPED} trace value.
+     * @param lvtIndex The LVT index.
+     * @param size The stack size.
+     * @return The new {@link TraceValue}
+     */
     static @NotNull TraceValue wrapped(final int lvtIndex, final int size) {
         return new TraceValue(Kind.WRAPPED, lvtIndex, size);
     }
@@ -372,9 +409,18 @@ final class SuperCallInterpreter extends Interpreter<TraceValue> {
 
     private final @NotNull BasicInterpreter basic = new BasicInterpreter();
 
-    @Nullable MethodInsnNode superCallInsn;
-    @Nullable List<TraceValue> superCallArgs;
+    /**
+     * The super call instruction.
+     */
+    /* package */ @Nullable MethodInsnNode superCallInsn;
+    /**
+     * Traces for the super call instruction arguments.
+     */
+    /* package */ @Nullable List<TraceValue> superCallArgs;
 
+    /**
+     * Create a new instance of this interpreter.
+     */
     SuperCallInterpreter() {
         super(Opcodes.ASM9);
     }

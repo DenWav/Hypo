@@ -180,8 +180,8 @@ public final class LorenzUtil {
             case final org.cadixdev.bombe.type.ArrayType array ->
                 ArrayTypeDescriptor.of(array.getDimCount(), convertType(array.getComponent()));
             // Primitive (BaseType and VoidType)
-            case org.cadixdev.bombe.type.VoidType ignored -> VoidType.INSTANCE;
-            case org.cadixdev.bombe.type.BaseType baseType -> switch (baseType) {
+            case final org.cadixdev.bombe.type.VoidType ignored -> VoidType.INSTANCE;
+            case final org.cadixdev.bombe.type.BaseType baseType -> switch (baseType) {
                 case CHAR -> PrimitiveType.CHAR;
                 case BYTE -> PrimitiveType.BYTE;
                 case SHORT -> PrimitiveType.SHORT;

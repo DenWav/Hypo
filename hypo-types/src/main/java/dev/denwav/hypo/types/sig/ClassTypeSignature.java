@@ -210,7 +210,7 @@ public final class ClassTypeSignature
 
     @Override
     public @NotNull ClassTypeSignature bind(final @NotNull TypeVariableBinder binder) {
-        ClassTypeSignature newOwner;
+        final ClassTypeSignature newOwner;
         if (this.ownerClass == null) {
             newOwner = null;
         } else {
@@ -223,19 +223,6 @@ public final class ClassTypeSignature
                 .map(t -> t.bind(binder))
                 .collect(Collectors.toList())
         );
-    }
-
-    @Override
-    public boolean isUnbound() {
-        if (this.ownerClass != null && this.ownerClass.isUnbound()) {
-            return true;
-        }
-        for (final TypeArgument t : this.typeArguments) {
-            if (t.isUnbound()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

@@ -41,10 +41,12 @@ import javax.xml.stream.events.XMLEvent;
 import org.jetbrains.annotations.Nullable;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@DisplayName("[types] TestAllTypes")
 class TestAllTypes {
 
     private static FileSystem fs;
@@ -63,21 +65,25 @@ class TestAllTypes {
     }
 
     @Test
+    @DisplayName("Test all types from JVM metadata xml")
     void testJvmTypes() throws XMLStreamException, IOException {
         this.doTest(root.resolve("jvm.xml"));
     }
 
     @Test
+    @DisplayName("Test all types from Spring metadata xml")
     void testSpringTypes() throws XMLStreamException, IOException {
         this.doTest(root.resolve("spring.xml"));
     }
 
     @Test
+    @DisplayName("Test all types from Guava metadata xml")
     void testGuavaTypes() throws XMLStreamException, IOException {
         this.doTest(root.resolve("guava.xml"));
     }
 
     @Test
+    @DisplayName("Test all types from Eclipse metadata xml")
     void testEclipseTypes() throws XMLStreamException, IOException {
         this.doTest(root.resolve("eclipse.xml"));
     }

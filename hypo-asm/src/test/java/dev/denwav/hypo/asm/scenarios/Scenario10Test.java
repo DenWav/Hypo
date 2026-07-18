@@ -81,8 +81,8 @@ public class Scenario10Test extends TestScenarioBase {
         final var testClass = this.findClass("scenario10/TestClass$1LocalClass");
         final List<LocalClassClosure> localClasses = testClass.require(HypoHydration.LOCAL_CLASSES);
         assertEquals(1, localClasses.size());
-        final LocalClassClosure localClass = localClasses.get(0);
+        final LocalClassClosure localClass = localClasses.getFirst();
 
-        assertArrayEquals(new int[] { 2, 3 }, localClass.getParamLvtIndices());
+        assertArrayEquals(new int[] { 2, 3 }, localClass.paramLvtIndices());
     }
 }

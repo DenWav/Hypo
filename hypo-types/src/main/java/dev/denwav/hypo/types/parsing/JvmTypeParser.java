@@ -432,7 +432,7 @@ public final class JvmTypeParser {
     }
 
     private static boolean consumeMethodSignature(final @NotNull ParserState source) {
-        List<TypeParameter> typeParams;
+        final List<TypeParameter> typeParams;
         if (consumeTypeParameters(source)) {
             typeParams = source.getLastResult();
         } else {
@@ -529,7 +529,7 @@ public final class JvmTypeParser {
 
         source.advance();
 
-        char next = source.current();
+        final char next = source.current();
         if (next == ':' || next == '>') {
             return true;
         }

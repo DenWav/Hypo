@@ -55,7 +55,7 @@ import org.jetbrains.annotations.Nullable;
     }
 
     @Override
-    public byte @Nullable [] getClassData(@NotNull String fileName) throws IOException {
+    public byte @Nullable [] getClassData(@NotNull final String fileName) throws IOException {
         for (final ModuleReader reader : this.readers) {
             final ByteBuffer resource = reader.read(fileName).orElse(null);
             if (resource == null) {

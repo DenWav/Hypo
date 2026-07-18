@@ -80,7 +80,7 @@ public final class TypeParameterPatterns {
      */
     public static @NotNull TypePattern hasClassBound() {
         return (ctx, t) ->
-            t instanceof TypeParameter p && p.getClassBound() != null;
+            t instanceof final TypeParameter p && p.getClassBound() != null;
     }
 
 
@@ -93,7 +93,7 @@ public final class TypeParameterPatterns {
      */
     public static @NotNull TypePattern hasClassBound(final @NotNull TypePattern classBound) {
         return (ctx, t) ->
-            t instanceof TypeParameter p && p.getClassBound() != null && classBound.test(ctx, p.getClassBound());
+            t instanceof final TypeParameter p && p.getClassBound() != null && classBound.test(ctx, p.getClassBound());
     }
 
     /**

@@ -145,7 +145,7 @@ public class CopyMappingsDown implements ChangeContributor {
 
         for (final SuperCall superCall : superCalls) {
             // we are the super constructor, find the `this` constructor
-            final ConstructorData childConst = superCall.getThisConstructor();
+            final ConstructorData childConst = superCall.thisConstructor();
             final ClassMapping<?, ?> childClassMapping = getClassMapping(mappings, childConst.parentClass().name());
 
             if (childClassMapping != null) {
@@ -177,7 +177,7 @@ public class CopyMappingsDown implements ChangeContributor {
                 thisSuperCall = parentSuperCall.chain(superCall);
             }
 
-            change.addParams(thisSuperCall.getParams());
+            change.addParams(thisSuperCall.params());
 
             walkConstructor(childConst, mapping, registry, thisSuperCall);
         }

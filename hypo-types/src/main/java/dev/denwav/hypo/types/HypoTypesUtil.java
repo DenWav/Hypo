@@ -18,6 +18,9 @@
 
 package dev.denwav.hypo.types;
 
+import dev.denwav.hypo.types.sig.param.TypeVariable;
+import dev.denwav.hypo.types.visitor.TraversingTypeVisitor;
+import dev.denwav.hypo.types.visitor.TypeVisitor;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -62,4 +65,15 @@ public final class HypoTypesUtil {
         @SuppressWarnings("unchecked") final T t = (T) o;
         return t;
     }
+
+    /**
+     * A {@link TypeVisitor} that returns {@code true} if the visited type does not contain {@link TypeVariable.Unbound}.
+     */
+    /* package */ static final TypeVisitor IS_FULLY_BOUND = new TraversingTypeVisitor() {
+        @SuppressWarnings("MissingSuperCall")
+        @Override
+        public boolean visit(final TypeVariable.@NotNull Unbound ignored) {
+            return false;
+        }
+    };
 }

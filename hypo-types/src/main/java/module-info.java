@@ -38,4 +38,5 @@ module dev.denwav.hypo.types {
     exports dev.denwav.hypo.types.pattern;
     exports dev.denwav.hypo.types.sig;
     exports dev.denwav.hypo.types.sig.param;
+    exports dev.denwav.hypo.types.visitor;
 }

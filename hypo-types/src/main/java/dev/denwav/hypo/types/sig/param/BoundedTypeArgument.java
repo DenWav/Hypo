@@ -103,11 +103,6 @@ public final class BoundedTypeArgument extends Intern<BoundedTypeArgument> imple
         return BoundedTypeArgument.of(this.bounds, this.signature.bind(binder));
     }
 
-    @Override
-    public boolean isUnbound() {
-        return this.signature.isUnbound();
-    }
-
     /**
      * Return the {@link WildcardBound bounds} for this type argument.
      * @return The {@link WildcardBound bounds} for this type argument.

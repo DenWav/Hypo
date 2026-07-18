@@ -176,8 +176,8 @@ public final class LocalClassHydrator implements HydrationProvider<AsmMethodData
                 return;
             }
 
-            if (lambdaCall.getContainingMethod().equals(method)) {
-                this.findNewCalls(lambdaCall.getLambda(), nestedClasses);
+            if (lambdaCall.containingMethod().equals(method)) {
+                this.findNewCalls(lambdaCall.lambda(), nestedClasses);
             }
         }
     }

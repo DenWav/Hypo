@@ -25,23 +25,31 @@ import dev.denwav.hypo.types.desc.TypeDescriptor;
 import dev.denwav.hypo.types.sig.ClassTypeSignature;
 import dev.denwav.hypo.types.sig.MethodSignature;
 import dev.denwav.hypo.types.sig.TypeSignature;
-import dev.denwav.hypo.types.sig.param.TypeParameter;
+import dev.denwav.hypo.types.sig.param.TypeVariable;
+import dev.denwav.hypo.types.visitor.TraversingTypeVisitor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("all")
+@DisplayName("[types] JvmReflection Tests")
 class JvmReflectionTest {
 
     @Test
+    @DisplayName("Test JVM type descriptor mapping")
     void testTypeDescriptor() {
         assertEquals(ClassTypeDescriptor.of("java/lang/String"), TypeDescriptor.of(String.class));
     }
+
+    @SuppressWarnings("unused")
+    private List<@NotNull String> annotatedField;
 
     private static final String someMethodSig = "<T::Ldev/denwav/hypo/types/JvmReflectionTest$OneInterface<*>;:Ldev/denwav/hypo/types/JvmReflectionTest$TwoInterface;>(Ljava/lang/Object;Ljava/util/Map<-Ljava/lang/String;Ljava/util/function/Function<Ljava/lang/Integer;+Ljava/lang/String;>;>;[I[[Ljava/lang/String;[Ljava/util/List<Ljava/lang/String;>;TT;)Ljava/util/List<Ljava/lang/String;>;";
     @SuppressWarnings("unused")
@@ -64,15 +72,8 @@ class JvmReflectionTest {
     }
     private static @NotNull MethodSignature someMethodSig() {
         final MethodSignature sig = MethodSignature.parse(someMethodSig);
-        // TODO replace with proper binder when implemented
-        return sig.bind(var -> {
-            for (final TypeParameter param : sig.getTypeParameters()) {
-                if (param.getName().equals(var)) {
-                    return param;
-                }
-            }
-            return null;
-        });
+        final var binder = HierarchyTypeVariableBinder.of(sig);
+        return sig.bind(binder);
     }
 
     @SuppressWarnings("unused")
@@ -84,6 +85,7 @@ class JvmReflectionTest {
     }
 
     @Test
+    @DisplayName("Test JVM method descriptor mapping")
     void testMethodDescriptor() {
         final Method someMethod = someMethod();
         final MethodDescriptor expected = someMethodSig().asDescriptor();
@@ -92,15 +94,30 @@ class JvmReflectionTest {
     }
 
     @Test
+    @DisplayName("Test simple JVM type signature mapping")
     void testTypeSignatureSimple() {
         assertEquals(ClassTypeSignature.of("java/lang/String"), TypeSignature.of(String.class));
         assertEquals(
-            TypeSignature.parse("Ljava/util/List<TE;>;").bind(TypeVariableBinder.object()),
+            resolve(TypeSignature.parse("Ljava/util/List<TE;>;").bind(TypeVariableBinder.object())),
             TypeSignature.of(List.class)
         );
     }
 
+    private TypeSignature resolve(final @NotNull TypeSignature sig) {
+        sig.accept(new TraversingTypeVisitor() {
+            @Override
+            public boolean visit(final @NotNull TypeVariable var) {
+                if (var.hasUnresolvedDefinition()) {
+                    var.getDefinition();
+                }
+                return true;
+            }
+        });
+        return sig;
+    }
+
     @Test
+    @DisplayName("Test generic JVM type signature mapping")
     void testTypeSignatureGeneric() {
         final TypeSignature expected = TypeSignature.parse("Ljava/util/List<Ljava/lang/String;>;");
         final TypeSignature actual = TypeSignature.of(new TypeToken<List<String>>() {}.getType());
@@ -109,6 +126,12 @@ class JvmReflectionTest {
     }
 
     @Test
-    void testTypeSignatureAnnotatedGeneric() {
+    @DisplayName("Test annotated generic JVM type signature mapping")
+    void testTypeSignatureAnnotatedGeneric() throws NoSuchFieldException {
+        final Type type = JvmReflectionTest.class.getDeclaredField("annotatedField").getGenericType();
+        final TypeSignature expected = TypeSignature.parse("Ljava/util/List<Ljava/lang/String;>;");
+        final TypeSignature actual = TypeSignature.of(type);
+
+        assertEquals(expected, actual);
     }
 }

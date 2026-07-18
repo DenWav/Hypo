@@ -70,11 +70,20 @@ public abstract class LazyClassData extends AbstractClassData {
     public abstract @Nullable ClassData computeOuterClass() throws IOException;
 
     /**
+     * {@code compute} variant of {@link #outerMethod()}.
+     *
+     * @return The outer method of this class.
+     * @throws IOException If an IO error occurs while reading the class.
+     */
+    public abstract @Nullable MethodData computeOuterMethod() throws IOException;
+
+    /**
      * {@code compute} variant of {@link #isStaticInnerClass()}.
      *
      * @return {@code true} if this class is a {@code static} inner class.
+     * @throws IOException If an IO error occurs while reading the class.
      */
-    public abstract boolean computeStaticInnerClass();
+    public abstract boolean computeStaticInnerClass() throws IOException;
 
     /**
      * {@code compute} variant of {@link #isFinal()}.
@@ -186,6 +195,13 @@ public abstract class LazyClassData extends AbstractClassData {
     @Override
     public @Nullable ClassData outerClass() throws IOException {
         return this.outerClass.getOrThrow();
+    }
+
+    @SuppressWarnings("this-escape")
+    private final @NotNull LazyValue<MethodData, IOException> outerMethod = LazyValue.of(this::computeOuterMethod);
+    @Override
+    public @Nullable MethodData outerMethod() throws IOException {
+        return this.outerMethod.getOrThrow();
     }
 
     @SuppressWarnings("this-escape")

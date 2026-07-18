@@ -19,6 +19,7 @@
 package dev.denwav.hypo.types.sig;
 
 import com.google.errorprone.annotations.Immutable;
+import dev.denwav.hypo.types.HierarchyTypeVariableBinder;
 import dev.denwav.hypo.types.intern.Intern;
 import dev.denwav.hypo.types.TypeBindable;
 import dev.denwav.hypo.types.TypeRepresentable;
@@ -98,7 +99,6 @@ public final class ClassSignature extends Intern<ClassSignature> implements Sign
      * @return The {@link ClassSignature}.
      * @throws JvmTypeParseFailureException If the given text does not represent a valid JVM class signature.
      */
-
     public static @NotNull ClassSignature parse(final String text, final int from) throws JvmTypeParseFailureException {
         if (text.length() > 1 && from == 0) {
             final ClassSignature r = Intern.tryFind(ClassSignature.class, text);
@@ -172,33 +172,24 @@ public final class ClassSignature extends Intern<ClassSignature> implements Sign
 
     @Override
     public @NotNull ClassSignature bind(final @NotNull TypeVariableBinder binder) {
-        return ClassSignature.of(
-            this.typeParameters.stream()
-                .map(t -> t.bind(binder))
-                .collect(Collectors.toList()),
-            this.superClass.bind(binder),
-            this.superInterfaces.stream()
-                .map(t -> t.bind(binder))
-                .collect(Collectors.toList())
-        );
-    }
+        final TempTypeParameterHolder currentHolder = new TempTypeParameterHolder();
+        final HierarchyTypeVariableBinder fullBinder = HierarchyTypeVariableBinder.of(currentHolder, binder);
+        for (final TypeParameter t : this.typeParameters) {
+            currentHolder.add(t.bind(fullBinder));
+        }
+        currentHolder.resolveAll();
 
-    @Override
-    public boolean isUnbound() {
-        for (final TypeParameter p : this.typeParameters) {
-            if (p.isUnbound()) {
-                return true;
-            }
+        final ClassTypeSignature newSuperClass = this.superClass.bind(fullBinder);
+        final List<ClassTypeSignature> newSuperInterfaces = this.superInterfaces.stream()
+            .map(t -> t.bind(fullBinder))
+            .collect(Collectors.toList());
+
+        currentHolder.resolve(newSuperClass);
+        for (final ClassTypeSignature si : newSuperInterfaces) {
+            currentHolder.resolve(si);
         }
-        if (this.superClass.isUnbound()) {
-            return true;
-        }
-        for (final ClassTypeSignature c : this.superInterfaces) {
-            if (c.isUnbound()) {
-                return true;
-            }
-        }
-        return false;
+
+        return ClassSignature.of(currentHolder.getTypeParameters(), newSuperClass, newSuperInterfaces);
     }
 
     @Override

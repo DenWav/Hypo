@@ -40,6 +40,7 @@ import dev.denwav.hypo.types.sig.param.TypeArgument;
 import dev.denwav.hypo.types.sig.param.TypeParameter;
 import dev.denwav.hypo.types.sig.param.TypeVariable;
 import dev.denwav.hypo.types.sig.param.WildcardBound;
+import dev.denwav.hypo.types.visitor.TypeVisitor;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -82,19 +83,14 @@ public sealed interface TypeRepresentable extends InternKey
      * @return The new {@link TypeRepresentable}.
      */
     static @Nullable TypeRepresentable of(final Type type) {
-        if (type instanceof final Class<?> clazz) {
-            return TypeSignature.ofOrNull(clazz);
-        } else if (type instanceof final ParameterizedType parameterizedType) {
-            return ClassTypeSignature.of(parameterizedType);
-        } else if (type instanceof final GenericArrayType arrayType) {
-            return ArrayTypeSignature.of(arrayType);
-        } else if (type instanceof final java.lang.reflect.TypeVariable<?> typeVar) {
-            return TypeVariable.of(typeVar);
-        } else if (type instanceof final WildcardType wildcardType) {
-            return TypeArgument.of(wildcardType);
-        } else {
-            return null;
-        }
+        return switch (type) {
+            case final Class<?> clazz -> TypeSignature.ofOrNull(clazz);
+            case final ParameterizedType parameterizedType -> ClassTypeSignature.of(parameterizedType);
+            case final GenericArrayType arrayType -> ArrayTypeSignature.of(arrayType);
+            case final java.lang.reflect.TypeVariable<?> typeVar -> TypeVariable.of(typeVar);
+            case final WildcardType wildcardType -> TypeArgument.of(wildcardType);
+            case null, default -> null;
+        };
     }
 
     /**
@@ -110,6 +106,16 @@ public sealed interface TypeRepresentable extends InternKey
      * @param sb The {@link StringBuilder} to print this type's internal JVM name to.
      */
     void asInternal(final @NotNull StringBuilder sb);
+
+    /**
+     * Accept a {@link TypeVisitor} to visit this type representation.
+     *
+     * @param visitor The {@link TypeVisitor} to accept.
+     * @return The result of {@link TypeVisitor#accept(TypeRepresentable)}.
+     */
+    default boolean accept(final @NotNull TypeVisitor visitor) {
+        return visitor.accept(this);
+    }
 
     @Override
     default @NotNull String internKey() {

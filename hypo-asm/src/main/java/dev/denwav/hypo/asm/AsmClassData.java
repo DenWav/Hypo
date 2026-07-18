@@ -27,8 +27,10 @@ import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.LazyClassData;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
+import dev.denwav.hypo.types.HierarchyTypeVariableBinder;
 import dev.denwav.hypo.types.desc.MethodDescriptor;
 import dev.denwav.hypo.types.sig.ClassSignature;
+import dev.denwav.hypo.types.sig.TypeParameterHolder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -86,10 +88,17 @@ public class AsmClassData extends LazyClassData {
     @Override
     public @Nullable ClassSignature computeSignature() {
         final String sig = this.node.signature;
-        if (sig != null) {
-            return ClassSignature.parse(sig);
-        } else {
+        if (sig == null) {
             return null;
+        }
+        final ClassSignature classSig = ClassSignature.parse(sig);
+        if (classSig.isUnbound()) {
+            final ArrayList<TypeParameterHolder> hierarchy = new ArrayList<>();
+            this.buildTypeVariableContext(hierarchy);
+            final HierarchyTypeVariableBinder binder = HierarchyTypeVariableBinder.of(null, hierarchy);
+            return classSig.bind(binder);
+        } else {
+            return classSig;
         }
     }
 
@@ -112,27 +121,27 @@ public class AsmClassData extends LazyClassData {
     }
 
     @Override
-    public boolean computeStaticInnerClass() {
+    public @Nullable MethodData computeOuterMethod() throws IOException {
+        if (this.node.outerMethod == null) {
+            return null;
+        }
+        final ClassData outerClass = this.outerClass();
+        if (outerClass == null) {
+            return null;
+        }
+        return outerClass.method(this.node.outerMethod, MethodDescriptor.parse(this.node.outerMethodDesc));
+    }
+
+    @Override
+    public boolean computeStaticInnerClass() throws IOException {
         if (this.node.outerClass != null) {
             if ((this.node.access & (Opcodes.ACC_STATIC | Opcodes.ACC_ENUM | Opcodes.ACC_RECORD)) != 0) {
                 return true;
             }
-            if (this.node.outerMethod != null) {
-                final ClassData outerClass;
-                try {
-                    outerClass = this.outerClass();
-                } catch (final IOException e) {
-                    throw HypoModelUtil.rethrow(e);
-                }
-                if (outerClass != null) {
-                    final MethodData outerMethod = outerClass.method(this.node.outerMethod, MethodDescriptor.parse(this.node.outerMethodDesc));
-                    if (outerMethod != null) {
-                        return outerMethod.isStatic();
-                    }
-                }
+            final MethodData outerMethod = this.outerMethod();
+            if (outerMethod != null) {
+                return outerMethod.isStatic();
             }
-            // All we know is it's a class inside a method, which is usually not static. We can't find the method though,
-            // so we have to guess.
             return false;
         }
         final String thisName = this.name();
@@ -293,6 +302,26 @@ public class AsmClassData extends LazyClassData {
             }
         }
         return res;
+    }
+
+    @Override
+    public void buildTypeVariableContext(final List<TypeParameterHolder> hierarchy) {
+        final MethodData outerMethod;
+        final ClassData outerClass;
+        try {
+            outerMethod = this.outerMethod();
+            outerClass = this.outerClass();
+        } catch (final IOException e) {
+            throw HypoModelUtil.rethrow(e);
+        }
+
+        if (outerMethod != null && outerMethod.signature() != null) {
+            hierarchy.add(outerMethod.signature());
+            outerMethod.buildTypeVariableContext(hierarchy);
+        } else if (outerClass != null && outerClass.signature() != null) {
+            hierarchy.add(outerClass.signature());
+            outerClass.buildTypeVariableContext(hierarchy);
+        }
     }
 
     /**

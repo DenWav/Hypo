@@ -26,6 +26,7 @@ import dev.denwav.hypo.model.data.HypoKey;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
 import dev.denwav.hypo.types.sig.ClassSignature;
+import dev.denwav.hypo.types.sig.TypeParameterHolder;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -109,7 +110,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
     }
 
     @Override
-    public void setContextClassProvider(boolean contextClassProvider) {
+    public void setContextClassProvider(final boolean contextClassProvider) {
         this.isContextClassProvider = contextClassProvider;
     }
 
@@ -119,7 +120,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
     }
 
     @Override
-    public void setRequireFullClasspath(boolean requireFullClasspath) {
+    public void setRequireFullClasspath(final boolean requireFullClasspath) {
         this.isRequireFullClasspath = requireFullClasspath;
     }
 
@@ -250,7 +251,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
-            public void setContextClass(boolean contextClass) {
+            public void setContextClass(final boolean contextClass) {
                 throw new IllegalStateException();
             }
 
@@ -260,7 +261,7 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
-            public void setRequireFullClasspath(boolean requireFullClasspath) {
+            public void setRequireFullClasspath(final boolean requireFullClasspath) {
                 throw new IllegalStateException();
             }
 
@@ -276,6 +277,16 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
 
             @Override
             public @Nullable ClassData outerClass() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public @Nullable MethodData outerMethod() {
+                throw new IllegalStateException();
+            }
+
+            @Override
+            public void buildTypeVariableContext(final List<TypeParameterHolder> hierarchy) {
                 throw new IllegalStateException();
             }
 
@@ -350,22 +361,22 @@ public abstract class AbstractClassDataProvider implements ClassDataProvider {
             }
 
             @Override
-            public <T> @Nullable T store(@NotNull HypoKey<T> key, @Nullable T t) {
+            public <T> @Nullable T store(final @NotNull HypoKey<T> key, final @Nullable T t) {
                 throw new IllegalStateException();
             }
 
             @Override
-            public <T> @NotNull T compute(@NotNull HypoKey<T> key, @NotNull Supplier<T> supplier) {
+            public <T> @NotNull T compute(final @NotNull HypoKey<T> key, final @NotNull Supplier<T> supplier) {
                 throw new IllegalStateException();
             }
 
             @Override
-            public <T> @Nullable T get(@NotNull HypoKey<T> key) {
+            public <T> @Nullable T get(final @NotNull HypoKey<T> key) {
                 throw new IllegalStateException();
             }
 
             @Override
-            public boolean contains(@NotNull HypoKey<?> key) {
+            public boolean contains(final @NotNull HypoKey<?> key) {
                 throw new IllegalStateException();
             }
         };

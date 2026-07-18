@@ -57,7 +57,7 @@ public abstract class AbstractClassData extends AbstractHypoData implements Clas
     }
 
     @Override
-    public void setContextClass(boolean contextClass) {
+    public void setContextClass(final boolean contextClass) {
         this.isContextClass = contextClass;
     }
 
@@ -67,7 +67,7 @@ public abstract class AbstractClassData extends AbstractHypoData implements Clas
     }
 
     @Override
-    public void setRequireFullClasspath(boolean requireFullClasspath) {
+    public void setRequireFullClasspath(final boolean requireFullClasspath) {
         this.isRequireFullClasspath = requireFullClasspath;
     }
 

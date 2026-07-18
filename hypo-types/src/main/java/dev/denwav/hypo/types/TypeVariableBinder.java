@@ -18,6 +18,7 @@
 
 package dev.denwav.hypo.types;
 
+import dev.denwav.hypo.types.sig.TypeParameterHolder;
 import dev.denwav.hypo.types.sig.param.TypeParameter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

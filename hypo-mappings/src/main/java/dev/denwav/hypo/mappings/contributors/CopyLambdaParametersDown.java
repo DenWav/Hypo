@@ -91,12 +91,12 @@ public class CopyLambdaParametersDown implements ChangeContributor {
 
             LambdaClosure closure = null;
             for (final LambdaClosure possibleLambdaClosure : lambdaClosures) {
-                if (possibleLambdaClosure.getLambda().equals(method)) {
+                if (possibleLambdaClosure.lambda().equals(method)) {
                     closure = possibleLambdaClosure;
                     break;
                 }
             }
-            if (closure == null || closure.getInterfaceMethod() == null) {
+            if (closure == null || closure.interfaceMethod() == null) {
                 continue;
             }
 
@@ -107,8 +107,8 @@ public class CopyLambdaParametersDown implements ChangeContributor {
                 }
             }
 
-            final MethodData ifaceMethod = closure.getInterfaceMethod();
-            final int paramOffset = closure.getParamLvtIndices().length - 1;
+            final MethodData ifaceMethod = closure.interfaceMethod();
+            final int paramOffset = closure.paramLvtIndices().length - 1;
 
             final ClassMapping<?, ?> ifaceClassMapping = getClassMapping(registry.getMappings(), ifaceMethod.parentClass().name());
             final MethodMapping ifaceMethodMapping = getMethodMapping(ifaceClassMapping, ifaceMethod);

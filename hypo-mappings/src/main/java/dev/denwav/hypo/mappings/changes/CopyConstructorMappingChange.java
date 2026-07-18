@@ -25,7 +25,6 @@ import dev.denwav.hypo.mappings.MergeableMappingsChange;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.BiConsumer;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.model.ClassMapping;
 import org.cadixdev.lorenz.model.MethodMapping;
@@ -103,11 +102,11 @@ public class CopyConstructorMappingChange
         final MethodMapping targetMapping = classMapping.getOrCreateMethodMapping(target.name(), target.desc());
 
         for (final SuperCall.SuperCallParameter param : this.params) {
-            final MethodParameterMapping paramMapping = getParameterMapping(this.superMapping, param.getSuperIndex());
+            final MethodParameterMapping paramMapping = getParameterMapping(this.superMapping, param.superIndex());
             if (paramMapping == null) {
                 continue;
             }
-            targetMapping.getOrCreateParameterMapping(param.getThisIndex())
+            targetMapping.getOrCreateParameterMapping(param.thisIndex())
                 .setDeobfuscatedName(paramMapping.getDeobfuscatedName());
         }
     }
@@ -131,8 +130,8 @@ public class CopyConstructorMappingChange
         for (final MethodParameterMapping thisParamMapping : this.superMapping.getParameterMappings()) {
             final int index = thisParamMapping.getIndex();
             for (final SuperCall.SuperCallParameter thisParam : this.params) {
-                if (index == thisParam.getSuperIndex()) {
-                    mergedParams.put(thisParam.getThisIndex(), thisParamMapping.getDeobfuscatedName());
+                if (index == thisParam.superIndex()) {
+                    mergedParams.put(thisParam.thisIndex(), thisParamMapping.getDeobfuscatedName());
                     break;
                 }
             }
@@ -141,12 +140,12 @@ public class CopyConstructorMappingChange
         for (final MethodParameterMapping thatParamMapping : that.superMapping.getParameterMappings()) {
             final int index = thatParamMapping.getIndex();
             for (final SuperCall.SuperCallParameter thatParam : that.params) {
-                if (index != thatParam.getSuperIndex()) {
+                if (index != thatParam.superIndex()) {
                     continue;
                 }
-                final String existingMapping = mergedParams.get(thatParam.getThisIndex());
+                final String existingMapping = mergedParams.get(thatParam.thisIndex());
                 if (existingMapping == null) {
-                    mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                    mergedParams.put(thatParam.thisIndex(), thatParamMapping.getDeobfuscatedName());
                 } else {
                     if (existingMapping.equals(thatParamMapping.getDeobfuscatedName())) {
                         // nothing to do, they match
@@ -163,7 +162,7 @@ public class CopyConstructorMappingChange
                     if (thisCount > thatCount) {
                         break;
                     } else if (thisCount < thatCount) {
-                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                        mergedParams.put(thatParam.thisIndex(), thatParamMapping.getDeobfuscatedName());
                         break;
                     }
 
@@ -173,7 +172,7 @@ public class CopyConstructorMappingChange
                     if (thisClassNameLen < thatClassNameLen) {
                         break;
                     } else if (thisClassNameLen > thatClassNameLen) {
-                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                        mergedParams.put(thatParam.thisIndex(), thatParamMapping.getDeobfuscatedName());
                         break;
                     }
 
@@ -183,7 +182,7 @@ public class CopyConstructorMappingChange
                     if (existingLen < otherLen) {
                         break;
                     } else if (existingLen > otherLen) {
-                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                        mergedParams.put(thatParam.thisIndex(), thatParamMapping.getDeobfuscatedName());
                         break;
                     }
 
@@ -195,7 +194,7 @@ public class CopyConstructorMappingChange
                     if (existingHash < otherHash) {
                         break;
                     } else if (existingHash > otherHash) {
-                        mergedParams.put(thatParam.getThisIndex(), thatParamMapping.getDeobfuscatedName());
+                        mergedParams.put(thatParam.thisIndex(), thatParamMapping.getDeobfuscatedName());
                     }
                 }
             }

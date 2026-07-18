@@ -215,7 +215,7 @@ public final class HypoModelUtil {
 
         @SuppressWarnings("FunctionalInterfaceMethodChanged")
         @Override
-        default R apply(T t) {
+        default R apply(final T t) {
             try {
                 return this.applyThrowing(t);
             } catch (final Throwable x) {
@@ -245,7 +245,7 @@ public final class HypoModelUtil {
 
         @SuppressWarnings("FunctionalInterfaceMethodChanged")
         @Override
-        default void accept(T t) {
+        default void accept(final T t) {
             try {
                 this.acceptThrowing(t);
             } catch (final Throwable x) {

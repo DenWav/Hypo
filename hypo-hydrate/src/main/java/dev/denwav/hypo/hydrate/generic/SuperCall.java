@@ -21,7 +21,6 @@ package dev.denwav.hypo.hydrate.generic;
 import dev.denwav.hypo.model.data.ConstructorData;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,53 +30,47 @@ import org.jetbrains.annotations.NotNull;
  *
  * <p>Note that for the purposes of this class, both {@code super()} and {@code this()} calls are considered super
  * constructor calls.
+ *
+ * @param thisConstructor  The {@link ConstructorData constructor} which calls to the {@code superConstructor}.
+ * @param superConstructor The {@link ConstructorData constructor} referred to by the {@code this()} or
+ *                         {@code super()} call.
+ * @param params           The {@link SuperCallParameter parameters} which were passed directly from {@code thisConstructor}
+ *                         to the {@code superConstructor}.
  */
-public final class SuperCall {
-    private final @NotNull ConstructorData thisConstructor;
-    private final @NotNull ConstructorData superConstructor;
-    private final @NotNull List<@NotNull SuperCallParameter> params;
-
-    /**
-     * Construct a new {@link SuperCall}.
-     *
-     * @param thisConstructor The {@link ConstructorData constructor} which calls to the {@code superConstructor}.
-     * @param superConstructor The {@link ConstructorData constructor} referred to by the {@code this()} or
-     *                         {@code super()} call.
-     * @param params The {@link SuperCallParameter parameters} which were passed directly from {@code thisConstructor}
-     *               to the {@code superConstructor}.
-     */
-    public SuperCall(
-        final @NotNull ConstructorData thisConstructor,
-        final @NotNull ConstructorData superConstructor,
-        final @NotNull List<@NotNull SuperCallParameter> params
-    ) {
-        this.thisConstructor = thisConstructor;
-        this.superConstructor = superConstructor;
-        this.params = params;
-    }
+public record SuperCall(
+    @NotNull ConstructorData thisConstructor,
+    @NotNull ConstructorData superConstructor,
+    @NotNull List<@NotNull SuperCallParameter> params
+) {
 
     /**
      * Returns {@code this} {@link ConstructorData constructor}.
+     *
      * @return {@code this} {@link ConstructorData constructor}.
      */
-    public @NotNull ConstructorData getThisConstructor() {
+    @Override
+    public @NotNull ConstructorData thisConstructor() {
         return this.thisConstructor;
     }
 
     /**
      * Returns the {@code super} {@link ConstructorData constructor}.
+     *
      * @return The {@code super} {@link ConstructorData constructor}.
      */
-    public @NotNull ConstructorData getSuperConstructor() {
+    @Override
+    public @NotNull ConstructorData superConstructor() {
         return this.superConstructor;
     }
 
     /**
      * Returns the {@link SuperCallParameter parameters} which were passed directly from {@code thisConstructor} to the
      * {@code superConstructor}.
+     *
      * @return The {@link SuperCallParameter parameters}.
      */
-    public @NotNull List<@NotNull SuperCallParameter> getParams() {
+    @Override
+    public @NotNull List<@NotNull SuperCallParameter> params() {
         return this.params;
     }
 
@@ -86,7 +79,7 @@ public final class SuperCall {
      * super call to another.
      *
      * <p>For example, given the following set of constructor calls:
-     *Returns the {@link SuperCallParameter parameters}
+     * Returns the {@link SuperCallParameter parameters}
      * <pre>
      *     public SomeClass(int i) {
      *     }
@@ -119,28 +112,26 @@ public final class SuperCall {
 
         for (final SuperCallParameter thisParam : this.params) {
             for (final SuperCallParameter thatParam : that.params) {
-                if (thisParam.getThisIndex() == thatParam.getSuperIndex()) {
-                    newParams.add(new SuperCallParameter(thatParam.getThisIndex(), thisParam.getSuperIndex()));
+                if (thisParam.thisIndex() == thatParam.superIndex()) {
+                    newParams.add(new SuperCallParameter(thatParam.thisIndex(), thisParam.superIndex()));
                 }
             }
         }
 
-        return new SuperCall(that.getThisConstructor(), this.getSuperConstructor(), newParams);
+        return new SuperCall(that.thisConstructor(), this.superConstructor(), newParams);
     }
 
     @Override
     public boolean equals(final Object o) {
-        if (this == o) return true;
-        if (!(o instanceof SuperCall)) return false;
-        final SuperCall superCall = (SuperCall) o;
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof final SuperCall superCall)) {
+            return false;
+        }
         return this.thisConstructor.equals(superCall.thisConstructor)
             && this.superConstructor.equals(superCall.superConstructor)
             && this.params.equals(superCall.params);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(this.thisConstructor, this.superConstructor, this.params);
     }
 
     @Override
@@ -187,49 +178,41 @@ public final class SuperCall {
      *     <li>{@code thisIndex} of {@code 0} and {@code superIndex} of {@code 1}</li>
      *     <li>{@code thisIndex} of {@code 1} and {@code superIndex} of {@code 0}</li>
      * </ol>
+     *
+     * @param thisIndex  The index for the parameter of the current constructor.
+     * @param superIndex The index for the parameter of the super constructor.
      */
-    public static final class SuperCallParameter {
-        private final int thisIndex;
-        private final int superIndex;
-
-        /**
-         * Construct a new super call parameter mapping between the given {@code thisIndex} and {@code superIndex}.
-         *
-         * @param thisIndex The index for the parameter of the current constructor.
-         * @param superIndex The index for the parameter of the super constructor.
-         */
-        public SuperCallParameter(final int thisIndex, final int superIndex) {
-            this.thisIndex = thisIndex;
-            this.superIndex = superIndex;
-        }
+    public record SuperCallParameter(int thisIndex, int superIndex) {
 
         /**
          * Returns the index for the parameter of the current constructor.
+         *
          * @return The index for the parameter of the current constructor.
          */
-        public int getThisIndex() {
+        @Override
+        public int thisIndex() {
             return this.thisIndex;
         }
 
         /**
          * Returns the index for the parameter of the super constructor.
+         *
          * @return The index for the parameter of the super constructor.
          */
-        public int getSuperIndex() {
+        @Override
+        public int superIndex() {
             return this.superIndex;
         }
 
         @Override
         public boolean equals(final Object o) {
-            if (this == o) return true;
-            if (!(o instanceof SuperCallParameter)) return false;
-            final SuperCallParameter that = (SuperCallParameter) o;
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof final SuperCallParameter that)) {
+                return false;
+            }
             return this.thisIndex == that.thisIndex && this.superIndex == that.superIndex;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.thisIndex, this.superIndex);
         }
 
         @Override

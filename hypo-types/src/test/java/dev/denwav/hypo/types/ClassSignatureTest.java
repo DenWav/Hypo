@@ -26,14 +26,17 @@ import dev.denwav.hypo.types.sig.param.TypeVariable;
 import dev.denwav.hypo.types.sig.param.WildcardArgument;
 import dev.denwav.hypo.types.sig.param.WildcardBound;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SuppressWarnings("unused")
+@DisplayName("[types] ClassSignature Tests")
 class ClassSignatureTest {
 
     @Test
+    @DisplayName("Test collection generic class signature parsing")
     void testCollectionGeneric() {
         final String s = "<E:Ljava/lang/Object;>Ljava/lang/Object;Ljava/lang/Iterable<TE;>;";
 
@@ -53,6 +56,7 @@ class ClassSignatureTest {
     }
 
     @Test
+    @DisplayName("Test double generic class signature parsing")
     void testDoubleGeneric() {
         final String s = "<K:Ljava/lang/Object;V:Ljava/lang/Object;>Ljava/util/Collections$CheckedSortedMap<TK;TV;>;Ljava/util/NavigableMap<TK;TV;>;Ljava/io/Serializable;";
 
@@ -74,6 +78,7 @@ class ClassSignatureTest {
     }
 
     @Test
+    @DisplayName("Test interface bound type parameter parsing")
     void testTypeParamInterfaceBound() {
         final String s = "<D::Ljava/time/chrono/ChronoLocalDate;>Ljava/lang/Object;Ljava/time/chrono/ChronoLocalDate;Ljava/time/temporal/Temporal;Ljava/time/temporal/TemporalAdjuster;Ljava/io/Serializable;";
 
@@ -96,6 +101,7 @@ class ClassSignatureTest {
     }
 
     @Test
+    @DisplayName("Test nested generic type argument parsing")
     void testNestedArgument() {
         final String s = "Ljava/lang/Object;Lsun/util/locale/provider/LocaleServiceProviderPool$LocalizedObjectGetter<Ljava/util/spi/CalendarNameProvider;Ljava/util/Map<Ljava/lang/String;Ljava/lang/Integer;>;>;";
 
@@ -123,6 +129,7 @@ class ClassSignatureTest {
     }
 
     @Test
+    @DisplayName("Test wildcard type argument parsing")
     void testWildcard() {
         final String s = "<T:Ljava/lang/Object;>Ljava/lang/Object;Ljava/io/Serializable;Ljava/lang/reflect/GenericDeclaration;Ljava/lang/reflect/Type;Ljava/lang/reflect/AnnotatedElement;Ljava/lang/invoke/TypeDescriptor$OfField<Ljava/lang/Class<*>;>;Ljava/lang/constant/Constable;";
 
@@ -150,6 +157,7 @@ class ClassSignatureTest {
     }
 
     @Test
+    @DisplayName("Test upper-bounded wildcard type argument parsing")
     void testPlus() {
         final String s = "Lcom/sun/source/util/SimpleDocTreeVisitor<Ljava/util/List<+Lcom/sun/source/doctree/DocTree;>;Ljava/lang/Void;>;";
 
@@ -174,6 +182,7 @@ class ClassSignatureTest {
     }
 
     @Test
+    @DisplayName("Test lower-bounded wildcard type argument parsing")
     void testMinus() {
         final String s = "<S::Ljava/util/concurrent/Flow$Subscriber<-Ljava/util/List<Ljava/nio/ByteBuffer;>;>;R:Ljava/lang/Object;>Ljava/lang/Object;Ljdk/internal/net/http/ResponseSubscribers$TrustedSubscriber<TR;>;";
 

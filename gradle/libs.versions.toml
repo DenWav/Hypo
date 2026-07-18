@@ -1,6 +1,5 @@
 [versions]
-junit = "5.11.3"
-junit-platform = "1.11.3"
+junit = "6.1.1"
 errorprone = "2.36.0"
 asm = "9.10.1"
 slf4j = "2.0.16"
@@ -11,7 +10,7 @@ nexusPublish = "io.github.gradle-nexus.publish-plugin:2.0.0"
 
 [libraries]
 # Deps
-annotations = "org.jetbrains:annotations:26.0.1"
+annotations = "org.jetbrains:annotations:26.1.0"
 slf4j-api = { module = "org.slf4j:slf4j-api", version.ref = "slf4j" }
 slf4j-log4j2-impl = { module = "org.apache.logging.log4j:log4j-slf4j2-impl", version.ref = "log4j" }
 log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
@@ -32,8 +31,9 @@ staxUtils = "net.java.dev.stax-utils:stax-utils:20070216"
 
 # Testing
 junit-api = { module = "org.junit.jupiter:junit-jupiter-api", version.ref = "junit" }
+junit-params = { module = "org.junit.jupiter:junit-jupiter-params", version.ref = "junit" }
 junit-runtime = { module = "org.junit.jupiter:junit-jupiter-engine", version.ref = "junit" }
-junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit-platform" }
+junit-launcher = { module = "org.junit.platform:junit-platform-launcher", version.ref = "junit" }
 
 guava = "com.google.guava:guava:33.4.7-jre"
 

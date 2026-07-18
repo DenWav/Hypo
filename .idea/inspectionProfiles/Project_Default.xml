@@ -2,6 +2,10 @@
   <profile version="1.0">
     <option name="myName" value="Project Default" />
     <inspection_tool class="CodeBlock2Expr" enabled="true" level="INFORMATION" enabled_by_default="true" />
+    <inspection_tool class="LocalCanBeFinal" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="REPORT_VARIABLES" value="true" />
+      <option name="REPORT_PARAMETERS" value="true" />
+    </inspection_tool>
     <inspection_tool class="UnqualifiedFieldAccess" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UnqualifiedMethodAccess" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="UnstableApiUsage" enabled="true" level="INFORMATION" enabled_by_default="true" />
@@ -19,6 +23,7 @@
       <option name="ADD_NONJAVA_TO_ENTRIES" value="true" />
       <option name="selected" value="true" />
       <option name="mixinEntryPoint" value="true" />
+      <option name="selected" value="true" />
     </inspection_tool>
   </profile>
 </component>

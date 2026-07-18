@@ -146,7 +146,7 @@ public final class ChangeRegistry {
                 final List<MappingsChange> changes = e.getValue();
                 Class<? extends MappingsChange> clazz = null;
                 for (final MappingsChange change : changes) {
-                    Class<? extends MappingsChange> changeClazz = change.getClass();
+                    final Class<? extends MappingsChange> changeClazz = change.getClass();
                     if (clazz == null) {
                         clazz = changeClazz;
                     }

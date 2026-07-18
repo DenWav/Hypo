@@ -27,11 +27,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicLong;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("[types] MethodSignature Thread Contention Tests")
 public class MethodSignatureThreadContentionTest {
 
     @Test
+    @DisplayName("Test method signature parsing thread contention under virtual threads")
     void testThreadContention() throws ExecutionException, InterruptedException {
         final AtomicLong counter = new AtomicLong(0);
 

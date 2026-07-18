@@ -28,7 +28,7 @@ public class HypoException extends RuntimeException {
      *
      * @param message The message for this exception.
      */
-    public HypoException(String message) {
+    public HypoException(final String message) {
         super(message);
     }
 
@@ -38,7 +38,7 @@ public class HypoException extends RuntimeException {
      * @param message The message for this exception.
      * @param cause The cause of this exception.
      */
-    public HypoException(String message, Throwable cause) {
+    public HypoException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

@@ -25,11 +25,13 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+@DisplayName("[types] Intern Tests")
 class InternTest {
 
     private static final MethodHandle constructor;
@@ -43,6 +45,7 @@ class InternTest {
     }
 
     @Test
+    @DisplayName("Test type descriptor interning basic behavior")
     void testIntern() {
         final TypeDescriptor first = TypeDescriptor.parse("Ljava/lang/String;");
         final TypeDescriptor second = TypeDescriptor.parse("Ljava/lang/String;");
@@ -54,6 +57,7 @@ class InternTest {
     }
 
     @Test
+    @DisplayName("Test interning of programmatically created separate class descriptor instances")
     void testInternOnSeparate() throws Throwable {
         final ClassTypeDescriptor instance1 = (ClassTypeDescriptor) constructor.invoke("java/lang/String");
         final ClassTypeDescriptor instance2 = (ClassTypeDescriptor) constructor.invoke("java/lang/String");

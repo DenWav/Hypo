@@ -19,13 +19,16 @@
 package dev.denwav.hypo.types.pattern;
 
 import java.util.HashSet;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisplayName("[types] TypeCapture Tests")
 class TypeCaptureTest {
 
     @Test
+    @DisplayName("Test random key generation uniqueness")
     void testKeyGen() {
         final HashSet<String> set = new HashSet<>();
         for (int i = 0; i < 250_000; i++) {

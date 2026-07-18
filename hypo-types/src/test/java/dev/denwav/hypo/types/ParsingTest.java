@@ -26,11 +26,14 @@ import dev.denwav.hypo.types.sig.ClassTypeSignature;
 import dev.denwav.hypo.types.sig.TypeSignature;
 import java.util.List;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("[types] Parsing Tests")
 class ParsingTest {
 
     @Test
+    @DisplayName("Test type descriptor parsing")
     void testTypeDescriptor() {
         Assertions.assertEquals(ClassTypeDescriptor.of("java/lang/Object"), TypeDescriptor.parse("Ljava/lang/Object;"));
         Assertions.assertEquals(ArrayTypeDescriptor.of(2, ClassTypeDescriptor.of("java/lang/Object")), TypeDescriptor.parse("[[Ljava/lang/Object;"));
@@ -46,6 +49,7 @@ class ParsingTest {
     }
 
     @Test
+    @DisplayName("Test type signature parsing")
     void testTypeSignature() {
         Assertions.assertEquals(ClassTypeSignature.of(null, "java/lang/Object", null), TypeSignature.parse("Ljava/lang/Object;"));
         Assertions.assertEquals(ArrayTypeSignature.of(2, ClassTypeSignature.of(null, "java/lang/Object", null)), TypeSignature.parse("[[Ljava/lang/Object;"));
