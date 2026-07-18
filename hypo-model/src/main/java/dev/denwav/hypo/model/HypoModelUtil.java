@@ -19,6 +19,7 @@
 package dev.denwav.hypo.model;
 
 import dev.denwav.hypo.types.HypoTypesUtil;
+import java.io.IOException;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.Contract;
@@ -225,6 +226,40 @@ public final class HypoModelUtil {
     }
 
     /**
+     * Version of {@link Function} which allows throwing checked exception inside the method implementation. When the
+     * {@link Function#apply(Object)} method is invoked it will call {@link #applyThrowing(Object)}, rethrowing any
+     * exceptions thrown as unchecked using {@link #rethrow(Throwable)}. {@link IOException} is expliclty thrown here
+     * to allow it to be handled separately from {@link X}.
+     *
+     * @param <T> The input type of the function.
+     * @param <R> The return type of the function.
+     * @param <X> The exception the function may throw.
+     */
+    @FunctionalInterface
+    public interface IoThrowingFunction<T, R, X extends Throwable> extends Function<T, R> {
+
+        /**
+         * The same as {@link #apply(Object)}, but also allowing checked exceptions to be thrown.
+         *
+         * @param t The function argument
+         * @return The function result
+         * @throws IOException If an IO error occurs.
+         * @throws X The type of the exception which this method throws
+         */
+        R applyThrowing(T t) throws IOException, X;
+
+        @SuppressWarnings("FunctionalInterfaceMethodChanged")
+        @Override
+        default R apply(final T t) {
+            try {
+                return this.applyThrowing(t);
+            } catch (final Throwable x) {
+                throw HypoModelUtil.rethrow(x);
+            }
+        }
+    }
+
+    /**
      * Version of {@link Consumer} which allows throwing checked exception inside the method implementation. When the
      * {@link Consumer#accept(Object)} method is invoked it will call {@link #acceptThrowing(Object)}, rethrowing any
      * exceptions thrown as unchecked using {@link #rethrow(Throwable)}.
@@ -242,6 +277,38 @@ public final class HypoModelUtil {
          * @throws X The type of the exception which this method throws
          */
         void acceptThrowing(T t) throws X;
+
+        @SuppressWarnings("FunctionalInterfaceMethodChanged")
+        @Override
+        default void accept(final T t) {
+            try {
+                this.acceptThrowing(t);
+            } catch (final Throwable x) {
+                throw HypoModelUtil.rethrow(x);
+            }
+        }
+    }
+
+    /**
+     * Version of {@link Consumer} which allows throwing checked exception inside the method implementation. When the
+     * {@link Consumer#accept(Object)} method is invoked it will call {@link #acceptThrowing(Object)}, rethrowing any
+     * exceptions thrown as unchecked using {@link #rethrow(Throwable)}. {@link IOException} is expliclty thrown here
+     * to allow it to be handled separately from {@link X}.
+     *
+     * @param <T> The input type of the consumer.
+     * @param <X> The exception the consumer may throw.
+     */
+    @FunctionalInterface
+    public interface IoThrowingConsumer<T, X extends Throwable> extends Consumer<T> {
+
+        /**
+         * The same as {@link #accept(Object)}, but also allowing checked exceptions to be thrown.
+         *
+         * @param t The input argument
+         * @throws IOException If an IO error occurs.
+         * @throws X The type of the exception which this method throws
+         */
+        void acceptThrowing(T t) throws IOException, X;
 
         @SuppressWarnings("FunctionalInterfaceMethodChanged")
         @Override

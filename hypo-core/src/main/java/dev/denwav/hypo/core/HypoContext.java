@@ -24,6 +24,9 @@ import dev.denwav.hypo.model.ClassDataDecorator;
 import dev.denwav.hypo.model.ClassDataProvider;
 import dev.denwav.hypo.model.ClassDataProviderSet;
 import dev.denwav.hypo.model.HypoModelUtil;
+import dev.denwav.hypo.model.data.ClassData;
+import dev.denwav.hypo.types.desc.ClassTypeDescriptor;
+import dev.denwav.hypo.types.desc.TypeDescriptor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -31,6 +34,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -101,6 +105,69 @@ public final class HypoContext implements AutoCloseable {
      */
     public @NotNull ClassDataProvider getContextProvider() {
         return this.contextProvider;
+    }
+
+    /**
+     * Search for the given {@code className} in the {@link #getProvider() provider} and {@link #getContextProvider()
+     * context provider}. Prioritizes classes in the standard provider over the context provider.
+     *
+     * @param className The internal JVM name of the class.
+     * @return The parsed {@link ClassData} object corresponding with the given name, or {@code null} if the class name
+     *         cannot be found.
+     * @throws IOException If an IO error occurs while attempting to read the class file.
+     * @see ClassDataProvider#findClass(String)
+     */
+    @Contract("null -> null")
+    public @Nullable ClassData findClass(final @Nullable String className) throws IOException {
+        final ClassData c = this.getProvider().findClass(className);
+        if (c != null) {
+            return c;
+        }
+        return this.getContextProvider().findClass(className);
+    }
+
+    /**
+     * This is a convenience method for resolving the {@link ClassData} object corresponding to a given
+     * {@link TypeDescriptor}. The {@link TypeDescriptor} passed to this method must be a {@link ClassTypeDescriptor},
+     * or this method will always return {@code null}. Searches for the given {@code type} in the
+     * {@link #getProvider() provider} and {@link #getContextProvider() context provider}. Prioritizes classes in the
+     * standard provider over the context provider.
+     *
+     * @param type The {@link TypeDescriptor} of the class to find. Must be an instance of {@link ClassTypeDescriptor}
+     *             or this method will always return {@code null}.
+     * @return The parsed {@link ClassData} object corresponding with the given name, or {@code null} if the class name
+     *         cannot be found.
+     * @throws IOException If an IO error occurs while attempting to read the class file.
+     * @see ClassDataProvider#findClass(TypeDescriptor)
+     */
+
+    @Contract("null -> null")
+    public @Nullable ClassData findClass(final @Nullable TypeDescriptor type) throws IOException {
+        final ClassData c = this.getProvider().findClass(type);
+        if (c != null) {
+            return c;
+        }
+        return this.getContextProvider().findClass(type);
+    }
+
+    /**
+     * Convenience method that simply delegates to {@link ClassDataProvider#allClasses()} of the
+     * {@link #getProvider() standard provider}.
+     * @return An {@link Iterable} which will iterate over all classes available in the standard provider.
+     * @see ClassDataProvider#allClasses()
+     */
+    public @NotNull Iterable<ClassData> allClasses() {
+        return this.getProvider().allClasses();
+    }
+
+    /**
+     * Convenience method that simply delegates to {@link ClassDataProvider#stream()} ()} of the
+     * {@link #getProvider() standard provider}.
+     * @return A {@link Stream} which will iterate over all classes available in this provider.
+     * @see ClassDataProvider#stream() ()
+     */
+    public @NotNull Stream<ClassData> stream() throws IOException {
+        return this.getProvider().stream();
     }
 
     /**

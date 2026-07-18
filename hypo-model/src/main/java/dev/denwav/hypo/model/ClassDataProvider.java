@@ -124,7 +124,7 @@ public interface ClassDataProvider extends AutoCloseable {
     @Nullable ClassData findClass(final @Nullable String className) throws IOException;
 
     /**
-     * This is a convenience method for resolving the {@link ClassData} object corresponding to a give
+     * This is a convenience method for resolving the {@link ClassData} object corresponding to a given
      * {@link TypeDescriptor}. The {@link TypeDescriptor} passed to this method must be a {@link ClassTypeDescriptor},
      * or this method will always return {@code null}.
      *
