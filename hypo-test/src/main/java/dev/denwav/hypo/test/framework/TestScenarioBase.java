@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import net.fabricmc.lorenztiny.TinyMappingFormat;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.config.Configurator;
 import org.cadixdev.lorenz.MappingSet;
 import org.cadixdev.lorenz.io.MappingFormats;
