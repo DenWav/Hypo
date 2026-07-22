@@ -83,7 +83,7 @@ public final class TypeParameter extends Intern<TypeParameter> implements TypeBi
         final @NotNull String name,
         final @NotNull ReferenceTypeSignature classBound
     ) {
-        return new TypeParameter(name, classBound, List.of()).intern();
+        return TypeParameter.of(name, classBound, List.of());
     }
 
     /**
@@ -94,7 +94,7 @@ public final class TypeParameter extends Intern<TypeParameter> implements TypeBi
     public static @NotNull TypeParameter of(
         final @NotNull String name
     ) {
-        return new TypeParameter(name, ClassTypeSignature.of("java/lang/Object"), List.of()).intern();
+        return TypeParameter.of(name, ClassTypeSignature.of("java/lang/Object"), List.of());
     }
 
     private TypeParameter(
@@ -162,19 +162,6 @@ public final class TypeParameter extends Intern<TypeParameter> implements TypeBi
         );
     }
 
-    @Override
-    public boolean isUnbound() {
-        if (this.classBound != null && this.classBound.isUnbound()) {
-            return true;
-        }
-        for (final ReferenceTypeSignature b : this.interfaceBounds) {
-            if (b.isUnbound()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Get the name of the type parameter, as it appears in the Java source code.
      * @return The name of the type parameter.
@@ -201,6 +188,9 @@ public final class TypeParameter extends Intern<TypeParameter> implements TypeBi
 
     @Override
     public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof final TypeParameter that)) {
             return false;
         }

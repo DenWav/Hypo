@@ -19,6 +19,7 @@
 package dev.denwav.hypo.types.sig;
 
 import com.google.errorprone.annotations.Immutable;
+import dev.denwav.hypo.types.HierarchyTypeVariableBinder;
 import dev.denwav.hypo.types.TypeBindable;
 import dev.denwav.hypo.types.kind.MethodType;
 import dev.denwav.hypo.types.intern.Intern;
@@ -124,44 +125,32 @@ public final class MethodSignature
 
     @Override
     public @NotNull MethodSignature bind(final @NotNull TypeVariableBinder binder) {
-        final List<TypeParameter> newTypeParams = this.typeParameters.stream()
-            .map(t -> t.bind(binder))
-            .collect(Collectors.toList());
+        final TempTypeParameterHolder currentHolder = new TempTypeParameterHolder();
+        final HierarchyTypeVariableBinder fullBinder = HierarchyTypeVariableBinder.of(currentHolder, binder);
+        for (final TypeParameter t : this.typeParameters) {
+            currentHolder.add(t.bind(fullBinder));
+        }
+        currentHolder.resolveAll();
 
         final List<TypeSignature> newParams = this.parameters.stream()
-            .map(t -> t.bind(binder))
+            .map(t -> t.bind(fullBinder))
             .collect(Collectors.toList());
 
-        final TypeSignature newReturnType = this.returnType.bind(binder);
+        final TypeSignature newReturnType = this.returnType.bind(fullBinder);
 
         final List<ThrowsSignature> newThrows = this.throwsSignatures.stream()
-            .map(t -> t.bind(binder))
+            .map(t -> t.bind(fullBinder))
             .collect(Collectors.toList());
 
-        return MethodSignature.of(newTypeParams, newParams, newReturnType, newThrows);
-    }
+        for (final TypeSignature p : newParams) {
+            currentHolder.resolve(p);
+        }
+        currentHolder.resolve(newReturnType);
+        for (final ThrowsSignature th : newThrows) {
+            currentHolder.resolve(th);
+        }
 
-    @Override
-    public boolean isUnbound() {
-        for (final TypeParameter t : this.typeParameters) {
-            if (t.isUnbound()) {
-                return true;
-            }
-        }
-        for (final TypeSignature p : this.parameters) {
-            if (p.isUnbound()) {
-                return true;
-            }
-        }
-        if (this.returnType.isUnbound()) {
-            return true;
-        }
-        for (final ThrowsSignature t : this.throwsSignatures) {
-            if (t.isUnbound()) {
-                return true;
-            }
-        }
-        return false;
+        return MethodSignature.of(currentHolder.getTypeParameters(), newParams, newReturnType, newThrows);
     }
 
     @Override

@@ -30,64 +30,59 @@ import org.jetbrains.annotations.Nullable;
  *
  * <p>This class requires a hydrator to determine where it should be placed corresponding to the code being analyzed. Use
  * {@link HypoHydration#LAMBDA_CALLS}.
+ *
+ * @param containingMethod The method that contains the lambda expression.
+ * @param interfaceMethod  The method the lambda expression is implementing.
+ * @param lambda           The method which is generated as the implementation of the lambda.
+ * @param paramLvtIndices  The local variable indices from the containing method which are captured by the lambda expression.
  */
-public final class LambdaClosure {
-
-    private final @NotNull MethodData containingMethod;
-    private final @Nullable MethodData interfaceMethod;
-    private final @NotNull MethodData lambda;
-    private final int @NotNull [] paramLvtIndices;
-
-    /**
-     * Creates a new {@link LambdaClosure}.
-     * @param containingMethod The method that contains the lambda expression.
-     * @param interfaceMethod The method the lambda expression is implementing.
-     * @param lambda The method which is generated as the implementation of the lambda.
-     * @param paramLvtIndices The local variable indices from the containing method which are captured by the lambda expression.
-     */
-    public LambdaClosure(
-        final @NotNull MethodData containingMethod,
-        final @Nullable MethodData interfaceMethod,
-        final @NotNull MethodData lambda,
-        final int @NotNull [] paramLvtIndices
-    ) {
-        this.containingMethod = containingMethod;
-        this.interfaceMethod = interfaceMethod;
-        this.lambda = lambda;
-        this.paramLvtIndices = paramLvtIndices;
-    }
+@SuppressWarnings("ArrayRecordComponent")
+public record LambdaClosure(
+    @NotNull MethodData containingMethod,
+    @Nullable MethodData interfaceMethod,
+    @NotNull MethodData lambda,
+    int @NotNull [] paramLvtIndices
+) {
 
     /**
      * Returns the method which contains the lambda expression.
+     *
      * @return The method which contains the lambda expression.
      */
-    public @NotNull MethodData getContainingMethod() {
+    @Override
+    public @NotNull MethodData containingMethod() {
         return this.containingMethod;
     }
 
 
     /**
-     * Returns the single abstract method on the functional interface the {@link #getLambda() lambda} expression implements.
-     * @return Tthe single abstract method on the functional interface the {@link #getLambda() lambda} expression implements.
+     * Returns the single abstract method on the functional interface the {@link #lambda} expression implements.
+     *
+     * @return The single abstract method on the functional interface the {@link #lambda} expression implements.
      */
-    public @Nullable MethodData getInterfaceMethod() {
+    @Override
+    public @Nullable MethodData interfaceMethod() {
         return this.interfaceMethod;
     }
 
     /**
      * Returns the lambda expression itself. This is the synthetic method which is generated which contains the implementation
      * of the lambda method.
+     *
      * @return The lambda expression itself.
      */
-    public @NotNull MethodData getLambda() {
+    @Override
+    public @NotNull MethodData lambda() {
         return this.lambda;
     }
 
     /**
-     * Returns the local variable table slots that the {@link #getLambda() lambda} expression captures.
-     * @return The local variable table slots that the {@link #getLambda() lambda} expression captures.
+     * Returns the local variable table slots that the {@link #lambda} expression captures.
+     *
+     * @return The local variable table slots that the {@link #lambda} expression captures.
      */
-    public int @NotNull [] getParamLvtIndices() {
+    @Override
+    public int @NotNull [] paramLvtIndices() {
         return this.paramLvtIndices;
     }
 
@@ -106,10 +101,10 @@ public final class LambdaClosure {
         if (this == o) {
             return true;
         }
-        if (o == null || this.getClass() != o.getClass()) {
+        //noinspection DeconstructionCanBeUsed
+        if (!(o instanceof final LambdaClosure that)) {
             return false;
         }
-        final LambdaClosure that = (LambdaClosure) o;
         return Objects.equals(this.containingMethod, that.containingMethod)
             && Objects.equals(this.interfaceMethod, that.interfaceMethod)
             && Objects.equals(this.lambda, that.lambda)

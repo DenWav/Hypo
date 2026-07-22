@@ -63,7 +63,7 @@ public class ClassDataProviderSet implements ClassDataProvider {
     }
 
     @Override
-    public void setContextClassProvider(boolean contextClassProvider) {
+    public void setContextClassProvider(final boolean contextClassProvider) {
         for (final ClassDataProvider delegateProvider : this.delegateProviders) {
             delegateProvider.setContextClassProvider(contextClassProvider);
         }
@@ -79,7 +79,7 @@ public class ClassDataProviderSet implements ClassDataProvider {
     }
 
     @Override
-    public void setRequireFullClasspath(boolean requireFullClasspath) {
+    public void setRequireFullClasspath(final boolean requireFullClasspath) {
         for (final ClassDataProvider delegateProvider : this.delegateProviders) {
             delegateProvider.setRequireFullClasspath(requireFullClasspath);
         }

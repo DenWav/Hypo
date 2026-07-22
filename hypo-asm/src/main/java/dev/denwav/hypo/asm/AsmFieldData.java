@@ -22,8 +22,12 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.FieldData;
 import dev.denwav.hypo.model.data.LazyFieldData;
 import dev.denwav.hypo.model.data.Visibility;
+import dev.denwav.hypo.types.HierarchyTypeVariableBinder;
 import dev.denwav.hypo.types.desc.TypeDescriptor;
+import dev.denwav.hypo.types.sig.ClassSignature;
+import dev.denwav.hypo.types.sig.TypeParameterHolder;
 import dev.denwav.hypo.types.sig.TypeSignature;
+import java.util.ArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -94,10 +98,17 @@ public class AsmFieldData extends LazyFieldData implements FieldData {
     @Override
     public @Nullable TypeSignature computeSignature() {
         final String sig = this.node.signature;
-        if (sig != null) {
-            return TypeSignature.parse(sig);
-        } else {
+        if (sig == null) {
             return null;
         }
+        final TypeSignature typeSig = TypeSignature.parse(sig);
+        final ArrayList<TypeParameterHolder> hierarchy = new ArrayList<>();
+        final ClassData parentClass = this.parentClass();
+        final ClassSignature classSig = parentClass.signature();
+        if (classSig != null) {
+            hierarchy.add(classSig);
+        }
+        parentClass.buildTypeVariableContext(hierarchy);
+        return typeSig.bind(HierarchyTypeVariableBinder.of(null, hierarchy));
     }
 }

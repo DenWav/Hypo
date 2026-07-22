@@ -23,7 +23,7 @@ public class TestClass {
 
         record LocalRecord(String name, int num) {}
 
-        enum LocalEnum { ONE, TWO; }
+        enum LocalEnum { ONE, TWO }
 
         new LocalClass(Integer.toString(random.nextInt()));
     }
@@ -46,7 +46,7 @@ public class TestClass {
 
         record LocalRecord(String name, int num) {}
 
-        enum LocalEnum { ONE, TWO; }
+        enum LocalEnum { ONE, TWO }
 
         new LocalClass(Integer.toString(random.nextInt()));
     }

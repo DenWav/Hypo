@@ -23,6 +23,7 @@ import dev.denwav.hypo.model.HypoModelUtil;
 import dev.denwav.hypo.types.desc.MethodDescriptor;
 import dev.denwav.hypo.types.desc.TypeDescriptor;
 import dev.denwav.hypo.types.sig.ClassSignature;
+import dev.denwav.hypo.types.sig.TypeParameterHolder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,6 +115,16 @@ public interface ClassData extends HypoData {
      * @throws IOException If an IO error occurs while reading the outer class.
      */
     @Nullable ClassData outerClass() throws IOException;
+
+    /**
+     * This class data's outer method data, or {@code null} if this class data does not have an outer method.
+     *
+     * <p>This applies to local and anonymous classes.
+     *
+     * @return This class data's outer method data.
+     * @throws IOException If an IO error occurs while reading the outer method.
+     */
+    @Nullable MethodData outerMethod() throws IOException;
 
     /**
      * Returns {@code true} if this class data is a {@code static} inner class.
@@ -320,7 +331,7 @@ public interface ClassData extends HypoData {
             final ClassData[] res = new ClassData[superInterfaces.size() + 1];
             res[0] = superClass;
             int index = 1;
-            for (ClassData superInterface : superInterfaces) {
+            for (final ClassData superInterface : superInterfaces) {
                 res[index++] = superInterface;
             }
             return Arrays.stream(res);
@@ -532,6 +543,14 @@ public interface ClassData extends HypoData {
         }
         return null;
     }
+
+    /**
+     * Add all {@link TypeParameterHolder} signature instances that appear in the type hierarchy above this class to the {@code hierarchy} list. This
+     * method must not add the signature type of {@code this} to the hierarchy. The order of the hierarchy is from the lowest scope to the highest scope.
+     *
+     * @param hierarchy The hierarchy of {@link TypeParameterHolder} to add to.
+     */
+    void buildTypeVariableContext(final List<TypeParameterHolder> hierarchy);
 
     // Hydration methods
 

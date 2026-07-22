@@ -107,11 +107,6 @@ public final class ArrayTypeSignature
     }
 
     @Override
-    public boolean isUnbound() {
-        return this.baseType.isUnbound();
-    }
-
-    @Override
     public int getDimension() {
         return this.dimension;
     }

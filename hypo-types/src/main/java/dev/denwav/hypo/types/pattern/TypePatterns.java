@@ -426,4 +426,27 @@ public final class TypePatterns {
             return false;
         };
     }
+
+    /**
+     * Helper utility that delegates to {@link TypePattern#capture(String, TypePattern)}. See that method for full docs.
+     *
+     * @param name The name of the capture, to be used with {@link TypeMatch#get(String)}
+     * @param delegate The type pattern the captured type object must satisfy.
+     * @return A new pattern which wraps the given delegate and captures the matching value.
+     * @see TypePattern#capture(String, TypePattern)
+     */
+    public static TypePattern capture(final String name, final @NotNull TypePattern delegate) {
+        return TypePattern.capture(name, delegate);
+    }
+
+    /**
+     * Helper utility that delegates to {@link TypePattern#capture(TypePattern)}. See that method for full docs.
+     *
+     * @param delegate The type pattern the captured type object must satisfy.
+     * @return A new pattern which wraps the given delegate and captures the matching value.
+     * @see TypePattern#capture(TypePattern)
+     */
+    public static TypeCapture capture(final @NotNull TypePattern delegate) {
+        return TypePattern.capture(delegate);
+    }
 }

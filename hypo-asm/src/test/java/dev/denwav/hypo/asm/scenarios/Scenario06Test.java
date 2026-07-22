@@ -67,20 +67,20 @@ public class Scenario06Test extends TestScenarioBase {
 
         final LocalClassClosure firstAnon = localClasses.getFirst();
         assertNotNull(firstAnon);
-        assertEquals(testMethod, firstAnon.getContainingMethod());
-        assertEquals("scenario06/TestClass$1", firstAnon.getLocalClass().name());
-        assertEquals(0, firstAnon.getParamLvtIndices().length);
+        assertEquals(testMethod, firstAnon.containingMethod());
+        assertEquals("scenario06/TestClass$1", firstAnon.localClass().name());
+        assertEquals(0, firstAnon.paramLvtIndices().length);
 
         final LocalClassClosure secondAnon = localClasses.get(1);
         assertNotNull(secondAnon);
-        assertEquals(testMethod, secondAnon.getContainingMethod());
-        assertEquals("scenario06/TestClass$2", secondAnon.getLocalClass().name());
-        assertArrayEquals(new int [] { 1, 2 }, secondAnon.getParamLvtIndices());
+        assertEquals(testMethod, secondAnon.containingMethod());
+        assertEquals("scenario06/TestClass$2", secondAnon.localClass().name());
+        assertArrayEquals(new int [] { 1, 2 }, secondAnon.paramLvtIndices());
 
         final LocalClassClosure firstLocal = localClasses.get(2);
         assertNotNull(firstLocal);
-        assertEquals(testMethod, firstLocal.getContainingMethod());
-        assertEquals("scenario06/TestClass$1LocalClass", firstLocal.getLocalClass().name());
-        assertArrayEquals(new int [] { 1, 2 }, firstLocal.getParamLvtIndices());
+        assertEquals(testMethod, firstLocal.containingMethod());
+        assertEquals("scenario06/TestClass$1LocalClass", firstLocal.localClass().name());
+        assertArrayEquals(new int [] { 1, 2 }, firstLocal.paramLvtIndices());
     }
 }

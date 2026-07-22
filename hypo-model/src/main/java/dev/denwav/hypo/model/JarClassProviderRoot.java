@@ -66,7 +66,7 @@ public final class JarClassProviderRoot implements ClassProviderRoot {
     }
 
     @Override
-    public byte @Nullable [] getClassData(@NotNull String fileName) throws IOException {
+    public byte @Nullable [] getClassData(final @NotNull String fileName) throws IOException {
         for (final Path root : this.roots) {
             final Path file = root.resolve(fileName);
             if (Files.exists(file)) {

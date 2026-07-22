@@ -55,7 +55,7 @@ public class RemoveClassMappingChange implements ClassMappingsChange {
     }
 
     @Override
-    public void applyChange(@NotNull MappingSet input) {
+    public void applyChange(final @NotNull MappingSet input) {
         final ClassMapping<?, ?> mapping = getClassMapping(input, this.targetClass);
         if (mapping == null) {
             return;

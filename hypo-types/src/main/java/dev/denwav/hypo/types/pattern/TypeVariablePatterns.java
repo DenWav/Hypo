@@ -75,7 +75,7 @@ public final class TypeVariablePatterns {
      * @return The type pattern.
      */
     public static @NotNull TypePattern isBound(final @NotNull TypePattern definition) {
-        return (ctx, t) -> t instanceof TypeVariable && definition.test(ctx, t);
+        return (ctx, t) -> t instanceof final TypeVariable v && definition.test(ctx, v.getDefinition());
     }
 
     /**
@@ -83,7 +83,7 @@ public final class TypeVariablePatterns {
      * @return The type pattern.
      */
     public static @NotNull TypePattern isUnbound() {
-        return (ctx, t) -> t instanceof final TypeVariable v && v.isUnbound();
+        return (ctx, t) -> t instanceof TypeVariable.Unbound || (t instanceof final TypeVariable v && v.isUnbound());
     }
 
     /**

@@ -22,6 +22,7 @@ import dev.denwav.hypo.types.PrimitiveType;
 import dev.denwav.hypo.types.desc.MethodDescriptor;
 import dev.denwav.hypo.types.desc.TypeDescriptor;
 import dev.denwav.hypo.types.sig.MethodSignature;
+import dev.denwav.hypo.types.sig.TypeParameterHolder;
 import java.util.List;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
@@ -216,6 +217,14 @@ public interface MethodData extends MemberData {
 
         return this.parentClass().doesExtendOrImplement(that.parentClass());
     }
+
+    /**
+     * Add all {@link TypeParameterHolder} signature instances that appear in the type hierarchy above this method to the {@code hierarchy} list. This
+     * method must not add the signature type of {@code this} to the hierarchy. The order of the hierarchy is from the lowest scope to the highest scope.
+     *
+     * @param hierarchy The hierarchy of {@link TypeParameterHolder} to add to.
+     */
+    void buildTypeVariableContext(final List<TypeParameterHolder> hierarchy);
 
     // Hydration methods
 

@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * Marker interface for types that can hold type parameters. This includes {@link ClassSignature}
  * and {@link MethodSignature}.
  */
-public interface TypeParameterHolder {
+public sealed interface TypeParameterHolder permits MethodSignature, ClassSignature, TempTypeParameterHolder {
 
     /**
      * The type parameters held by this type. The returned list is immutable.

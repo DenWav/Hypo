@@ -42,7 +42,7 @@ public class RemoveParameterMappingChange
 
     private final long indices;
 
-    private RemoveParameterMappingChange(@NotNull MemberReference target, long index) {
+    private RemoveParameterMappingChange(final @NotNull MemberReference target, final long index) {
         super(target);
         this.indices = index;
     }

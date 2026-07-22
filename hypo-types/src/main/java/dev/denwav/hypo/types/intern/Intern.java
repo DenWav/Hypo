@@ -19,7 +19,11 @@
 package dev.denwav.hypo.types.intern;
 
 import dev.denwav.hypo.types.HypoTypesUtil;
+import dev.denwav.hypo.types.TypeBindable;
 import dev.denwav.hypo.types.TypeRepresentable;
+import dev.denwav.hypo.types.sig.param.TypeVariable;
+import dev.denwav.hypo.types.visitor.TraversingTypeVisitor;
+import dev.denwav.hypo.types.visitor.TypeVisitor;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -124,6 +128,11 @@ public abstract class Intern<T extends Intern<T>> implements InternKey {
         if (interningDisabled) {
             return HypoTypesUtil.cast(this);
         }
+        if (this instanceof final TypeBindable b) {
+            if (!(b instanceof TypeVariable.Unbound) && !b.accept(IS_INTERNABLE)) {
+                return HypoTypesUtil.cast(this);
+            }
+        }
 
         final T t = HypoTypesUtil.cast(this);
         try {
@@ -184,4 +193,21 @@ public abstract class Intern<T extends Intern<T>> implements InternKey {
     public static long internmentSize(final @NotNull Class<?> c) {
         return internment.get(c).mappingCount();
     }
+
+    private static final TypeVisitor IS_INTERNABLE = new TraversingTypeVisitor() {
+        @SuppressWarnings("MissingSuperCall")
+        @Override
+        public boolean visit(final TypeVariable.@NotNull Unbound ignored) {
+            return false;
+        }
+
+        @SuppressWarnings("MissingSuperCall")
+        @Override
+        public boolean visit(final @NotNull TypeVariable var) {
+            if (var.hasUnresolvedDefinition()) {
+                return false;
+            }
+            return TraversingTypeVisitor.super.visit(var);
+        }
+    };
 }

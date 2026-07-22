@@ -6,6 +6,7 @@ plugins {
 
 dependencies {
     testImplementation(lib("junit-api"))
+    testImplementation(lib("junit-params"))
     testRuntimeOnly(lib("junit-runtime"))
     testRuntimeOnly(lib("junit-launcher"))
 }

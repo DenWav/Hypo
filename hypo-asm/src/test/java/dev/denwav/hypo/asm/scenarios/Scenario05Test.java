@@ -86,10 +86,10 @@ public class Scenario05Test extends TestScenarioBase {
 
         final LambdaClosure methodClosure = methodClosures.getFirst();
         assertNotNull(methodClosure);
-        assertEquals(this.runnableRun, methodClosure.getInterfaceMethod());
-        final MethodData call = methodClosure.getLambda();
+        assertEquals(this.runnableRun, methodClosure.interfaceMethod());
+        final MethodData call = methodClosure.lambda();
         assertNotNull(call);
-        assertArrayEquals(new int[] { 0, 1, 2, 4 }, methodClosure.getParamLvtIndices());
+        assertArrayEquals(new int[] { 0, 1, 2, 4 }, methodClosure.paramLvtIndices());
 
         assertEquals(testClass, call.parentClass());
         assertTrue(call.isSynthetic());
@@ -100,11 +100,11 @@ public class Scenario05Test extends TestScenarioBase {
         assertEquals(3, nestedCalls.size());
 
         final LambdaClosure firstNestedMethodClosure = nestedCalls.stream()
-            .filter(c -> c.getLambda().name().equals("thing"))
+            .filter(c -> c.lambda().name().equals("thing"))
             .findFirst()
             .orElse(null);
         assertNotNull(firstNestedMethodClosure);
-        final MethodData firstNestedCall = firstNestedMethodClosure.getLambda();
+        final MethodData firstNestedCall = firstNestedMethodClosure.lambda();
         assertNotNull(firstNestedCall);
         assertEquals(testClass, firstNestedCall.parentClass());
         // this is a method reference
@@ -112,19 +112,19 @@ public class Scenario05Test extends TestScenarioBase {
         assertTrue(firstNestedCall.isStatic());
 
         final LambdaClosure secondNestedMethodClosure = nestedCalls.stream()
-            .filter(c -> !c.getLambda().name().equals("thing"))
-            .filter(c -> !c.getContainingMethod().name().equals("test"))
+            .filter(c -> !c.lambda().name().equals("thing"))
+            .filter(c -> !c.containingMethod().name().equals("test"))
             .findFirst()
             .orElse(null);
         assertNotNull(secondNestedMethodClosure);
-        final MethodData secondNestedCall = secondNestedMethodClosure.getLambda();
+        final MethodData secondNestedCall = secondNestedMethodClosure.lambda();
         assertNotNull(secondNestedCall);
         assertEquals(testClass, secondNestedCall.parentClass());
         assertTrue(secondNestedCall.isSynthetic());
         assertTrue(secondNestedCall.isStatic());
 
         final LambdaClosure outerNestedMethodClosure = nestedCalls.stream()
-            .filter(c -> c.getLambda().name().equals("thing"))
+            .filter(c -> c.lambda().name().equals("thing"))
             .findFirst()
             .orElse(null);
         assertNotNull(outerNestedMethodClosure);
@@ -145,9 +145,9 @@ public class Scenario05Test extends TestScenarioBase {
 
         final LambdaClosure methodClosure = methodClosures.getFirst();
         assertNotNull(methodClosure);
-        final MethodData call = methodClosure.getLambda();
+        final MethodData call = methodClosure.lambda();
         assertNotNull(call);
-        assertArrayEquals(new int[] { 0 }, methodClosure.getParamLvtIndices());
+        assertArrayEquals(new int[] { 0 }, methodClosure.paramLvtIndices());
 
         assertEquals(testClass, call.parentClass());
         assertTrue(call.isSynthetic());
@@ -169,8 +169,8 @@ public class Scenario05Test extends TestScenarioBase {
         final LambdaClosure lambda = lambdas.getFirst();
         assertNotNull(lambda);
 
-        assertEquals(testMethod, lambda.getContainingMethod());
+        assertEquals(testMethod, lambda.containingMethod());
 
-        assertEquals(this.functionApply, lambda.getInterfaceMethod());
+        assertEquals(this.functionApply, lambda.interfaceMethod());
     }
 }

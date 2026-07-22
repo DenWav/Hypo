@@ -111,7 +111,7 @@ public class DefaultHydrationManager implements HydrationManager {
         final @NotNull HashSet<HydrationProvider<?>> stage
     ) throws ExecutionException, InterruptedException {
         final ExecutorService executor = context.getExecutor();
-        ArrayList<Future<?>> futures = new ArrayList<>();
+        final ArrayList<Future<?>> futures = new ArrayList<>();
 
         for (final ClassData classData : context.getProvider().allClasses()) {
             futures.add(executor.submit((Callable<?>) () -> {

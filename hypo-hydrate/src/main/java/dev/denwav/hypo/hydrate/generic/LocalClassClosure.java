@@ -30,50 +30,45 @@ import org.jetbrains.annotations.NotNull;
  *
  * <p>This class requires a hydrator to determine where it should be placed corresponding to the code being analyzed. Use
  * {@link HypoHydration#LOCAL_CLASSES}.
+ *
+ * @param containingMethod The method that contains the local class.
+ * @param localClass       The local class which is contained in the method.
+ * @param paramLvtIndices  The local variable indices from the containing method which are captured by the local class.
  */
-public final class LocalClassClosure {
-
-    private final @NotNull MethodData containingMethod;
-    private final @NotNull ClassData localClass;
-    private final int @NotNull [] paramLvtIndices;
-
-    /**
-     * Creates a new {@link LocalClassClosure}.
-     * @param containingMethod The method that contains the local class.
-     * @param localClass The local class which is contained in the method.
-     * @param paramLvtIndices The local variable indices from the containing method which are captured by the local class.
-     */
-    public LocalClassClosure(
-        final @NotNull MethodData containingMethod,
-        final @NotNull ClassData localClass,
-        final int @NotNull [] paramLvtIndices
-    ) {
-        this.containingMethod = containingMethod;
-        this.localClass = localClass;
-        this.paramLvtIndices = paramLvtIndices;
-    }
+@SuppressWarnings("ArrayRecordComponent")
+public record LocalClassClosure(
+    @NotNull MethodData containingMethod,
+    @NotNull ClassData localClass,
+    int @NotNull [] paramLvtIndices
+) {
 
     /**
      * Returns the method which contains the local class.
+     *
      * @return The method which contains the local class.
      */
-    public @NotNull MethodData getContainingMethod() {
+    @Override
+    public @NotNull MethodData containingMethod() {
         return this.containingMethod;
     }
 
     /**
      * Returns the local class itself.
+     *
      * @return The local class itself.
      */
-    public @NotNull ClassData getLocalClass() {
+    @Override
+    public @NotNull ClassData localClass() {
         return this.localClass;
     }
 
     /**
-     * Returns the local variable table slots that the {@link #getLocalClass() local class} captures.
-     * @return The local variable table slots that the {@link #getLocalClass() local class} captures.
+     * Returns the local variable table slots that the {@link #localClass () local class} captures.
+     *
+     * @return The local variable table slots that the {@link #localClass () local class} captures.
      */
-    public int @NotNull [] getParamLvtIndices() {
+    @Override
+    public int @NotNull [] paramLvtIndices() {
         return this.paramLvtIndices;
     }
 
@@ -91,10 +86,10 @@ public final class LocalClassClosure {
         if (this == o) {
             return true;
         }
-        if (o == null || this.getClass() != o.getClass()) {
+        //noinspection DeconstructionCanBeUsed
+        if (!(o instanceof final LocalClassClosure that)) {
             return false;
         }
-        final LocalClassClosure that = (LocalClassClosure) o;
         return Objects.equals(this.containingMethod, that.containingMethod)
             && Objects.equals(this.localClass, that.localClass)
             && Arrays.equals(this.paramLvtIndices, that.paramLvtIndices);

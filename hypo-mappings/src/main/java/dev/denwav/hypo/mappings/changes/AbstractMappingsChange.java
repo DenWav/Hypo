@@ -45,7 +45,7 @@ public abstract class AbstractMappingsChange implements MappingsChange {
     }
 
     @Override
-    public void applyChange(@NotNull MappingSet input) {
+    public void applyChange(final @NotNull MappingSet input) {
         this.applyChange(input, this.target);
     }
 
@@ -59,10 +59,14 @@ public abstract class AbstractMappingsChange implements MappingsChange {
 
     @SuppressWarnings("EqualsGetClass")
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || this.getClass() != o.getClass()) return false;
-        AbstractMappingsChange that = (AbstractMappingsChange) o;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || this.getClass() != o.getClass()) {
+            return false;
+        }
+        final AbstractMappingsChange that = (AbstractMappingsChange) o;
         return this.target.equals(that.target);
     }
 

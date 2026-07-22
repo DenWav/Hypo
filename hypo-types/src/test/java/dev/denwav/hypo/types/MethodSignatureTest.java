@@ -36,11 +36,14 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+@DisplayName("[types] MethodSignature Tests")
 class MethodSignatureTest {
 
     @Test
+    @DisplayName("Test method signature interning and serialization permutations")
     void testMethodSig() throws ExecutionException, InterruptedException {
         final var primitives = List.of(PrimitiveType.values());
 

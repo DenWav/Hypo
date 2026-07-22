@@ -110,18 +110,16 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
             }
 
             final Object bsmArgHandle = dyn.bsmArgs[1];
-            if (!(bsmArgHandle instanceof Handle)) {
+            if (!(bsmArgHandle instanceof final Handle handle)) {
                 // This is also invalid bytecode
                 continue;
             }
-            final Handle handle = (Handle) bsmArgHandle;
 
             final Object bsmDesc = dyn.bsmArgs[0];
-            if (!(bsmDesc instanceof Type)) {
+            if (!(bsmDesc instanceof final Type interfaceDesc)) {
                 // This is also invalid bytecode
                 continue;
             }
-            final Type interfaceDesc = (Type) bsmDesc;
 
             final ClassData owner;
             if (data.parentClass().name().equals(handle.getOwner())) {
@@ -188,7 +186,7 @@ public final class LambdaCallHydrator implements HydrationProvider<AsmMethodData
                 final List<LambdaClosure> interfaceMethodLambdas = interfaceMethod.compute(HypoHydration.LAMBDA_CALLS, ArrayList::new);
                 outer: synchronized (interfaceMethodLambdas) {
                     for (final LambdaClosure lambdaClosure : interfaceMethodLambdas) {
-                        if (lambdaClosure.getLambda().equals(targetMethod)) {
+                        if (lambdaClosure.lambda().equals(targetMethod)) {
                             break outer;
                         }
                     }

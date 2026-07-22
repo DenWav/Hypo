@@ -68,27 +68,27 @@ public class Scenario07Test extends TestScenarioBase {
         assertEquals(1, firstLambdas.size());
         final LambdaClosure firstLambda = firstLambdas.getFirst();
 
-        final List<LambdaClosure> secondLambdas = firstLambda.getLambda().get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> secondLambdas = firstLambda.lambda().get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(secondLambdas);
         assertEquals(2, secondLambdas.size());
-        final LambdaClosure secondLambda = secondLambdas.stream().filter(l -> l.getContainingMethod().equals(firstLambda.getLambda())).findFirst().orElse(null);
+        final LambdaClosure secondLambda = secondLambdas.stream().filter(l -> l.containingMethod().equals(firstLambda.lambda())).findFirst().orElse(null);
         assertNotNull(secondLambda);
 
-        final List<LambdaClosure> thirdLambdas = secondLambda.getLambda().get(HypoHydration.LAMBDA_CALLS);
+        final List<LambdaClosure> thirdLambdas = secondLambda.lambda().get(HypoHydration.LAMBDA_CALLS);
         assertNotNull(thirdLambdas);
         assertEquals(2, thirdLambdas.size());
-        final LambdaClosure thirdLambda = thirdLambdas.stream().filter(l -> l.getContainingMethod().equals(secondLambda.getLambda())).findFirst().orElse(null);
+        final LambdaClosure thirdLambda = thirdLambdas.stream().filter(l -> l.containingMethod().equals(secondLambda.lambda())).findFirst().orElse(null);
         assertNotNull(thirdLambda);
 
-        final List<LocalClassClosure> locals = thirdLambda.getLambda().get(HypoHydration.LOCAL_CLASSES);
+        final List<LocalClassClosure> locals = thirdLambda.lambda().get(HypoHydration.LOCAL_CLASSES);
         assertNotNull(locals);
         assertEquals(1, locals.size());
         final LocalClassClosure local = locals.get(0);
         assertNotNull(local);
 
-        assertArrayEquals(new int[] { 0, 2, 3, 4 }, firstLambda.getParamLvtIndices());
-        assertArrayEquals(new int[] { 0, 1, 2, 3 }, secondLambda.getParamLvtIndices());
-        assertArrayEquals(new int[] { 0, 1, 2, 3 }, thirdLambda.getParamLvtIndices());
-        assertArrayEquals(new int[] { 1, 2, 3 }, local.getParamLvtIndices());
+        assertArrayEquals(new int[] { 0, 2, 3, 4 }, firstLambda.paramLvtIndices());
+        assertArrayEquals(new int[] { 0, 1, 2, 3 }, secondLambda.paramLvtIndices());
+        assertArrayEquals(new int[] { 0, 1, 2, 3 }, thirdLambda.paramLvtIndices());
+        assertArrayEquals(new int[] { 1, 2, 3 }, local.paramLvtIndices());
     }
 }

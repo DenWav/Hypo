@@ -41,7 +41,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -55,6 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@DisplayName("[types] TypePattern Tests")
 class TypePatternTest {
 
     public static final String STRING = "java/lang/String";
@@ -261,10 +261,12 @@ class TypePatternTest {
     private static Predicate<TypeRepresentable> is(final Class<? extends TypeRepresentable> clazz) {
         return t -> clazz.isAssignableFrom(t.getClass());
     }
+    @SuppressWarnings("SameParameterValue")
     private static Predicate<TypeRepresentable> isNot(final Class<? extends TypeRepresentable> clazz) {
         return is(clazz).negate();
     }
 
+    @SuppressWarnings({"UnusedReturnValue", "unused"})
     static class TestBuilder {
         private final TypePattern pattern;
 

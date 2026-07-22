@@ -47,7 +47,7 @@ public record TypeMatch(
      * @param matches Whether the match succeeded.
      * @param captures The map of captures and their associated type objects.
      */
-    public TypeMatch(boolean matches, @Nullable Map<String, TypeRepresentable> captures) {
+    public TypeMatch(final boolean matches, final @Nullable Map<String, TypeRepresentable> captures) {
         this.matches = matches;
         this.captures = captures != null ? Map.copyOf(captures) : Map.of();
     }

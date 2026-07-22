@@ -22,8 +22,13 @@ import dev.denwav.hypo.model.data.ClassData;
 import dev.denwav.hypo.model.data.LazyMethodData;
 import dev.denwav.hypo.model.data.MethodData;
 import dev.denwav.hypo.model.data.Visibility;
+import dev.denwav.hypo.types.HierarchyTypeVariableBinder;
 import dev.denwav.hypo.types.desc.MethodDescriptor;
+import dev.denwav.hypo.types.sig.ClassSignature;
 import dev.denwav.hypo.types.sig.MethodSignature;
+import dev.denwav.hypo.types.sig.TypeParameterHolder;
+import java.util.ArrayList;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
@@ -113,11 +118,28 @@ public class AsmMethodData extends LazyMethodData implements MethodData {
     @Override
     public @Nullable MethodSignature computeSignature() {
         final String sig = this.node.signature;
-        if (sig != null) {
-            return MethodSignature.parse(sig);
-        } else {
+        if (sig == null) {
             return null;
         }
+        final MethodSignature methodSig = MethodSignature.parse(sig);
+        if (methodSig.isUnbound()) {
+            final ArrayList<TypeParameterHolder> hierarchy = new ArrayList<>();
+            this.buildTypeVariableContext(hierarchy);
+            final HierarchyTypeVariableBinder binder = HierarchyTypeVariableBinder.of(null, hierarchy);
+            return methodSig.bind(binder);
+        } else {
+            return methodSig;
+        }
+    }
+
+    @Override
+    public void buildTypeVariableContext(final List<TypeParameterHolder> hierarchy) {
+        final AsmClassData parentClass = this.parentClass();
+        final ClassSignature parentSig = parentClass.signature();
+        if (parentSig != null) {
+            hierarchy.add(parentSig);
+        }
+        parentClass.buildTypeVariableContext(hierarchy);
     }
 
     @Override

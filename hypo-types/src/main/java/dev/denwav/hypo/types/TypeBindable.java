@@ -25,6 +25,7 @@ import dev.denwav.hypo.types.sig.ThrowsSignature;
 import dev.denwav.hypo.types.sig.TypeSignature;
 import dev.denwav.hypo.types.sig.param.TypeArgument;
 import dev.denwav.hypo.types.sig.param.TypeParameter;
+import dev.denwav.hypo.types.sig.param.TypeVariable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
@@ -53,14 +54,12 @@ public sealed interface TypeBindable
     @NotNull TypeBindable bind(final @NotNull TypeVariableBinder binder);
 
     /**
-     * Returns true if {@code this} contains any instances of
-     * {@link dev.denwav.hypo.types.sig.param.TypeVariable.Unbound TypeVariable.Unbound}. If this method returns
-     * {@code true} then certain resolution operations such as
-     * {@link dev.denwav.hypo.types.sig.TypeSignature#asDescriptor() TypeSignatureasDescriptor()} will fail.
-     *
-     * @return {@code true} if {@code this} contains an unbound type variable.
+     * Returns {@code true} if this type instance contains {@link TypeVariable.Unbound unbound type varaibles}.
+     * @return {@code true} if this type instance contains {@link TypeVariable.Unbound unbound type varaibles}.
      */
-    boolean isUnbound();
+    default boolean isUnbound() {
+        return !this.accept(HypoTypesUtil.IS_FULLY_BOUND);
+    }
 
     /**
      * Internal method, use {@link #asInternal(StringBuilder)} or {@link #asInternal()} instead.
