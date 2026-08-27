@@ -27,11 +27,11 @@ Releases of Hypo are deployed to Maven Central.
 > <details>
 > <summary>Using SNAPSHOT versions</summary>
 > 
-> You can also use the latest SNAPSHOT commit to `main` with Sonatype's snapshot repo:
+> You can also use the latest SNAPSHOT commit to `main` with the Maven Central snapshot repo:
 > 
 > ```kotlin
 > repositories {
->     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+>     maven("https://central.sonatype.com/repository/maven-snapshots/")
 > }
 > ```
 > </details>
